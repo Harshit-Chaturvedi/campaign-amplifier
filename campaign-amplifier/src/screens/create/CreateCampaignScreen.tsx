@@ -47,8 +47,8 @@ export function CreateCampaignScreen({ navigation }: any) {
       const generated = generateCampaignContent(issueText);
       setTitle(generated.title);
       setTagline(generated.tagline);
-      setDescription(generated.descriptionHtml.replace(/<[^>]*>/g, '\n').trim());
-      setWhyBack(generated.whyBackersShouldCareHtml.replace(/<[^>]*>/g, '').trim());
+      setDescription(generated.summary);
+      setWhyBack(generated.tagline);
       setCategory(generated.category);
       setTargetAudience(generated.targetAudience);
       setAdHeadline(generated.adHeadline);
@@ -90,18 +90,25 @@ export function CreateCampaignScreen({ navigation }: any) {
     const campaign = createCampaign({
       title,
       tagline,
-      short_description: description.slice(0, 200),
-      long_description: `<p>${description.replace(/\n/g, '</p><p>')}</p>`,
-      why_backers_should_care: `<p>${whyBack}</p>`,
+      summary: description.slice(0, 200),
       category,
-      funding_goal: parseInt(fundingGoal) || 5000,
-      duration_days: parseInt(durationDays) || 30,
-      target_audience: targetAudience,
-      ad_headline: adHeadline,
-      ad_primary_text: adPrimaryText,
-      campaign_sources: sources,
-      ad_platforms: selectedPlatforms,
-      creator_name: user.name,
+      fundingGoal: parseInt(fundingGoal) || 5000,
+      creatorName: user.name,
+      sources: sources.map((url, i) => ({ id: `src-${i}`, title: `Source ${i + 1}`, url })),
+      adAssets: {
+        coverUrl: 'https://picsum.photos/seed/' + Date.now() + '/800/500',
+        adImages: [],
+        headline: adHeadline || title.slice(0, 60),
+        description: adPrimaryText || description.slice(0, 200),
+        cta: 'Learn More',
+      },
+      reachSettings: {
+        locations: [targetAudience || 'Metro Area'],
+        interests: ['Community Awareness'],
+        channels: selectedPlatforms,
+        budgetAllocation: { [selectedPlatforms[0] || 'Meta']: 100 },
+        durationDays: parseInt(durationDays) || 30,
+      },
     }, user.uid);
 
     Alert.alert('Campaign Submitted!', 'Your campaign has been submitted for review.', [

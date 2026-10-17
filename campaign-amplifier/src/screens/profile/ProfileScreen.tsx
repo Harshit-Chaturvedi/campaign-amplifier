@@ -15,7 +15,6 @@ export function ProfileScreen({ navigation }: any) {
   const getUserContributions = useCampaignStore((s) => s.getUserContributions);
   const getUserCampaigns = useCampaignStore((s) => s.getUserCampaigns);
   const getCampaign = useCampaignStore((s) => s.getCampaign);
-  const allCampaigns = useCampaignStore((s) => s.campaigns);
 
   const uid = user?.uid || '';
   const contributions = getUserContributions(uid);
@@ -65,7 +64,7 @@ export function ProfileScreen({ navigation }: any) {
               <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Reach</Text>
             </View>
             <View style={{ flex: 1, alignItems: 'center' }}>
-              <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a' }}>{formatCurrency(impact.totalContributedCents / 100)}</Text>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a' }}>{formatCurrency(impact.totalContributedDollars)}</Text>
               <Text style={{ fontSize: 12, color: '#64748b' }}>Contributed</Text>
             </View>
           </View>
@@ -93,9 +92,9 @@ export function ProfileScreen({ navigation }: any) {
                     <Ionicons name="heart" size={18} color="#4f46e5" />
                     <View style={{ flex: 1, marginLeft: 12 }}>
                       <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }}>{campaign?.title || 'Campaign'}</Text>
-                      <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{timeAgo(c.created_at)}</Text>
+                      <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{timeAgo(c.createdAt)}</Text>
                     </View>
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#22c55e' }}>{formatCurrency(c.amount_dollars)}</Text>
+                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#22c55e' }}>{formatCurrency(c.amount)}</Text>
                   </Card>
                 );
               })}

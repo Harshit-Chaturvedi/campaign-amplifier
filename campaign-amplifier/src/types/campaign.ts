@@ -10,64 +10,189 @@ export type CampaignCategory =
   | 'business'
   | 'other';
 
-export type CampaignStatus = 'Approved' | 'Pending' | 'Rejected' | 'Completed';
+export type CreatorType = 'individual' | 'creator' | 'nonprofit' | 'business' | 'community_group';
 
-export interface CampaignSlide {
+export type CampaignStatus =
+  | 'draft'
+  | 'submitted'
+  | 'changes_requested'
+  | 'approved'
+  | 'available_for_funding'
+  | 'goal_reached'
+  | 'funding_ended'
+  | 'distribution_preparation'
+  | 'promoting'
+  | 'completed'
+  | 'rejected'
+  | 'cancelled'
+  | 'refund_pending'
+  | 'failed';
+
+export type StoryBlock =
+  | { type: 'heading'; text: string; level?: 1 | 2 | 3 }
+  | { type: 'paragraph'; text: string }
+  | { type: 'image'; url: string; caption?: string; credit?: string }
+  | { type: 'statistic'; value: string; label: string }
+  | { type: 'quote'; quote: string; attribution?: string }
+  | { type: 'action'; title: string; description: string; url?: string };
+
+export interface Source {
+  id: string;
+  title: string;
+  url: string;
+}
+
+export interface AdAssets {
+  coverUrl: string;
+  adImages: string[];
+  videoUrl?: string;
+  headline: string;
   description: string;
-  image_url?: string;
+  cta: string;
+}
+
+export interface ReachSettings {
+  locations: string[];
+  interests: string[];
+  channels: string[];
+  budgetAllocation: Record<string, number>;
+  durationDays: number;
+  platformFinalized?: boolean;
+}
+
+export interface Report {
+  fundsRaised: number;
+  adSpend: number;
+  impressions: number;
+  measuredReach: number;
+  clicks: number;
+  estimatedReach: number;
+  final: boolean;
+  completedAt?: string;
+  summaryNotes?: string;
+}
+
+export interface MeasuredDelivery {
+  impressions: number;
+  measuredReach: number;
+  clicks: number;
+  adSpend: number;
+  lastUpdated: string;
 }
 
 export interface Campaign {
   id: string;
   slug: string;
   title: string;
-  tagline: string;
-  short_description: string;
-  long_description: string;
-  why_backers_should_care: string;
+  summary: string;
+  tagline?: string;
   category: CampaignCategory;
+  creatorType: CreatorType;
+  creatorName: string;
+  creatorId: string | null;
   status: CampaignStatus;
   currency: string;
-  funding_goal: number;
-  funding_current: number;
-  amount_raised: number;
-  percent_funded: number;
-  thumbnail_url: string;
-  ad_image_url: string;
-  ad_headline: string;
-  ad_primary_text: string;
-  ad_image_prompt: string;
-  target_audience: string;
-  creator_name: string;
-  created_by: string | null;
-  created_at: string;
-  campaign_starts_at: string;
-  launched_at: string;
-  delivered_at?: string;
-  duration_days: number;
-  evergreen: boolean;
-  show_countdown: boolean;
-  campaign_sources: string[];
-  ad_platforms: string[];
-  milestones: string[];
-  hero_slideshow: CampaignSlide[];
-  stripe_product_id: string;
-  slides: CampaignSlide[];
-  slideshowSupportTitle?: string;
-  slideshowBackButtonText?: string;
+
+  // Funding details (goal entered by creator in Step 5)
+  fundingGoal: number;
+  amountRaised: number;
+  percentFunded: number;
+  backerCount: number;
+
+  // Editorial story & verified sources
+  storyBlocks: StoryBlock[];
+  sources: Source[];
+
+  // Ad distribution assets & reach parameters
+  adAssets: AdAssets;
+  reachSettings: ReachSettings;
+
+  // Reach figures
+  estimatedReachAtGoal: number;
+  measuredDelivery?: MeasuredDelivery;
+  report?: Report;
+
+  // Moderation & audit
+  moderationFeedback?: string;
+  draftStep?: number; // 1 to 5 for draft progress
+
+  // Lifecycle timestamps
+  createdAt: string;
+  updatedAt?: string;
+  submittedAt?: string;
+  approvedAt?: string;
+  publishedAt?: string;
+  deadline?: string;
+  promotingAt?: string;
+  completedAt?: string;
 }
+
+export type ContributionStatus =
+  | 'pending'
+  | 'succeeded'
+  | 'failed'
+  | 'cancelled'
+  | 'rejected'
+  | 'refunded';
 
 export interface Contribution {
   id: string;
   campaignId: string;
-  uid: string | null;
-  email: string | null;
-  name: string;
-  amount_cents: number;
-  amount_dollars: number;
-  net_cents: number;
-  created_at: string;
-  sessionId: string | null;
+  userId?: string | null;
+  guestEmail?: string | null;
+  amount: number; // dollars
+  fee: number;    // dollars
+  total: number;  // dollars
+  status: ContributionStatus;
+  showName: boolean; // default false
+  backerName: string; // "Anonymous" if showName is false
+  receiptNo: string;
+  createdAt: string;
+  estimatedReach?: number;
+}
+
+export interface CampaignUpdate {
+  id: string;
+  campaignId: string;
+  title: string;
+  body: string;
+  createdAt: string;
+  authorName: string;
+}
+
+export interface ModerationEvent {
+  id: string;
+  campaignId: string;
+  actorId: string;
+  actorRole: 'creator' | 'reviewer' | 'admin' | 'system';
+  fromStatus: CampaignStatus;
+  toStatus: CampaignStatus;
+  note?: string;
+  createdAt: string;
+}
+
+export type NotificationType =
+  | 'submission_received'
+  | 'review_decision'
+  | 'funding_milestone'
+  | 'deadline_approaching'
+  | 'contribution_status'
+  | 'promotion_started'
+  | 'distribution_progress'
+  | 'campaign_completed'
+  | 'final_report'
+  | 'update';
+
+export interface AppNotification {
+  id: string;
+  userId?: string;
+  type: NotificationType;
+  campaignId?: string;
+  campaignTitle?: string;
+  title: string;
+  body: string;
+  read: boolean;
+  createdAt: string;
 }
 
 export interface UserProfile {
@@ -75,62 +200,29 @@ export interface UserProfile {
   email: string;
   name: string;
   username: string;
-  usernameLower: string;
-  photoURL: string;
-  bio: string;
-  created_at: string;
-}
-
-export interface ImpactData {
-  totalContributedCents: number;
-  personalReach: number;
-  personalViews: number;
-  personalActions: number;
-  totalReach: number;
-  totalViews: number;
-  totalActions: number;
-  peopleReached: number;
-  campaignsBacked: number;
-  estimatedPerceptionShift: number;
-  timeSeries: TimeSeriesPoint[];
-  campaignSummaries: CampaignImpactSummary[];
-}
-
-export interface TimeSeriesPoint {
-  date: string;
-  reach: number;
-  views: number;
-  actions: number;
-}
-
-export interface CampaignImpactSummary {
-  id: string;
-  slug: string;
-  title: string;
-  category: CampaignCategory;
-  thumbnail_url: string;
-  contributedCents: number;
-  peopleReached: number;
+  usernameLower?: string;
+  role?: 'user' | 'creator' | 'admin';
+  photoURL?: string;
+  bio?: string;
+  createdAt: string;
 }
 
 export interface AdPlatform {
   key: string;
   label: string;
   configured: boolean;
+  icon?: string;
 }
 
 export interface GeneratedCampaignContent {
   title: string;
   category: CampaignCategory;
   tagline: string;
-  descriptionHtml: string;
-  whyBackersShouldCareHtml: string;
+  summary: string;
+  storyBlocks: StoryBlock[];
   targetAudience: string;
   adHeadline: string;
   adPrimaryText: string;
   adImagePrompt: string;
-  slides: CampaignSlide[];
-  slideshowSupportTitle: string;
-  slideshowBackButtonText: string;
-  sources: string[];
+  sources: Source[];
 }

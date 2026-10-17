@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { formatCurrency } from '../../utils/formatting';
+import { formatCurrency, formatNumber } from '../../utils/formatting';
 import { getCategoryColor } from '../../theme/colors';
 import { DemoDataBadge } from '../ui/DemoDataBadge';
+import { StatusBadge } from '../ui/StatusBadge';
 import type { Campaign } from '../../types/campaign';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -42,9 +43,10 @@ interface CampaignCardProps {
 
 export function CampaignCard({ campaign, onPress, variant = 'default' }: CampaignCardProps) {
   const catColor = getCategoryColor(campaign.category);
-  const pct = campaign.percent_funded;
+  const pct = campaign.percentFunded ?? 0;
   const barColor = pct >= 100 ? '#22c55e' : '#4f46e5';
   const displayCategory = catLabels[campaign.category] || campaign.category;
+  const coverUrl = campaign.adAssets?.coverUrl;
 
   if (variant === 'compact') {
     return (
@@ -70,15 +72,23 @@ export function CampaignCard({ campaign, onPress, variant = 'default' }: Campaig
             alignItems: 'center',
             justifyContent: 'center',
             marginRight: 12,
+            overflow: 'hidden',
           }}
         >
-          <Ionicons name={catIcons[campaign.category] || 'megaphone-outline'} size={24} color={catColor} />
+          {coverUrl ? (
+            <Image source={{ uri: coverUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+          ) : (
+            <Ionicons name={catIcons[campaign.category] || 'megaphone-outline'} size={24} color={catColor} />
+          )}
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }} numberOfLines={1}>
-            {campaign.title}
-          </Text>
-          <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{campaign.creator_name}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', flex: 1, marginRight: 6 }} numberOfLines={1}>
+              {campaign.title}
+            </Text>
+            <StatusBadge status={campaign.status} size="sm" showIcon={false} />
+          </View>
+          <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{campaign.creatorName}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
             <View style={{ flex: 1, height: 4, backgroundColor: '#e2e8f0', borderRadius: 2, marginRight: 8 }}>
               <View style={{ width: `${Math.min(100, pct)}%`, height: 4, backgroundColor: barColor, borderRadius: 2 }} />
@@ -110,23 +120,30 @@ export function CampaignCard({ campaign, onPress, variant = 'default' }: Campaig
           borderColor: '#f1f5f9',
         }}
       >
-        <View style={{ height: 160, backgroundColor: catColor + '15', alignItems: 'center', justifyContent: 'center' }}>
-          <Ionicons name={catIcons[campaign.category] || 'megaphone'} size={40} color={catColor} />
+        <View style={{ height: 160, backgroundColor: catColor + '15', overflow: 'hidden' }}>
+          {coverUrl ? (
+            <Image source={{ uri: coverUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+          ) : (
+            <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+              <Ionicons name={catIcons[campaign.category] || 'megaphone'} size={40} color={catColor} />
+            </View>
+          )}
+
           <View
             style={{
               position: 'absolute',
               top: 12,
               left: 12,
-              backgroundColor: catColor + '20',
+              backgroundColor: 'rgba(255,255,255,0.92)',
               borderRadius: 20,
               paddingHorizontal: 10,
               paddingVertical: 4,
             }}
           >
-            <Text style={{ fontSize: 11, fontWeight: '600', color: catColor }}>{displayCategory}</Text>
+            <Text style={{ fontSize: 11, fontWeight: '700', color: catColor }}>{displayCategory}</Text>
           </View>
           <View style={{ position: 'absolute', top: 12, right: 12 }}>
-            <DemoDataBadge size="sm" />
+            <StatusBadge status={campaign.status} size="sm" />
           </View>
         </View>
         <View style={{ padding: 16 }}>
@@ -134,16 +151,25 @@ export function CampaignCard({ campaign, onPress, variant = 'default' }: Campaig
             {campaign.title}
           </Text>
           <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }} numberOfLines={1}>
-            {campaign.tagline}
+            {campaign.tagline || campaign.summary}
           </Text>
+
           <View style={{ height: 6, backgroundColor: '#e2e8f0', borderRadius: 3 }}>
             <View style={{ width: `${Math.min(100, pct)}%`, height: 6, backgroundColor: barColor, borderRadius: 3 }} />
           </View>
+
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
             <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
-              {formatCurrency(campaign.funding_current)} raised
+              {formatCurrency(campaign.amountRaised)}
             </Text>
-            <Text style={{ fontSize: 12, color: '#94a3b8' }}>of {formatCurrency(campaign.funding_goal)}</Text>
+            <Text style={{ fontSize: 12, color: '#94a3b8' }}>of {formatCurrency(campaign.fundingGoal)} goal</Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f8fafc' }}>
+            <Text style={{ fontSize: 11, color: '#64748b', fontWeight: '500' }}>
+              Est. reach: <Text style={{ fontWeight: '700', color: '#4f46e5' }}>{formatNumber(campaign.estimatedReachAtGoal)}</Text>
+            </Text>
+            <DemoDataBadge size="sm" />
           </View>
         </View>
       </TouchableOpacity>
@@ -169,44 +195,61 @@ export function CampaignCard({ campaign, onPress, variant = 'default' }: Campaig
         elevation: 2,
       }}
     >
-      <View style={{ height: 150, backgroundColor: catColor + '12', alignItems: 'center', justifyContent: 'center' }}>
-        <Ionicons name={catIcons[campaign.category] || 'megaphone-outline'} size={36} color={catColor} />
-        <Text style={{ fontSize: 13, color: catColor, marginTop: 8, fontWeight: '600' }}>{displayCategory}</Text>
+      <View style={{ height: 150, backgroundColor: catColor + '12', overflow: 'hidden' }}>
+        {coverUrl ? (
+          <Image source={{ uri: coverUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+        ) : (
+          <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name={catIcons[campaign.category] || 'megaphone-outline'} size={36} color={catColor} />
+            <Text style={{ fontSize: 13, color: catColor, marginTop: 8, fontWeight: '600' }}>{displayCategory}</Text>
+          </View>
+        )}
+
         <View
           style={{
             position: 'absolute',
             top: 12,
             left: 12,
-            backgroundColor: catColor + '20',
+            backgroundColor: 'rgba(255,255,255,0.92)',
             borderRadius: 20,
             paddingHorizontal: 10,
             paddingVertical: 4,
           }}
         >
-          <Text style={{ fontSize: 11, fontWeight: '600', color: catColor }}>{displayCategory}</Text>
+          <Text style={{ fontSize: 11, fontWeight: '700', color: catColor }}>{displayCategory}</Text>
         </View>
         <View style={{ position: 'absolute', top: 12, right: 12 }}>
-          <DemoDataBadge size="sm" />
+          <StatusBadge status={campaign.status} size="sm" />
         </View>
       </View>
+
       <View style={{ padding: 16 }}>
         <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 4 }} numberOfLines={2}>
           {campaign.title}
         </Text>
         <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 2 }} numberOfLines={1}>
-          {campaign.tagline}
+          {campaign.tagline || campaign.summary}
         </Text>
-        <Text style={{ fontSize: 12, color: '#94a3b8', marginBottom: 12 }}>by {campaign.creator_name}</Text>
+        <Text style={{ fontSize: 12, color: '#94a3b8', marginBottom: 12 }}>by {campaign.creatorName}</Text>
+
         <View style={{ height: 6, backgroundColor: '#e2e8f0', borderRadius: 3 }}>
           <View style={{ width: `${Math.min(100, pct)}%`, height: 6, backgroundColor: barColor, borderRadius: 3 }} />
         </View>
+
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
           <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
-            {formatCurrency(campaign.funding_current)}
+            {formatCurrency(campaign.amountRaised)}
           </Text>
           <Text style={{ fontSize: 12, color: '#94a3b8' }}>
-            {pct}% of {formatCurrency(campaign.funding_goal)}
+            {pct}% of {formatCurrency(campaign.fundingGoal)}
           </Text>
+        </View>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f8fafc' }}>
+          <Text style={{ fontSize: 11, color: '#64748b', fontWeight: '500' }}>
+            Est. reach at goal: <Text style={{ fontWeight: '700', color: '#4f46e5' }}>{formatNumber(campaign.estimatedReachAtGoal)}</Text>
+          </Text>
+          <DemoDataBadge size="sm" />
         </View>
       </View>
     </TouchableOpacity>

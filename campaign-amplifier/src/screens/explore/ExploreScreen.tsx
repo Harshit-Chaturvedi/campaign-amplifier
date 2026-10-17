@@ -26,10 +26,13 @@ export function ExploreScreen({ navigation }: any) {
 
   const searchCampaigns = useCampaignStore((s) => s.searchCampaigns);
   const getCampaignsByCategory = useCampaignStore((s) => s.getCampaignsByCategory);
-  const getApproved = useCampaignStore((s) => s.getApprovedCampaigns);
-  const campaigns = useCampaignStore((s) => s.campaigns);
+  const getPublicCampaigns = useCampaignStore((s) => s.getPublicCampaigns);
 
-  const results = search ? searchCampaigns(search) : category === 'all' ? getApproved() : getCampaignsByCategory(category);
+  const results = search
+    ? searchCampaigns(search)
+    : category === 'all'
+    ? getPublicCampaigns()
+    : getCampaignsByCategory(category);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
@@ -45,7 +48,7 @@ export function ExploreScreen({ navigation }: any) {
           <TextInput
             value={search}
             onChangeText={setSearch}
-            placeholder="Search campaigns..."
+            placeholder="Search campaigns by title, keywords..."
             placeholderTextColor="#94a3b8"
             style={{ flex: 1, fontSize: 15, color: '#0f172a', marginLeft: 10 }}
           />
@@ -79,7 +82,9 @@ export function ExploreScreen({ navigation }: any) {
               }}
             >
               <Ionicons name={cat.icon} size={14} color={selected ? '#fff' : color} />
-              <Text style={{ fontSize: 13, fontWeight: '500', marginLeft: 6, color: selected ? '#fff' : '#334155' }}>{cat.label}</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', marginLeft: 6, color: selected ? '#fff' : '#334155' }}>
+                {cat.label}
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -87,15 +92,25 @@ export function ExploreScreen({ navigation }: any) {
 
       {/* Results */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
-        <Text style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>{results.length} campaign{results.length !== 1 ? 's' : ''}</Text>
+        <Text style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>
+          {results.length} campaign{results.length !== 1 ? 's' : ''} available
+        </Text>
         {results.map((c) => (
-          <CampaignCard key={c.id} campaign={c} onPress={() => navigation.navigate('CampaignDetail', { campaignId: c.id })} />
+          <CampaignCard
+            key={c.id}
+            campaign={c}
+            onPress={() => navigation.navigate('CampaignDetail', { campaignId: c.id })}
+          />
         ))}
         {results.length === 0 && (
           <View style={{ alignItems: 'center', paddingTop: 60 }}>
             <Ionicons name="search-outline" size={48} color="#94a3b8" />
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#64748b', marginTop: 12 }}>No campaigns found</Text>
-            <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>Try a different search or category</Text>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: '#64748b', marginTop: 12 }}>
+              No campaigns found
+            </Text>
+            <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
+              Try a different keyword or category filter
+            </Text>
           </View>
         )}
       </ScrollView>

@@ -1,30 +1,60 @@
-import type { Contribution, ImpactData, Campaign, TimeSeriesPoint, CampaignImpactSummary } from '../types/campaign';
+import type { Contribution, Campaign, CampaignCategory } from '../types/campaign';
+import { estimateReach, estimateReachPerDollar } from './reach';
 
-const REACH_PER_DOLLAR = 27;
+export interface TimeSeriesPoint {
+  date: string;
+  reach: number;
+  views: number;
+  actions: number;
+}
+
+export interface CampaignImpactSummary {
+  id: string;
+  slug: string;
+  title: string;
+  category: CampaignCategory;
+  thumbnail_url: string;
+  contributedDollars: number;
+  peopleReached: number;
+}
+
+export interface ImpactData {
+  totalContributedDollars: number;
+  personalReach: number;
+  personalViews: number;
+  personalActions: number;
+  totalReach: number;
+  totalViews: number;
+  totalActions: number;
+  peopleReached: number;
+  campaignsBacked: number;
+  timeSeries: TimeSeriesPoint[];
+  campaignSummaries: CampaignImpactSummary[];
+}
 
 export function calculateContributionStats(contributions: Contribution[]) {
-  const totalCents = contributions.reduce((s, c) => s + c.amount_cents, 0);
-  const dollars = totalCents / 100;
-  const reach = Math.round(dollars * REACH_PER_DOLLAR);
-  return { totalCents, dollars, reach };
+  const dollars = contributions.reduce((s, c) => s + (c.amount || 0), 0);
+  const reach = estimateReach(dollars).estimate;
+  return { dollars, reach };
 }
 
 export function buildTimeSeries(contributions: Contribution[]): TimeSeriesPoint[] {
   const byDate = new Map<string, number>();
   contributions.forEach((c) => {
-    const d = c.created_at.slice(0, 10);
-    byDate.set(d, (byDate.get(d) || 0) + c.amount_cents);
+    const d = (c.createdAt || new Date().toISOString()).slice(0, 10);
+    byDate.set(d, (byDate.get(d) || 0) + (c.amount || 0));
   });
   const dates = [...byDate.keys()].sort();
   let cumulative = 0;
   return dates.map((date) => {
     cumulative += byDate.get(date)!;
-    const dollars = cumulative / 100;
+    const dollars = cumulative;
+    const reach = estimateReach(dollars).estimate;
     return {
       date,
-      reach: Math.round(dollars * REACH_PER_DOLLAR),
-      views: Math.round(dollars * REACH_PER_DOLLAR * 1.6),
-      actions: Math.round(dollars * 0.42),
+      reach,
+      views: Math.round(reach * 1.6),
+      actions: Math.round(reach * 0.04),
     };
   });
 }
@@ -33,7 +63,7 @@ export function calculateImpact(
   contributions: Contribution[],
   getCampaign: (id: string) => Campaign | undefined
 ): ImpactData {
-  const { totalCents, reach } = calculateContributionStats(contributions);
+  const { dollars, reach } = calculateContributionStats(contributions);
   const campaignIds = [...new Set(contributions.map((c) => c.campaignId))];
   const campaigns = campaignIds.map(getCampaign).filter(Boolean) as Campaign[];
 
@@ -45,14 +75,14 @@ export function calculateImpact(
       slug: camp.slug,
       title: camp.title,
       category: camp.category,
-      thumbnail_url: camp.thumbnail_url || '',
-      contributedCents: stats.totalCents,
+      thumbnail_url: camp.adAssets?.coverUrl || '',
+      contributedDollars: stats.dollars,
       peopleReached: stats.reach,
     };
   });
 
   return {
-    totalContributedCents: totalCents,
+    totalContributedDollars: dollars,
     personalReach: reach,
     personalViews: Math.round(reach * 1.6),
     personalActions: Math.round(reach * 0.016),
@@ -61,7 +91,6 @@ export function calculateImpact(
     totalActions: Math.round(reach * 0.016),
     peopleReached: reach,
     campaignsBacked: campaignIds.length,
-    estimatedPerceptionShift: 7.4,
     timeSeries: buildTimeSeries(contributions),
     campaignSummaries: summaries,
   };

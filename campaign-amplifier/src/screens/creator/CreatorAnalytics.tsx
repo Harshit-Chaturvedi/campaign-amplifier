@@ -43,11 +43,11 @@ export function CreatorAnalyticsScreen({ navigation }: any) {
           {[
             { label: 'Est. Reach', value: formatNumber(impact.peopleReached), icon: 'radio-outline' },
             { label: 'Campaigns Backed', value: impact.campaignsBacked.toString(), icon: 'megaphone-outline' },
-            { label: 'Shift Metric', value: `+${impact.estimatedPerceptionShift}%`, icon: 'pulse' },
+            { label: 'Total Pooled', value: formatCurrency(impact.totalContributedDollars), icon: 'cash-outline' },
           ].map((stat) => (
             <View key={stat.label} style={{ flex: 1, alignItems: 'center' }}>
               <Ionicons name={stat.icon as any} size={20} color="#c7d2fe" />
-              <Text style={{ fontSize: 22, fontWeight: '800', color: '#fff', marginTop: 4 }}>{stat.value}</Text>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginTop: 4 }}>{stat.value}</Text>
               <Text style={{ fontSize: 11, color: '#a5b4fc', marginTop: 2 }}>{stat.label}</Text>
             </View>
           ))}
@@ -61,7 +61,7 @@ export function CreatorAnalyticsScreen({ navigation }: any) {
             <View>
               <Text style={{ fontSize: 13, color: '#64748b' }}>Total Amplification Budget</Text>
               <Text style={{ fontSize: 28, fontWeight: '800', color: '#0f172a', marginTop: 2 }}>
-                {formatCurrency(impact.totalContributedCents / 100)}
+                {formatCurrency(impact.totalContributedDollars)}
               </Text>
             </View>
             <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center' }}>

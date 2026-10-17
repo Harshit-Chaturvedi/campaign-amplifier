@@ -1,49 +1,61 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StatusBar, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StatusBar, Alert, ScrollView, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCampaignStore } from '../../store/useCampaignStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { formatCurrency } from '../../utils/formatting';
+import { formatCurrency, formatNumber } from '../../utils/formatting';
 import { AmplificationNotice } from '../../components/campaign/AmplificationNotice';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
-
-const AMOUNTS = [500, 1000, 2500, 5000, 10000];
+import { demoConfig } from '../../config/demoConfig';
+import { estimateReach, calculateBackerFee } from '../../services/reach';
 
 export function FundCampaignScreen({ route, navigation }: any) {
   const { campaignId } = route.params;
   const campaign = useCampaignStore((s) => s.getCampaign(campaignId));
   const addContribution = useCampaignStore((s) => s.addContribution);
   const user = useAuthStore((s) => s.user);
-  const [amountCents, setAmountCents] = useState(2500);
+
+  const [selectedPreset, setSelectedPreset] = useState<number>(50);
   const [customAmount, setCustomAmount] = useState('');
+  const [showName, setShowName] = useState(false); // default OFF per brief
+  const [guestEmail, setGuestEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   if (!campaign) return null;
 
-  const currentCents = customAmount ? Math.round(parseFloat(customAmount) * 100) : amountCents;
-  const dollars = currentCents > 0 ? currentCents / 100 : 0;
-  const estReach = Math.round(dollars * 27);
-  const estViews = Math.round(dollars * 27 * 1.6);
+  const dollars = customAmount ? parseFloat(customAmount) || 0 : selectedPreset;
+  const { fee, total } = calculateBackerFee(dollars);
+  const reachCalc = estimateReach(dollars);
+  const remaining = Math.max(0, campaign.fundingGoal - campaign.amountRaised);
 
   const handleFund = () => {
-    if (currentCents < 100) {
-      Alert.alert('Minimum Amount', 'Please enter at least $1.');
+    if (dollars < 1) {
+      Alert.alert('Invalid Amount', 'Minimum backer contribution is $1.');
       return;
     }
 
     setLoading(true);
     setTimeout(() => {
-      const backerUid = user?.uid || 'guest-' + Date.now().toString(36);
-      const backerName = user?.name || 'Community Backer';
-      addContribution(campaignId, currentCents, backerUid, backerName);
-      setLoading(false);
-      navigation.replace('ThankYou', { campaignId, amount: dollars });
-    }, 900);
-  };
+      const contribution = addContribution({
+        campaignId,
+        amount: dollars,
+        userId: user?.uid,
+        backerName: user?.name || 'Community Backer',
+        showName,
+        guestEmail: user?.email || guestEmail || null,
+      });
 
-  const remaining = campaign.funding_goal - campaign.funding_current;
+      setLoading(false);
+      navigation.replace('ThankYou', {
+        campaignId,
+        amount: dollars,
+        receiptNo: contribution.receiptNo,
+        estimatedReach: contribution.estimatedReach,
+      });
+    }, 800);
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
@@ -78,13 +90,13 @@ export function FundCampaignScreen({ route, navigation }: any) {
         </Text>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 110 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         <Card style={{ marginBottom: 16 }}>
           <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }} numberOfLines={2}>
             {campaign.title}
           </Text>
           <Text style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
-            {formatCurrency(remaining > 0 ? remaining : 0)} still needed to reach full distribution goal
+            {formatCurrency(remaining)} needed to reach full advertising distribution goal
           </Text>
         </Card>
 
@@ -97,13 +109,13 @@ export function FundCampaignScreen({ route, navigation }: any) {
           Choose Contribution
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 16 }}>
-          {AMOUNTS.map((a) => {
-            const selected = amountCents === a && !customAmount;
+          {demoConfig.presetAmounts.map((preset) => {
+            const selected = selectedPreset === preset && !customAmount;
             return (
               <TouchableOpacity
-                key={a}
+                key={preset}
                 onPress={() => {
-                  setAmountCents(a);
+                  setSelectedPreset(preset);
                   setCustomAmount('');
                 }}
                 style={{
@@ -118,7 +130,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 }}
               >
                 <Text style={{ fontSize: 15, fontWeight: '700', color: selected ? '#fff' : '#0f172a' }}>
-                  ${a / 100}
+                  ${preset}
                 </Text>
               </TouchableOpacity>
             );
@@ -144,7 +156,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
             value={customAmount}
             onChangeText={(t) => {
               setCustomAmount(t);
-              setAmountCents(0);
+              setSelectedPreset(0);
             }}
             placeholder="0.00"
             placeholderTextColor="#94a3b8"
@@ -161,17 +173,47 @@ export function FundCampaignScreen({ route, navigation }: any) {
           </View>
           <View style={{ flexDirection: 'row', marginTop: 4 }}>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 24, fontWeight: '800', color: '#312e81' }}>{estReach.toLocaleString()}</Text>
+              <Text style={{ fontSize: 24, fontWeight: '800', color: '#312e81' }}>{formatNumber(reachCalc.estimate)}</Text>
               <Text style={{ fontSize: 12, color: '#6366f1' }}>Est. audience reach</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 24, fontWeight: '800', color: '#312e81' }}>{estViews.toLocaleString()}</Text>
+              <Text style={{ fontSize: 24, fontWeight: '800', color: '#312e81' }}>{formatNumber(reachCalc.impressions)}</Text>
               <Text style={{ fontSize: 12, color: '#6366f1' }}>Est. ad impressions</Text>
             </View>
           </View>
           <Text style={{ fontSize: 11, color: '#6366f1', marginTop: 10 }}>
-            Estimate based on $0.037 per unique targeted reach. Actual reach depends on auction prices and ad delivery.
+            Estimate based on ${demoConfig.cpmUsd} CPM and {demoConfig.avgFrequency}x frequency. Not a delivery guarantee.
           </Text>
+        </Card>
+
+        {/* Breakdown of Total */}
+        <Card style={{ marginTop: 16 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 }}>
+            <Text style={{ fontSize: 14, color: '#64748b' }}>Contribution</Text>
+            <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }}>{formatCurrency(dollars)}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 }}>
+            <Text style={{ fontSize: 14, color: '#64748b' }}>Payment Processing Fee</Text>
+            <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }}>{formatCurrency(fee)}</Text>
+          </View>
+          <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 8 }} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>Total Payment</Text>
+            <Text style={{ fontSize: 18, fontWeight: '800', color: '#4f46e5' }}>{formatCurrency(total)}</Text>
+          </View>
+        </Card>
+
+        {/* Backer Privacy Option (Default OFF per Brief) */}
+        <Card style={{ marginTop: 16 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flex: 1, marginRight: 12 }}>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>Show my name publicly</Text>
+              <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                Private by default. Turn on to display your name on the campaign backers list.
+              </Text>
+            </View>
+            <Switch value={showName} onValueChange={setShowName} trackColor={{ false: '#cbd5e1', true: '#4f46e5' }} />
+          </View>
         </Card>
       </ScrollView>
 
@@ -203,9 +245,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
 }
 
 export function ThankYouScreen({ route, navigation }: any) {
-  const { campaignId, amount } = route.params;
+  const { campaignId, amount, receiptNo, estimatedReach } = route.params;
   const campaign = useCampaignStore((s) => s.getCampaign(campaignId));
-  const estReach = Math.round(amount * 27);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f8fafc', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
@@ -227,18 +268,26 @@ export function ThankYouScreen({ route, navigation }: any) {
         Thank you for amplifying!
       </Text>
       <Text style={{ fontSize: 15, color: '#64748b', textAlign: 'center', marginTop: 8, lineHeight: 22 }}>
-        Your ${amount} contribution will help distribute this message to an estimated{' '}
-        <Text style={{ fontWeight: '700', color: '#0f172a' }}>{estReach.toLocaleString()} people</Text>.
+        Your ${amount} contribution will pay for ad distribution reaching an estimated{' '}
+        <Text style={{ fontWeight: '700', color: '#0f172a' }}>{formatNumber(estimatedReach || 0)} people</Text>.
       </Text>
       <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 4 }}>
         (Configured demo estimate, not a guaranteed delivery)
       </Text>
 
+      {receiptNo && (
+        <View style={{ backgroundColor: '#f1f5f9', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6, marginTop: 16 }}>
+          <Text style={{ fontSize: 12, fontWeight: '600', color: '#475569' }}>
+            Receipt #{receiptNo}
+          </Text>
+        </View>
+      )}
+
       {campaign && (
         <Card style={{ marginTop: 24, width: '100%' }}>
           <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>{campaign.title}</Text>
           <Text style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
-            Now {campaign.percent_funded}% toward funding distribution
+            Now {campaign.percentFunded}% funded toward distribution goal
           </Text>
         </Card>
       )}

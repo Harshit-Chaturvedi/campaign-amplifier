@@ -157,14 +157,18 @@ If time is short, **cut in this order:** comments → image generation → push 
 ## 12. Hand-off state (UPDATE AS YOU WORK)
 
 **Phase 1 Complete (Sat 17 Oct, 23:45 IST):**
-- **Auth Gate Removed:** RootNavigator always loads `MainTabs`. Guests can browse, explore, and back campaigns freely. Login and Register are registered as modal screens reachable from Profile and actionable prompts.
-- **Activity Tab:** Replaced "Impact" tab with "Activity" tab (icon: notifications). Created `ActivityScreen` with All / Funding / Updates / Following tabs and an empty state. Relocated previous impact chart code to `src/screens/creator/CreatorAnalytics.tsx`.
-- **Trust Scores Eradicated:** Completely removed `trustScore.ts`, `TrustScoreBadge.tsx`, and all `trust_score` / `uuts_review_decision` attributes across types, stores, seed data, and cards. Replaced with expandable "How review works" and "Use of funds" explainers on `CampaignDetailScreen`. Zero trust score references remain.
-- **10 Categories:** Expanded `CampaignCategory` and themes to the 10 brief categories: `environment`, `health`, `science`, `education`, `public_policy`, `economic_policy`, `community`, `arts_culture`, `business`, `other`. Updated seed data and Explore chips.
-- **Message Amplification Copy:** Replaced donation wording with "Back this campaign", "amplification", and "estimated reach". Added reusable `<AmplificationNotice />` and `<DemoDataBadge />` across Home, Detail, and Funding.
-- **Build & Verification:** `npx tsc --noEmit` passes with 0 errors. Metro web bundle and Android bundle compile with HTTP 200.
+- Auth Gate Removed, Activity Tab built, Trust Scores eradicated, 10 Categories added, Amplification copy reworded.
 
-Next: Phase 2 backend & data pipeline (Supabase / FastAPI skeleton or offline client store + TanStack Query) & Step 5-stage creator workflow.
+**Phase 2 Complete (Sun 18 Oct, 00:05 IST):**
+- **Domain Model (src/types/campaign.ts):** Full 14-state `CampaignStatus`, `StoryBlock` (heading, paragraph, image, statistic, quote, action), `Source` ({id, title, url}), `AdAssets`, `ReachSettings`, `Campaign` (creator-entered fundingGoal, amountRaised, percentFunded, backerCount, sources, adAssets, reachSettings), `Contribution` (status, fee, total, showName=false private by default, receiptNo), `Report` (fundsRaised, adSpend, impressions, measuredReach, clicks, estimatedReach, final), `ModerationEvent`, `AppNotification`, `CampaignUpdate`.
+- **Configurable Demo Assumptions (src/config/demoConfig.ts):** `cpmUsd` ($14.50), `avgFrequency` (2.2), `platformFeePct` (5%), `paymentFeePct` (2.9% + $0.30), `minGoal` ($500), `maxGoal` ($50,000), presets.
+- **Reach Service (src/services/reach.ts):** `estimateReach(amount)` formula `(amount * (1 - platformFeePct) / cpmUsd * 1000) / avgFrequency` returning `{ estimate, adBudget, impressions, assumptions, label: 'Estimate' }`. Also `estimateReachPerDollar()` and fee calculation.
+- **Lifecycle Transition Table (src/services/lifecycle.ts):** Pure transition table covering all 14 states, role guards, preconditions, `canStartPromotion` check (approval + settled payments + budget + ad setup; `goal_reached` never auto-promotes). Reusable `StatusBadge` component (`src/components/ui/StatusBadge.tsx`) with 14 styling variants.
+- **Credible Seed Data (src/data/seedData.ts):** 14 realistic campaigns covering all 10 categories and all creator types (nonprofit, creator, business, community group), full story blocks, 2-4 verified sources each with URLs, ad assets, reach targeting, 3 demo user profiles (`creator@demo.org`, `backer@demo.org`, `admin@demo.org`), seed notifications, seed updates.
+- **UI & Store Alignment:** Updated `CampaignCard`, `CampaignDetailScreen` (renders story blocks, sources with clickable URLs, planned ad creative, audience targeting, status badge, and measured stats), `HomeScreen`, `ExploreScreen`, `FundingScreens` (with fee breakdown, receipt numbers, and backer privacy toggle), `ActivityScreen`, `ProfileScreen`, and `CreatorAnalytics`.
+- **Verification:** `npx expo-doctor` 20/20 passed; `npx tsc --noEmit` clean (0 errors); Metro web & Android bundles return HTTP 200.
+
+Next: Phase 3 (Backend FastAPI skeleton / Supabase or client query layer) & Phase 4 (Explore filters/sort & Backing flow 6 steps).
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `SUPABASE_URL/KEY` (server), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

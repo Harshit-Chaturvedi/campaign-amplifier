@@ -24,23 +24,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       name: email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
       username: email.split('@')[0].toLowerCase(),
       usernameLower: email.split('@')[0].toLowerCase(),
+      role: 'creator',
       photoURL: '',
       bio: '',
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
     set({ user, isAuthenticated: true });
   },
 
   loginAsDemo: () => {
     const user: UserProfile = {
-      uid: 'demo-user',
-      email: 'demo@campaign.example.com',
-      name: 'Demo User',
-      username: 'demo-user',
-      usernameLower: 'demo-user',
-      photoURL: '',
-      bio: 'Exploring the campaign platform.',
-      created_at: new Date().toISOString(),
+      uid: 'creator-demo',
+      email: 'creator@demo.org',
+      name: 'Elena Rostova',
+      username: 'elena-rostova',
+      usernameLower: 'elena-rostova',
+      role: 'creator',
+      photoURL: 'https://picsum.photos/seed/creator-elena/200/200',
+      bio: 'Independent environmental reporter and community campaign organizer.',
+      createdAt: new Date().toISOString(),
     };
     set({ user, isAuthenticated: true });
   },
@@ -52,9 +54,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       name,
       username: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 24),
       usernameLower: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 24),
+      role: 'user',
       photoURL: '',
       bio: '',
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
     set({ user, isAuthenticated: true });
   },

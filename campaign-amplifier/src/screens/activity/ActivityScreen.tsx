@@ -2,55 +2,29 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
+import { useCampaignStore } from '../../store/useCampaignStore';
+import { timeAgo } from '../../utils/formatting';
 
 type ActivityFilter = 'all' | 'funding' | 'updates' | 'following';
 
-interface ActivityItem {
-  id: string;
-  type: 'funding' | 'update' | 'following';
-  title: string;
-  body: string;
-  timestamp: string;
-  read: boolean;
-  campaignTitle?: string;
-}
-
-const SAMPLE_ACTIVITIES: ActivityItem[] = [
-  {
-    id: 'act-1',
-    type: 'funding',
-    title: 'Milestone reached: 65% funded',
-    body: 'Clean drinking water in every public school has reached $5,240 toward its goal.',
-    timestamp: '2h ago',
-    read: false,
-    campaignTitle: 'Clean drinking water in every public school',
-  },
-  {
-    id: 'act-2',
-    type: 'update',
-    title: 'New official source added',
-    body: 'Devin Okonkwo added the 2026 Ring-road Transit Capacity Analysis to Redraw the bus network.',
-    timestamp: '1d ago',
-    read: true,
-    campaignTitle: 'Redraw the bus network around where people actually work',
-  },
-  {
-    id: 'act-3',
-    type: 'following',
-    title: 'Review approved',
-    body: 'Let farmers repair the equipment they own is now available for community amplification.',
-    timestamp: '2d ago',
-    read: true,
-    campaignTitle: 'Let farmers repair the equipment they own',
-  },
-];
-
 export function ActivityScreen({ navigation }: any) {
   const [filter, setFilter] = useState<ActivityFilter>('all');
+  const notifications = useCampaignStore((s) => s.notifications);
+  const markRead = useCampaignStore((s) => s.markNotificationRead);
 
-  const filteredActivities = SAMPLE_ACTIVITIES.filter((item) => {
+  const filteredNotifications = notifications.filter((item) => {
     if (filter === 'all') return true;
-    return item.type === filter;
+    if (filter === 'funding') return item.type === 'funding_milestone' || item.type === 'contribution_status';
+    if (filter === 'updates') return item.type === 'update';
+    if (filter === 'following') {
+      return (
+        item.type === 'promotion_started' ||
+        item.type === 'final_report' ||
+        item.type === 'review_decision' ||
+        item.type === 'distribution_progress'
+      );
+    }
+    return true;
   });
 
   return (
@@ -129,24 +103,38 @@ export function ActivityScreen({ navigation }: any) {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-        {filteredActivities.length > 0 ? (
-          filteredActivities.map((act) => {
-            const iconName =
-              act.type === 'funding'
-                ? 'trending-up'
-                : act.type === 'update'
-                ? 'newspaper-outline'
-                : 'bookmark-outline';
-            const iconColor =
-              act.type === 'funding'
-                ? '#22c55e'
-                : act.type === 'update'
-                ? '#3b82f6'
-                : '#4f46e5';
+        {filteredNotifications.length > 0 ? (
+          filteredNotifications.map((act) => {
+            const isFunding = act.type === 'funding_milestone' || act.type === 'contribution_status';
+            const isUpdate = act.type === 'update';
+            const isReport = act.type === 'final_report';
+
+            const iconName = isFunding
+              ? 'trending-up'
+              : isUpdate
+              ? 'newspaper-outline'
+              : isReport
+              ? 'ribbon-outline'
+              : 'bookmark-outline';
+
+            const iconColor = isFunding
+              ? '#22c55e'
+              : isUpdate
+              ? '#3b82f6'
+              : isReport
+              ? '#0f172a'
+              : '#4f46e5';
 
             return (
-              <View
+              <TouchableOpacity
                 key={act.id}
+                onPress={() => {
+                  markRead(act.id);
+                  if (act.campaignId) {
+                    navigation.navigate('CampaignDetail', { campaignId: act.campaignId });
+                  }
+                }}
+                activeOpacity={0.7}
                 style={{
                   backgroundColor: '#ffffff',
                   borderRadius: 16,
@@ -173,7 +161,7 @@ export function ActivityScreen({ navigation }: any) {
                       marginRight: 12,
                     }}
                   >
-                    <Ionicons name={iconName} size={18} color={iconColor} />
+                    <Ionicons name={iconName as any} size={18} color={iconColor} />
                   </View>
 
                   <View style={{ flex: 1 }}>
@@ -181,7 +169,7 @@ export function ActivityScreen({ navigation }: any) {
                       <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', flex: 1, marginRight: 8 }}>
                         {act.title}
                       </Text>
-                      <Text style={{ fontSize: 11, color: '#94a3b8' }}>{act.timestamp}</Text>
+                      <Text style={{ fontSize: 11, color: '#94a3b8' }}>{timeAgo(act.createdAt)}</Text>
                     </View>
 
                     <Text style={{ fontSize: 13, color: '#475569', marginTop: 4, lineHeight: 18 }}>
@@ -212,7 +200,7 @@ export function ActivityScreen({ navigation }: any) {
                     )}
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })
         ) : (
