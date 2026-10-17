@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campaign Amplifier — Full Implementation Plan</title>
+<style>
+  :root { --primary: #4f46e5; --bg: #f8fafc; --surface: #fff; --text: #0f172a; --muted: #64748b; --border: #e2e8f0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  .container { max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; color: var(--primary); }
+  h2 { font-size: 1.5rem; font-weight: 700; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); }
+  h3 { font-size: 1.15rem; font-weight: 600; margin: 24px 0 10px; color: #334155; }
+  h4 { font-size: 1rem; font-weight: 600; margin: 16px 0 8px; }
+  p, li { font-size: 0.95rem; color: #334155; }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  li { margin-bottom: 6px; }
+  code { background: #eef2ff; padding: 2px 6px; border-radius: 4px; font-size: 0.88rem; font-family: 'Fira Code', 'Cascadia Code', monospace; color: var(--primary); }
+  pre { background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 12px; overflow-x: auto; margin: 12px 0 20px; font-size: 0.85rem; line-height: 1.6; }
+  pre code { background: none; color: inherit; padding: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; }
+  th, td { text-align: left; padding: 10px 14px; border: 1px solid var(--border); font-size: 0.9rem; }
+  th { background: #eef2ff; font-weight: 600; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 12px 0; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 600; }
+  .badge-green { background: #dcfce7; color: #166534; }
+  .badge-blue { background: #dbeafe; color: #1e40af; }
+  .badge-amber { background: #fef3c7; color: #92400e; }
+  .badge-red { background: #fef2f2; color: #991b1b; }
+  .alert { padding: 14px 18px; border-radius: 10px; margin: 12px 0; font-size: 0.9rem; }
+  .alert-info { background: #eef2ff; border-left: 4px solid var(--primary); }
+  .alert-warn { background: #fffbeb; border-left: 4px solid #f59e0b; }
+  .alert-success { background: #f0fdf4; border-left: 4px solid #22c55e; }
+  .alert-danger { background: #fef2f2; border-left: 4px solid #ef4444; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+  .toc { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 20px 24px; margin: 20px 0 40px; }
+  .toc a { color: var(--primary); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .toc ol { counter-reset: toc; list-style: none; padding-left: 0; }
+  .toc ol ol { padding-left: 20px; }
+  .toc li { counter-increment: toc; margin-bottom: 4px; }
+  .toc li::before { content: counters(toc, '.') '. '; font-weight: 600; color: var(--primary); }
+  .phase { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .phase-num { width: 40px; height: 40px; border-radius: 20px; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+  .file-tree { font-family: 'Fira Code', monospace; font-size: 0.82rem; line-height: 1.8; }
+  .file-tree .dir { color: #4f46e5; font-weight: 600; }
+  .file-tree .file { color: #334155; }
+  .checklist li { list-style: none; padding-left: 0; }
+  .checklist li::before { content: '☐ '; }
+  .checklist li.done::before { content: '☑ '; color: #22c55e; }
+  .status-done { color: #22c55e; font-weight: 600; }
+  .status-pending { color: #f59e0b; font-weight: 600; }
+  details { margin: 8px 0; }
+  details summary { cursor: pointer; font-weight: 600; color: var(--primary); padding: 8px 0; }
+  details[open] summary { margin-bottom: 8px; }
+  .subtitle { font-size: 1rem; color: var(--muted); margin-bottom: 24px; }
+  hr { border: none; height: 1px; background: var(--border); margin: 32px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🚀 Campaign Amplifier — Full Implementation Plan</h1>
+<p class="subtitle">Humanity Founders Hackathon • Deadline: 19 Oct 2026 11:59 AM • Deliverables: Demo Video + APK</p>
+
+<div class="toc">
+<h3>📑 Table of Contents</h3>
+<ol>
+  <li><a href="#understanding">Understanding the Task</a></li>
+  <li><a href="#tech-stack">Tech Stack</a></li>
+  <li><a href="#architecture">App Architecture & Navigation</a></li>
+  <li><a href="#screens">Screen-by-Screen Specs</a></li>
+  <li><a href="#algorithms">Core Algorithms (Ported from Reference)</a></li>
+  <li><a href="#project-structure">Project Structure</a></li>
+  <li><a href="#implementation-status">Implementation Status</a></li>
+  <li><a href="#remaining-work">Remaining Work & Commands</a></li>
+  <li><a href="#apk-build">APK Build Instructions</a></li>
+  <li><a href="#demo-video">Demo Video Script</a></li>
+  <li><a href="#design-system">Design System</a></li>
+  <li><a href="#dependencies">Dependencies</a></li>
+</ol>
+</div>
+
+<!-- ============================================== -->
+<h2 id="understanding">1. Understanding the Task</h2>
+
+<p>Based on analyzing the reference app at <code>campaign-one-pearl.vercel.app</code>, this is a <strong>community-funded ad campaign platform</strong>:</p>
+
+<table>
+<tr><th>Concept</th><th>Description</th></tr>
+<tr><td>Creators</td><td>Write campaigns about local/civic issues</td></tr>
+<tr><td>Trust Review (UUTS)</td><td>Fact-check score: fact_check + communication_integrity + shared_reality</td></tr>
+<tr><td>Backers</td><td>Fund campaigns; money pays for ad distribution</td></tr>
+<tr><td>Ad Amplification</td><td>Ads run on Facebook, Instagram, YouTube, Reddit, LinkedIn, X, TikTok</td></tr>
+<tr><td>Impact Tracking</td><td>$1 → 27 people reached; views = reach × 1.6</td></tr>
+</table>
+
+<h3>Core Entities</h3>
+<table>
+<tr><th>Entity</th><th>Key Fields</th></tr>
+<tr><td>Campaign</td><td>title, description, sources, category, funding_goal, trust_score, ad_headline, ad_primary_text</td></tr>
+<tr><td>Contribution</td><td>campaignId, amount_cents, uid, created_at</td></tr>
+<tr><td>UserProfile</td><td>uid, email, name, username, bio</td></tr>
+<tr><td>TrustScore</td><td>composite, fact_check, communication_integrity, shared_reality, decision</td></tr>
+</table>
+
+<!-- ============================================== -->
+<h2 id="tech-stack">2. Tech Stack</h2>
+
+<div class="cols">
+<div class="card">
+  <h4>Frontend</h4>
+  <ul>
+    <li><strong>React Native</strong> (Expo SDK 58)</li>
+    <li><strong>TypeScript</strong></li>
+    <li><strong>React Navigation 7</strong> (Stack + Bottom Tabs)</li>
+    <li><strong>Zustand 5</strong> (State Management)</li>
+    <li><strong>Ionicons</strong> (Icons)</li>
+    <li><strong>react-native-svg</strong> (Charts)</li>
+  </ul>
+</div>
+<div class="card">
+  <h4>Backend (Demo Mode)</h4>
+  <ul>
+    <li><strong>No real backend</strong> — all local</li>
+    <li><strong>Zustand stores</strong> with seed data</li>
+    <li><strong>AsyncStorage</strong> for persistence</li>
+    <li><strong>Mock API layer</strong> matching reference routes</li>
+    <li><strong>AI generation</strong> via local algorithm port</li>
+  </ul>
+</div>
+</div>
+
+<div class="alert alert-info">
+  <strong>Why this stack?</strong> The reference app is React (same paradigm), Expo gives us the fastest APK build path, and the local demo mode approach (matching the reference) means no backend infra needed.
+</div>
+
+<!-- ============================================== -->
+<h2 id="architecture">3. App Architecture & Navigation</h2>
+
+<pre><code>App Entry
+  └─ Auth Flow (Login / Register / Demo Mode)
+       └─ Main App (Bottom Tabs)
+            ├─ 🏠 Home Tab
+            │   ├─ Home (Featured + All Campaigns)
+            │   ├─ CampaignDetail
+            │   ├─ FundCampaign
+            │   └─ ThankYou
+            ├─ 🔍 Explore Tab
+            │   ├─ Explore (Search + Category Filter)
+            │   └─ CampaignDetail
+            ├─ ➕ Create Tab
+            │   └─ CreateCampaign (6-step wizard)
+            ├─ 📊 Impact Tab
+            │   └─ ImpactDashboard
+            └─ 👤 Profile Tab
+                └─ Profile</code></pre>
+
+<h3>Navigation Flow</h3>
+<ol>
+  <li>User opens app → <strong>Login screen</strong> (or tap "Demo User")</li>
+  <li>Authenticated → <strong>Home tab</strong> with featured campaigns</li>
+  <li>Tap campaign → <strong>Detail screen</strong> with full info + fund button</li>
+  <li>Tap "Fund" → <strong>Amount selection</strong> → Thank you</li>
+  <li>Create tab → <strong>6-step wizard</strong>: Describe → AI Enhance → Sources → Settings → Ad Creative → Review</li>
+  <li>Impact tab → <strong>Dashboard</strong> with reach charts, perception shift</li>
+</ol>
+
+<!-- ============================================== -->
+<h2 id="screens">4. Screen-by-Screen Specs</h2>
+
+<details>
+<summary>🔐 Auth Screens (Login, Register)</summary>
+<ul>
+  <li>Logo + branding header</li>
+  <li>Email/password inputs</li>
+  <li>"Continue as Demo User" button (one-tap auth)</li>
+  <li>Navigate between Login ↔ Register</li>
+  <li>Zustand <code>useAuthStore</code> for state</li>
+</ul>
+</details>
+
+<details>
+<summary>🏠 Home Screen</summary>
+<ul>
+  <li>Header: "Campaigns" title + notification bell</li>
+  <li>Stats banner (indigo bg): Active count, Total raised, People reached</li>
+  <li>Featured section: Horizontal FlatList with <code>variant="featured"</code> cards</li>
+  <li>Almost There section: Campaigns ≥80% funded, compact cards</li>
+  <li>All Campaigns: Vertical list of default campaign cards</li>
+  <li>Pull-to-refresh (optional)</li>
+</ul>
+</details>
+
+<details>
+<summary>📄 Campaign Detail Screen (MOST IMPORTANT)</summary>
+<ul>
+  <li><strong>Hero:</strong> Category-colored background + icon + trust badge</li>
+  <li><strong>Title & Meta:</strong> Title, tagline, creator, time ago</li>
+  <li><strong>Funding Card:</strong> Amount raised, progress bar, % funded, backers count, days left</li>
+  <li><strong>Description:</strong> Full campaign text (HTML stripped)</li>
+  <li><strong>Why Back:</strong> Highlighted card with indigo background</li>
+  <li><strong>Sources:</strong> List of clickable links with open-external icon</li>
+  <li><strong>Trust Score Detail:</strong> 3-pillar breakdown (fact_check, comm_integrity, shared_reality) + composite</li>
+  <li><strong>Ad Preview:</strong> Mock Facebook ad card (sponsored header, image, headline)</li>
+  <li><strong>Target Audience:</strong> Text description</li>
+  <li><strong>Impact Stats:</strong> People reached, est. views, est. actions</li>
+  <li><strong>Sticky Fund Button:</strong> Bottom fixed CTA</li>
+</ul>
+</details>
+
+<details>
+<summary>🔍 Explore Screen</summary>
+<ul>
+  <li>Search bar with clear button</li>
+  <li>Horizontal category chips (All, Environment, Health, Education, Consumer, Community, Civic)</li>
+  <li>Result count label</li>
+  <li>Campaign list filtered by search + category</li>
+  <li>Empty state when no results</li>
+</ul>
+</details>
+
+<details>
+<summary>➕ Create Campaign (6-Step Wizard)</summary>
+<table>
+<tr><th>Step</th><th>Content</th></tr>
+<tr><td>1. Describe</td><td>Large textarea "What's the issue?", char count, tips card</td></tr>
+<tr><td>2. AI Enhance</td><td>"Generate with AI" button → fills title, tagline, description, whyBack, category; all editable</td></tr>
+<tr><td>3. Sources</td><td>Add URL sources, remove, trust score preview updates live</td></tr>
+<tr><td>4. Settings</td><td>Funding goal ($), duration (days), target audience, ad platform checkboxes</td></tr>
+<tr><td>5. Ad Creative</td><td>Edit ad headline + primary text, live Facebook ad preview mock</td></tr>
+<tr><td>6. Review</td><td>Full summary card, category + trust badge, key stats, submit button</td></tr>
+</table>
+<p>Step indicator: colored bar segments at top. Back/Next navigation at bottom.</p>
+</details>
+
+<details>
+<summary>💰 Fund Campaign + Thank You</summary>
+<ul>
+  <li>Campaign title + remaining amount card</li>
+  <li>Preset amounts: $5, $10, $25, $50, $100</li>
+  <li>Custom amount input with $ prefix</li>
+  <li>Impact preview card (people reached, est. views)</li>
+  <li>Bottom "Fund $X" button</li>
+  <li>Thank You screen: checkmark, amount, reach estimate, view/share buttons</li>
+</ul>
+</details>
+
+<details>
+<summary>📊 Impact Dashboard</summary>
+<ul>
+  <li>Indigo header: People Reached, Campaigns Backed, Avg Trust Score</li>
+  <li>Total contributed card with trending-up icon</li>
+  <li>Two stat cards: Est. Views + Est. Actions</li>
+  <li>Perception Shift card: +7.4% (green background)</li>
+  <li>Reach Over Time SVG line chart</li>
+  <li>Campaigns Backed list (compact cards)</li>
+</ul>
+</details>
+
+<details>
+<summary>👤 Profile Screen</summary>
+<ul>
+  <li>Avatar circle with initial, name, username</li>
+  <li>Stats row: Backed, Reached, Given</li>
+  <li>My Campaigns list</li>
+  <li>Recent Contributions list</li>
+  <li>Menu items: Edit Profile, Settings, Help, About</li>
+  <li>Sign Out button</li>
+</ul>
+</details>
+
+<!-- ============================================== -->
+<h2 id="algorithms">5. Core Algorithms</h2>
+
+<h3>Trust Score Calculation</h3>
+<pre><code>// FNV-1a hash for deterministic pseudo-randomness
+function fnvHash(str: string, min: number, max: number): number {
+  let hash = 2166136261;
+  for (let i = 0; i &lt; str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return min + (Math.abs(hash) % (max - min + 1));
+}
+
+function calculateTrustScore(campaign) {
+  const text = [campaign.title, campaign.long_description,
+                campaign.why_backers_should_care].filter(Boolean).join(' ');
+  const sourceCount = campaign.campaign_sources?.length ?? 0;
+
+  const factCheck      = Math.min(100, 54 + sourceCount * 9 + fnvHash(text+'f', 0, 14));
+  const commIntegrity  = Math.min(100, 61 + fnvHash(text+'c', 0, 28));
+  const sharedReality  = Math.min(100, 58 + fnvHash(text+'s', 0, 30));
+  const composite      = Math.round(factCheck*0.45 + commIntegrity*0.30 + sharedReality*0.25);
+
+  return {
+    composite, fact_check: factCheck,
+    communication_integrity: commIntegrity, shared_reality: sharedReality,
+    decision: composite &gt;= 70 ? 'accepted' : composite &gt;= 55 ? 'on_hold' : 'rejected',
+  };
+}</code></pre>
+
+<h3>AI Campaign Generation</h3>
+<pre><code>function generateCampaignContent(issueText: string) {
+  const keywords = extractKeywords(issueText);       // top 6 by frequency
+  const summary  = extractSummary(issueText);         // first sentence up to 160 chars
+  const category = detectCategory(issueText);          // match words to category rules
+  const first    = capitalize(keywords[0] || 'This issue');
+  const second   = keywords[1] || 'the people affected';
+
+  return {
+    title: summary.replace(/[.!?]$/, '').slice(0, 80),
+    category,
+    tagline: `${first} is not a small problem, and it is a fixable one.`,
+    descriptionHtml: `&lt;p&gt;${summary}&lt;/p&gt;&lt;p&gt;Most people never hear about ${second}...`,
+    targetAudience: `People who care about ${keywords.slice(0,2).join(' and ')}`,
+    adHeadline: `${first}. The part nobody mentions.`,
+    adPrimaryText: `${summary} Here is what the records actually show.`,
+    // ... slides, whyBack, etc.
+  };
+}</code></pre>
+
+<h3>Impact Calculation</h3>
+<pre><code>const REACH_PER_DOLLAR = 27;
+
+function calculateImpact(contributions) {
+  const totalCents = contributions.reduce((s, c) =&gt; s + c.amount_cents, 0);
+  const dollars = totalCents / 100;
+  const reach = Math.round(dollars * REACH_PER_DOLLAR);
+  return {
+    totalCents, dollars, reach,
+    views: Math.round(reach * 1.6),
+    actions: Math.round(reach * 0.016),
+    perceptionShift: 7.4,
+  };
+}</code></pre>
+
+<!-- ============================================== -->
+<h2 id="project-structure">6. Project Structure</h2>
+
+<div class="file-tree">
+<pre><code>campaign-amplifier/
+├── App.tsx                          # Root — SafeAreaProvider + RootNavigator
+├── app.json                         # Expo config (package: com.campaigns.amplifier)
+├── eas.json                         # EAS Build → APK
+├── package.json
+├── tsconfig.json
+│
+├── src/
+│   ├── navigation/
+│   │   └── RootNavigator.tsx        # Auth↔Main flow, 5 tab stacks
+│   │
+│   ├── screens/
+│   │   ├── auth/AuthScreens.tsx     # Login + Register
+│   │   ├── home/HomeScreen.tsx      # Featured + All campaigns
+│   │   ├── home/CampaignDetailScreen.tsx  # Full campaign view
+│   │   ├── explore/ExploreScreen.tsx     # Search + filter
+│   │   ├── create/CreateCampaignScreen.tsx  # 6-step wizard
+│   │   ├── funding/FundingScreens.tsx    # Fund + ThankYou
+│   │   ├── impact/ImpactDashboard.tsx    # Charts + metrics
+│   │   └── profile/ProfileScreen.tsx     # User profile
+│   │
+│   ├── components/
+│   │   ├── ui/Button.tsx            # Primary/secondary/outline/ghost/danger
+│   │   ├── ui/Card.tsx              # Pressable card container
+│   │   ├── ui/Input.tsx             # Label + error + focus states
+│   │   ├── campaign/CampaignCard.tsx     # default/compact/featured variants
+│   │   └── campaign/TrustScoreBadge.tsx  # Color-coded trust display
+│   │
+│   ├── store/
+│   │   ├── useAuthStore.ts          # user, login, register, logout, demo
+│   │   └── useCampaignStore.ts      # campaigns CRUD, contributions, search
+│   │
+│   ├── data/
+│   │   └── seedData.ts             # 8 campaigns, 4 users, 16 contributions
+│   │
+│   ├── services/
+│   │   ├── campaignAI.ts           # AI content generation
+│   │   ├── trustScore.ts           # UUTS trust scoring
+│   │   └── impact.ts              # Impact calculations
+│   │
+│   ├── theme/
+│   │   └── colors.ts              # Full color palette + helpers
+│   │
+│   ├── types/
+│   │   ├── campaign.ts            # All TypeScript interfaces
+│   │   └── navigation.ts          # Navigation param lists
+│   │
+│   └── utils/
+│       ├── hash.ts                # FNV-1a hash
+│       ├── keywords.ts            # Keyword extraction, category detection
+│       └── formatting.ts          # Currency, number, date formatting
+│
+└── assets/                        # icon.png, splash, etc.</code></pre>
+</div>
+
+<!-- ============================================== -->
+<h2 id="implementation-status">7. Implementation Status</h2>
+
+<table>
+<tr><th>File</th><th>Status</th><th>Notes</th></tr>
+<tr><td>App.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>app.json + eas.json</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>types/campaign.ts</td><td class="status-done">✅ Done</td><td>All interfaces</td></tr>
+<tr><td>types/navigation.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>theme/colors.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>utils/hash.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>utils/keywords.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>utils/formatting.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>services/campaignAI.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>services/trustScore.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>services/impact.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>data/seedData.ts</td><td class="status-done">✅ Done</td><td>8 campaigns, 4 users, 16 contribs</td></tr>
+<tr><td>store/useAuthStore.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>store/useCampaignStore.ts</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>components/ui/Button.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>components/ui/Card.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>components/ui/Input.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>components/campaign/CampaignCard.tsx</td><td class="status-done">✅ Done</td><td>3 variants</td></tr>
+<tr><td>components/campaign/TrustScoreBadge.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>navigation/RootNavigator.tsx</td><td class="status-done">✅ Done</td><td>Full nav tree</td></tr>
+<tr><td>screens/auth/AuthScreens.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>screens/home/HomeScreen.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>screens/home/CampaignDetailScreen.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>screens/explore/ExploreScreen.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>screens/create/CreateCampaignScreen.tsx</td><td class="status-done">✅ Done</td><td>6-step wizard</td></tr>
+<tr><td>screens/funding/FundingScreens.tsx</td><td class="status-done">✅ Done</td><td>Fund + ThankYou</td></tr>
+<tr><td>screens/impact/ImpactDashboard.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+<tr><td>screens/profile/ProfileScreen.tsx</td><td class="status-done">✅ Done</td><td></td></tr>
+</table>
+
+<div class="alert alert-success">
+  <strong>✅ 26/26 source files complete. TypeScript compiles with zero errors.</strong>
+</div>
+
+<!-- ============================================== -->
+<h2 id="remaining-work">8. Remaining Work & Commands</h2>
+
+<h3>Step 1: Test on Device</h3>
+<pre><code># In terminal, from campaign-amplifier/ directory:
+cd c:\Users\harsh\Documents\antigravity\bold-volta\campaign-amplifier
+
+# Start the dev server
+npx expo start
+
+# Scan QR code with Expo Go app on your Android phone
+# OR press 'a' to open on Android emulator</code></pre>
+
+<h3>Step 2: Fix Any Runtime Issues</h3>
+<p>Common things to check:</p>
+<ul>
+  <li>If SVG chart crashes, wrap in try/catch or conditionally render</li>
+  <li>If fonts look off, install <code>expo-font</code> and load Inter/Plus Jakarta Sans</li>
+  <li>If navigation type errors, add <code>as any</code> to route params temporarily</li>
+</ul>
+
+<h3>Step 3: Build APK</h3>
+<pre><code># Install EAS CLI if not already installed
+npm install -g eas-cli
+
+# Login to Expo account
+eas login
+
+# Build APK (takes ~15-20 minutes on cloud)
+eas build -p android --profile preview
+
+# OR build locally if you have Android SDK:
+npx expo run:android --variant release</code></pre>
+
+<h3>Step 4: Quick Fixes If Needed</h3>
+<pre><code># If react-native-svg causes issues in Impact chart, remove the SVG chart
+# and replace with a simple text-based display
+
+# If eas build fails, try:
+npx expo prebuild --clean
+cd android && ./gradlew assembleRelease</code></pre>
+
+<h3>Optional Enhancements (if time permits)</h3>
+<ul class="checklist">
+  <li>Add dark mode toggle</li>
+  <li>Add haptic feedback on button presses</li>
+  <li>Add sharing via expo-sharing</li>
+  <li>Add pull-to-refresh on home screen</li>
+  <li>Add lottie animations for trust score</li>
+  <li>Add AsyncStorage persistence for campaigns</li>
+  <li>Add admin review panel screen</li>
+</ul>
+
+<!-- ============================================== -->
+<h2 id="apk-build">9. APK Build Instructions</h2>
+
+<div class="card">
+<h3>Option A: EAS Build (Recommended)</h3>
+<ol>
+  <li><code>npm install -g eas-cli</code></li>
+  <li><code>eas login</code> (create account at expo.dev if needed)</li>
+  <li><code>eas build -p android --profile preview</code></li>
+  <li>Wait ~15 min, download APK from link provided</li>
+</ol>
+</div>
+
+<div class="card">
+<h3>Option B: Local Build</h3>
+<ol>
+  <li>Install Android Studio + Android SDK</li>
+  <li><code>npx expo prebuild</code></li>
+  <li><code>cd android && ./gradlew assembleRelease</code></li>
+  <li>APK at <code>android/app/build/outputs/apk/release/</code></li>
+</ol>
+</div>
+
+<div class="card">
+<h3>Option C: Expo Dev Build (Quickest for testing)</h3>
+<ol>
+  <li><code>eas build -p android --profile development</code></li>
+  <li>Install development build APK on device</li>
+  <li>Run <code>npx expo start --dev-client</code></li>
+</ol>
+</div>
+
+<!-- ============================================== -->
+<h2 id="demo-video">10. Demo Video Script (2-3 min)</h2>
+
+<table>
+<tr><th>Segment</th><th>Duration</th><th>What to Show</th></tr>
+<tr><td>1. Intro</td><td>15s</td><td>App opens, splash/login, tap "Demo User"</td></tr>
+<tr><td>2. Home</td><td>20s</td><td>Stats banner, scroll featured, tap a campaign</td></tr>
+<tr><td>3. Campaign Detail</td><td>30s</td><td>Scroll through: funding progress, description, trust score breakdown, ad preview, sources</td></tr>
+<tr><td>4. Fund Campaign</td><td>20s</td><td>Tap Fund → select $25 → see impact preview → tap Fund → thank you screen</td></tr>
+<tr><td>5. Create Campaign</td><td>50s</td><td>Full wizard: type issue → AI generates → add sources → set $5000 goal → ad preview → submit</td></tr>
+<tr><td>6. Explore</td><td>15s</td><td>Search "water", filter by Health category</td></tr>
+<tr><td>7. Impact</td><td>20s</td><td>Show dashboard: reach chart, perception shift, campaigns backed</td></tr>
+<tr><td>8. Close</td><td>10s</td><td>Profile screen, brief outro</td></tr>
+</table>
+
+<div class="alert alert-warn">
+  <strong>Tip:</strong> Use a screen recorder like AZ Screen Recorder on Android. Narrate as you go. Keep it under 3 minutes. Show the AI generation step prominently — it's the killer feature.
+</div>
+
+<!-- ============================================== -->
+<h2 id="design-system">11. Design System</h2>
+
+<h3>Colors</h3>
+<div class="cols">
+<div class="card">
+  <h4>Core</h4>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <span class="badge" style="background:#4f46e5;color:#fff">#4f46e5 Primary</span>
+    <span class="badge" style="background:#3730a3;color:#fff">#3730a3 Dark</span>
+    <span class="badge" style="background:#818cf8;color:#fff">#818cf8 Light</span>
+    <span class="badge" style="background:#eef2ff;color:#3730a3">#eef2ff Faint</span>
+  </div>
+  <h4 style="margin-top:12px">Semantic</h4>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <span class="badge badge-green">Success #22c55e</span>
+    <span class="badge badge-amber">Warning #f59e0b</span>
+    <span class="badge badge-red">Error #ef4444</span>
+    <span class="badge badge-blue">Info #3b82f6</span>
+  </div>
+</div>
+<div class="card">
+  <h4>Category Colors</h4>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <span class="badge" style="background:#dcfce7;color:#166534">🌿 Environment</span>
+    <span class="badge" style="background:#fef2f2;color:#991b1b">❤️ Health</span>
+    <span class="badge" style="background:#dbeafe;color:#1e40af">📚 Education</span>
+    <span class="badge" style="background:#fef3c7;color:#92400e">🛡️ Consumer</span>
+    <span class="badge" style="background:#f3e8ff;color:#6b21a8">👥 Community</span>
+    <span class="badge" style="background:#eef2ff;color:#3730a3">🏛️ Civic</span>
+  </div>
+  <h4 style="margin-top:12px">Trust Score</h4>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+    <span class="badge badge-green">≥70 Verified</span>
+    <span class="badge badge-amber">55-69 Under Review</span>
+    <span class="badge badge-red">&lt;55 Flagged</span>
+  </div>
+</div>
+</div>
+
+<h3>Typography</h3>
+<table>
+<tr><th>Style</th><th>Size</th><th>Weight</th><th>Usage</th></tr>
+<tr><td>Display</td><td>28px</td><td>800</td><td>Screen titles</td></tr>
+<tr><td>Heading</td><td>22px</td><td>700</td><td>Section headers</td></tr>
+<tr><td>Subheading</td><td>18px</td><td>700</td><td>Card titles</td></tr>
+<tr><td>Body</td><td>15px</td><td>400</td><td>Main text</td></tr>
+<tr><td>Caption</td><td>13px</td><td>400</td><td>Secondary text</td></tr>
+<tr><td>Label</td><td>11-12px</td><td>500-600</td><td>Badges, stat labels</td></tr>
+</table>
+
+<!-- ============================================== -->
+<h2 id="dependencies">12. Dependencies</h2>
+
+<pre><code>{
+  "dependencies": {
+    "expo": "~58.0.14",
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "@react-navigation/native": "*",
+    "@react-navigation/native-stack": "*",
+    "@react-navigation/bottom-tabs": "*",
+    "react-native-screens": "*",
+    "react-native-safe-area-context": "*",
+    "zustand": "*",
+    "@expo/vector-icons": "*",
+    "react-native-svg": "*",
+    "expo-linear-gradient": "*",
+    "react-native-reanimated": "*",
+    "nativewind": "^4.1",
+    "tailwindcss": "*",
+    "@react-native-async-storage/async-storage": "*",
+    "react-native-render-html": "*"
+  }
+}</code></pre>
+
+<div class="alert alert-info">
+  <strong>All installed.</strong> Run <code>npm ls --depth=0</code> in the project directory to verify.
+</div>
+
+<hr>
+
+<h2>🏁 Priority Order (If Time Is Short)</h2>
+
+<div class="phase">
+  <div class="phase-num">1</div>
+  <div><strong>MUST HAVE:</strong> Home + Campaign Detail + Campaign Cards → This is what judges see first</div>
+</div>
+<div class="phase">
+  <div class="phase-num">2</div>
+  <div><strong>MUST HAVE:</strong> Create Campaign Wizard → The AI-powered differentiator</div>
+</div>
+<div class="phase">
+  <div class="phase-num">3</div>
+  <div><strong>MUST HAVE:</strong> Funding Flow → Shows the full loop: create → fund → impact</div>
+</div>
+<div class="phase">
+  <div class="phase-num">4</div>
+  <div><strong>SHOULD HAVE:</strong> Impact Dashboard → Proves the platform creates measurable change</div>
+</div>
+<div class="phase">
+  <div class="phase-num">5</div>
+  <div><strong>SHOULD HAVE:</strong> Profile & Auth → Makes it feel like a real app</div>
+</div>
+<div class="phase">
+  <div class="phase-num">6</div>
+  <div><strong>NICE TO HAVE:</strong> Dark mode, animations, admin panel, sharing</div>
+</div>
+
+<hr>
+<p style="text-align:center;color:#94a3b8;font-size:0.85rem;margin-top:40px">
+  Campaign Amplifier — Humanity Founders Hackathon 2026<br>
+  Generated implementation plan. All 26 source files written. Zero TypeScript errors. 🚀
+</p>
+
+</div>
+</body>
+</html>
