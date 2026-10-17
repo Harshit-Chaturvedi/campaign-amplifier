@@ -129,7 +129,7 @@ Calm, premium, credible. Primary indigo `#4f46e5` (matches the site), neutral sl
 **Sat night (17 Oct)**
 - [x] Inspect repo — **decision: reuse** (builds & typechecks; see Section 13)
 - [x] Quick wins: remove auth gate, rename Impact→Activity, delete trust score, 10 categories
-- [ ] Supabase project + schema + seed script; FastAPI skeleton + health + `/campaigns`
+- [x] FastAPI backend + SQLite/Postgres schema + seed script + /admin dashboard + /campaigns (Phase 3)
 - [ ] Expo Router tabs, theme tokens, core components, API client + TanStack Query
 
 **Sun (18 Oct)** — the core journey
@@ -140,7 +140,7 @@ Calm, premium, credible. Primary indigo `#4f46e5` (matches the site), neutral sl
 - [ ] Backing flow 6 steps + simulated payment + states + receipt
 
 **Mon (19 Oct)** — completeness & polish
-- [ ] State machine + admin page + notifications generation
+- [x] State machine + admin page + notifications generation (backend complete)
 - [ ] Activity tab, Profile (created/backed/saved/payments), creator dashboard + analytics (measured vs estimated)
 - [ ] Voice creation + AI suggest (with demo fallback); static info pages
 - [ ] Polish pass: loading/empty/error everywhere, a11y contrast, back behaviour, remove dead buttons
@@ -159,17 +159,21 @@ If time is short, **cut in this order:** comments → image generation → push 
 **Phase 1 Complete (Sat 17 Oct, 23:45 IST):**
 - Auth Gate Removed, Activity Tab built, Trust Scores eradicated, 10 Categories added, Amplification copy reworded.
 
-**Phase 2 Complete (Sun 18 Oct, 00:05 IST):**
-- **Domain Model (src/types/campaign.ts):** Full 14-state `CampaignStatus`, `StoryBlock` (heading, paragraph, image, statistic, quote, action), `Source` ({id, title, url}), `AdAssets`, `ReachSettings`, `Campaign` (creator-entered fundingGoal, amountRaised, percentFunded, backerCount, sources, adAssets, reachSettings), `Contribution` (status, fee, total, showName=false private by default, receiptNo), `Report` (fundsRaised, adSpend, impressions, measuredReach, clicks, estimatedReach, final), `ModerationEvent`, `AppNotification`, `CampaignUpdate`.
-- **Configurable Demo Assumptions (src/config/demoConfig.ts):** `cpmUsd` ($14.50), `avgFrequency` (2.2), `platformFeePct` (5%), `paymentFeePct` (2.9% + $0.30), `minGoal` ($500), `maxGoal` ($50,000), presets.
-- **Reach Service (src/services/reach.ts):** `estimateReach(amount)` formula `(amount * (1 - platformFeePct) / cpmUsd * 1000) / avgFrequency` returning `{ estimate, adBudget, impressions, assumptions, label: 'Estimate' }`. Also `estimateReachPerDollar()` and fee calculation.
-- **Lifecycle Transition Table (src/services/lifecycle.ts):** Pure transition table covering all 14 states, role guards, preconditions, `canStartPromotion` check (approval + settled payments + budget + ad setup; `goal_reached` never auto-promotes). Reusable `StatusBadge` component (`src/components/ui/StatusBadge.tsx`) with 14 styling variants.
-- **Credible Seed Data (src/data/seedData.ts):** 14 realistic campaigns covering all 10 categories and all creator types (nonprofit, creator, business, community group), full story blocks, 2-4 verified sources each with URLs, ad assets, reach targeting, 3 demo user profiles (`creator@demo.org`, `backer@demo.org`, `admin@demo.org`), seed notifications, seed updates.
-- **UI & Store Alignment:** Updated `CampaignCard`, `CampaignDetailScreen` (renders story blocks, sources with clickable URLs, planned ad creative, audience targeting, status badge, and measured stats), `HomeScreen`, `ExploreScreen`, `FundingScreens` (with fee breakdown, receipt numbers, and backer privacy toggle), `ActivityScreen`, `ProfileScreen`, and `CreatorAnalytics`.
-- **Verification:** `npx expo-doctor` 20/20 passed; `npx tsc --noEmit` clean (0 errors); Metro web & Android bundles return HTTP 200.
+**Phase 2 & 2.1 Complete (Sun 18 Oct, 00:05 IST):**
+- Domain model, 14-state lifecycle, reach service, seed data with 14 campaigns, verification claims and reach guarantees eliminated app-wide.
 
-Next: Phase 3 (Backend FastAPI skeleton / Supabase or client query layer) & Phase 4 (Explore filters/sort & Backing flow 6 steps).
-Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `SUPABASE_URL/KEY` (server), `EXPO_PUBLIC_API_URL`.
+**Phase 3 Complete (Sun 18 Oct, 00:30 IST):**
+- **Backend (/backend):** FastAPI, SQLAlchemy 2.x, Pydantic v2, PyJWT auth, bcrypt hashing, SQLite/Postgres via `DATABASE_URL`.
+- **Models & Tables (app/models.py):** `users`, `campaigns`, `campaign_story_blocks`, `campaign_sources`, `campaign_assets`, `campaign_reach`, `contributions`, `moderation_events`, `notifications`, `notification_prefs`, `follows`, `saves`, `campaign_updates`, `feedback`, `reports`, `system_config`.
+- **State Machine (app/services/lifecycle.py):** Pure transition table covering all 14 states with preconditions, audit logging in `moderation_events`, and 409 Conflict enforcement on illegal transitions.
+- **Reach Service (app/services/reach.py):** Mirrors mobile reach estimation `(amount * (1 - platformFeePct) / cpmUsd * 1000) / avgFrequency` and backer fee calculation.
+- **Seed Script (app/seed.py):** Seeds identical 14 campaigns, demo accounts `creator@demo.org` / `creator@demo.com`, `backer@demo.org` / `backer@demo.com`, `admin@demo.org` / `admin@demo.com` (password `demo123`), contributions, and notifications.
+- **Endpoints (/api/v1):** Auth, Public Campaigns (search, category, sort, page), Detail, Config Public, Reach Estimate, Drafts CRUD (with partial PATCH), Submit, Respond, Contributions (pending), Payments Simulate (success/pending/failed/cancelled/rejected, only success increments raised & checks milestones), Receipts, Social (follow/save), Notifications + Prefs, Analytics, Feedback, Uploads, AI endpoints (with demo-mode fallback).
+- **Admin Console (/admin):** Responsive HTML/JS dashboard for moderation queue, review actions with notes, delivery simulation, and completion.
+- **Verification:** `pytest -v` (10 passed, 0 failed); `uvicorn` running on port 8000; `/health`, `/docs`, `/admin` returning 200 OK; verified 3 complete end-to-end user flows.
+
+Next: Phase 4 (Explore filters/sort & Backing flow 6 steps) & Phase 5 (Creator flow 5-step wizard).
+Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)
 

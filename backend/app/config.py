@@ -1,0 +1,33 @@
+import os
+from typing import List
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+class Settings(BaseSettings):
+    DATABASE_URL: str = "sqlite:///./campaign_amplifier.db"
+    JWT_SECRET: str = "super-secret-key-change-in-production-hackathon-2026"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 30  # 30 days
+    GEMINI_API_KEY: str = ""
+    UPLOADS_DIR: str = "./uploads"
+    ENVIRONMENT: str = "development"
+    CORS_ORIGINS: List[str] = ["*"]
+
+    # Demo assumptions - mirrors mobile src/config/demoConfig.ts
+    CPM_USD: float = 14.50
+    AVG_FREQUENCY: float = 2.2
+    PLATFORM_FEE_PCT: float = 0.05
+    PAYMENT_FEE_PCT: float = 0.029
+    PAYMENT_FEE_FIXED: float = 0.30
+    MIN_GOAL: int = 500
+    MAX_GOAL: int = 50000
+    PRESET_AMOUNTS: List[int] = [10, 25, 50, 100, 250]
+    PRESET_GOALS: List[int] = [2500, 5000, 10000, 25000]
+    DEFAULT_DURATION_DAYS: int = 30
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+
+settings = Settings()
