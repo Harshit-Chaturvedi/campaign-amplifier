@@ -88,19 +88,22 @@ export function HomeScreen({ navigation }: any) {
             Help important messages travel beyond their networks
           </Text>
           <Text style={{ fontSize: 13, color: '#c7d2fe', marginTop: 8, lineHeight: 19 }}>
-            Not a donation to causes. Backers pool funds to pay for digital advertising that spreads verified messages to audiences who can act.
+            Not a donation to causes. Backers pool funds to pay for digital advertising that spreads the message to audiences who can act.
           </Text>
 
           {/* Illustrative Reach per Dollar */}
           <View style={{ backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, padding: 12, marginTop: 16 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="flash-outline" size={16} color="#818cf8" />
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#e0e7ff', marginLeft: 6 }}>
-                ~{reachPerDollar} people reached per $1 backed
-              </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, marginRight: 8 }}>
+                <Ionicons name="flash-outline" size={16} color="#818cf8" />
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#e0e7ff', marginLeft: 6 }}>
+                  Estimated reach: about {reachPerDollar} people per $1
+                </Text>
+              </View>
+              <DemoDataBadge size="sm" />
             </View>
-            <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>
-              Estimated from configurable CPM assumptions. Not a delivery guarantee.
+            <Text style={{ fontSize: 11, color: '#c7d2fe', marginTop: 4 }}>
+              (estimate based on demo assumptions, not a guarantee)
             </Text>
           </View>
 

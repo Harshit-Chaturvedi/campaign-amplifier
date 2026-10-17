@@ -313,7 +313,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
                   </Text>
                 </View>
                 <View style={{ backgroundColor: '#ccfbf1', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#0f766e' }}>VERIFIED ADS</Text>
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#0f766e' }}>AD PREVIEW</Text>
                 </View>
               </View>
 
@@ -386,17 +386,17 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             )}
           </View>
 
-          {/* Verified Sources Section */}
+          {/* Sources Section */}
           {campaign.sources && campaign.sources.length > 0 && (
             <View style={{ marginTop: 24 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <Ionicons name="document-text-outline" size={18} color="#0f172a" />
                 <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginLeft: 8 }}>
-                  Supporting Sources ({campaign.sources.length})
+                  Sources ({campaign.sources.length})
                 </Text>
               </View>
               <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 10 }}>
-                Traceable evidence cited by the creator for public inspection:
+                Sources cited by the creator for public inspection:
               </Text>
               {campaign.sources.map((src) => (
                 <TouchableOpacity
@@ -543,16 +543,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             {reviewExpanded && (
               <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
                 <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20 }}>
-                  Every campaign is reviewed by platform moderators before community funding opens. The review checks:
-                </Text>
-                <Text style={{ fontSize: 13, color: '#475569', marginTop: 8, lineHeight: 20 }}>
-                  • <Text style={{ fontWeight: '600' }}>Sources & Evidence:</Text> Claims must link to public, verifiable citations.{'\n'}
-                  • <Text style={{ fontWeight: '600' }}>Message Integrity:</Text> Story and headlines must stay proportionate to the evidence.{'\n'}
-                  • <Text style={{ fontWeight: '600' }}>Ad Compliance:</Text> Creative assets and targeting must satisfy public platform advertising policies.{'\n'}
-                  • <Text style={{ fontWeight: '600' }}>No Direct Donations:</Text> Contributions solely fund distribution costs; funds are never transferred to the creator.
-                </Text>
-                <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 10, fontStyle: 'italic' }}>
-                  We do not score causes or claim independent truth verification. We verify that citations exist and framing is proportionate.
+                  Submitted campaigns are reviewed by our team for content, sources, creative and targeting before they can be funded. We list sources so you can read them yourself. We do not score causes or claim independent fact-checking.
                 </Text>
               </View>
             )}
@@ -617,7 +608,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               ))}
             </View>
             <Text style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', marginTop: 12 }}>
-              Reach is estimated from prototype assumptions, not guaranteed delivery.
+              Reach is estimated from prototype assumptions, not a guarantee.
             </Text>
           </Card>
         </View>

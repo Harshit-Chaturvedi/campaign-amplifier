@@ -99,7 +99,7 @@ export interface Campaign {
   percentFunded: number;
   backerCount: number;
 
-  // Editorial story & verified sources
+  // Editorial story & sources
   storyBlocks: StoryBlock[];
   sources: Source[];
 

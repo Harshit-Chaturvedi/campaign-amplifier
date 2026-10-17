@@ -700,7 +700,7 @@ export const seedCampaigns: Campaign[] = [
     storyBlocks: [
       { type: 'heading', text: 'Solar Without a Rooftop', level: 1 },
       { type: 'paragraph', text: 'Over 68% of city residents live in multi-family buildings or rental properties where installing private solar panels is impossible.' },
-      { type: 'statistic', value: '18%', label: 'Average verified rate reduction on utility electric bills' },
+      { type: 'statistic', value: '18%', label: 'Average reported rate reduction on utility electric bills' },
     ],
     measuredDelivery: {
       impressions: 489200,
@@ -885,7 +885,7 @@ export const seedNotifications: AppNotification[] = [
     campaignId: 'cmp-school-crossing',
     campaignTitle: 'A supervised pedestrian crossing outside Cedar Elementary',
     title: 'Final distribution report published',
-    body: '32,100 verified residents reached; pedestrian crossing signals successfully installed.',
+    body: '32,100 measured residents reached; pedestrian crossing signals successfully installed.',
     read: true,
     createdAt: iso(NOW - 22 * DAY),
   },

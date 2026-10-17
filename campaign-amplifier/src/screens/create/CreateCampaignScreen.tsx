@@ -207,7 +207,7 @@ export function CreateCampaignScreen({ navigation }: any) {
           <View>
             <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a', marginBottom: 4 }}>Add Sources</Text>
             <Text style={{ fontSize: 14, color: '#64748b', marginBottom: 16, lineHeight: 20 }}>
-              Link to evidence that supports your campaign message. Clear, public citations help moderators verify that claims are traceable.
+              Link to evidence that supports your campaign message. Clear, public citations allow reviewers and readers to check the evidence.
             </Text>
 
             <View style={{ flexDirection: 'row', marginBottom: 16 }}>

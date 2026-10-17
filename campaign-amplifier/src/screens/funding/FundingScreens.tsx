@@ -182,7 +182,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
             </View>
           </View>
           <Text style={{ fontSize: 11, color: '#6366f1', marginTop: 10 }}>
-            Estimate based on ${demoConfig.cpmUsd} CPM and {demoConfig.avgFrequency}x frequency. Not a delivery guarantee.
+            Estimate based on ${demoConfig.cpmUsd} CPM and ${demoConfig.avgFrequency}x frequency. Not a guarantee.
           </Text>
         </Card>
 
@@ -272,7 +272,7 @@ export function ThankYouScreen({ route, navigation }: any) {
         <Text style={{ fontWeight: '700', color: '#0f172a' }}>{formatNumber(estimatedReach || 0)} people</Text>.
       </Text>
       <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 4 }}>
-        (Configured demo estimate, not a guaranteed delivery)
+        (Configured demo estimate, not a guarantee)
       </Text>
 
       {receiptNo && (
