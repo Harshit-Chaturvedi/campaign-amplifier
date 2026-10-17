@@ -74,13 +74,18 @@ def fallback_suggest(topic: str) -> AISuggestResponse:
         demo_mode=True
     )
 
+import logging
+
+logger = logging.getLogger("campaign.ai")
+
 async def generate_draft_with_gemini(text: str) -> AIDraftResponse:
     if not settings.GEMINI_API_KEY:
+        logger.info("GEMINI_API_KEY not configured. Using deterministic demo-mode fallback.")
         return fallback_draft(text)
 
     prompt = f"""
 You are an expert campaign messaging strategist for an advertising amplification platform.
-The user wants to run a digital advertising campaign to spread a verifiable message.
+The user wants to run a digital advertising campaign to spread a checkable message.
 Note: DO NOT generate a funding goal under any circumstances.
 
 User provided text:
@@ -100,7 +105,8 @@ Generate a JSON object matching this schema exactly:
 }}
 Return ONLY raw JSON. No markdown backticks.
 """
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={settings.GEMINI_API_KEY}"
+    model_name = settings.GEMINI_MODEL or "gemini-2.0-flash"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
     for attempt in range(2):
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
@@ -113,8 +119,13 @@ Return ONLY raw JSON. No markdown backticks.
                         raw_text = re.sub(r"\n```$", "", raw_text)
                     parsed = json.loads(raw_text)
                     parsed["demo_mode"] = False
+                    logger.info("Successfully generated campaign draft using Gemini model: %s", model_name)
                     return AIDraftResponse(**parsed)
-        except Exception:
+                else:
+                    logger.warning("Gemini API returned status %s: %s", res.status_code, res.text)
+        except Exception as err:
+            logger.warning("Gemini API attempt %d error: %s", attempt + 1, err)
             continue
 
+    logger.info("Gemini generation failed or timed out. Falling back to demo-mode draft.")
     return fallback_draft(text)

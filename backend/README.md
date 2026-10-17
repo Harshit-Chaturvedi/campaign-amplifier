@@ -76,14 +76,42 @@ Tests cover:
 
 ---
 
-## Deployment (Render / Docker)
+---
 
-### Render (via `render.yaml`)
-1. Connect GitHub repository to Render.
-2. Select **Blueprint** and point to `backend/render.yaml`.
-3. Set environment variable `DATABASE_URL` (e.g. Supabase Postgres connection string).
+## Production Deployment (Supabase & Render)
 
-### Docker
+### 1. Supabase PostgreSQL Setup
+1. Create a new project in [Supabase](https://supabase.com/).
+2. Navigate to **Project Settings** &rarr; **Database**.
+3. Under **Connection string**, select **URI** (or Transaction Pooler mode).
+4. Copy the connection string. It looks like:
+   ```text
+   postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+   ```
+   *(Note: The backend automatically normalizes `postgres://` or `postgresql://` to `postgresql+psycopg://` with `pool_pre_ping=True`).*
+
+### 2. Deploying to Render
+1. Go to the [Render Dashboard](https://dashboard.render.com/) and click **New +** &rarr; **Web Service**.
+2. Connect your GitHub repository (`campaign-amplifier`).
+3. Set the following service parameters:
+   - **Name:** `campaign-amplifier-backend`
+   - **Root Directory:** `backend` *(Crucial: set to `backend` since it is a subfolder)*
+   - **Environment:** `Python 3`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+4. Add the following **Environment Variables**:
+   | Key | Value / Example | Notes |
+   |---|---|---|
+   | `DATABASE_URL` | `postgresql://postgres.[ref]:[pw]@...` | Your Supabase connection string |
+   | `JWT_SECRET` | `generate-a-secure-random-string-64-chars` | Used to sign JWT auth tokens |
+   | `GEMINI_API_KEY` | `AIzaSy...` | Optional: Gemini API key (falls back to demo mode if empty) |
+   | `GEMINI_MODEL` | `gemini-2.0-flash` | Default Gemini model (e.g. `gemini-2.0-flash`) |
+   | `CORS_ORIGINS` | `*` | Allows Expo mobile app & web clients |
+   | `ENVIRONMENT` | `production` | Set to production |
+5. Click **Deploy Web Service**.
+6. On startup, the backend automatically initializes tables and seeds the 14 demo campaigns and accounts into Postgres if the database is empty. Verify via `https://<your-render-url>/health` and `https://<your-render-url>/admin`.
+
+### 3. Docker Deployment
 ```bash
 docker build -t campaign-amplifier-backend .
 docker run -p 8000:8000 -e DATABASE_URL=sqlite:///./campaign_amplifier.db campaign-amplifier-backend

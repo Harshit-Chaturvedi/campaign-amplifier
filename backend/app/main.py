@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -65,10 +65,21 @@ app.include_router(ai.router, prefix=api_prefix)
 app.include_router(uploads.router, prefix=api_prefix)
 
 
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+from app.database import get_db
+
 @app.get("/health", tags=["system"])
-def health_check():
+def health_check(db: Session = Depends(get_db)):
+    db_status = "connected"
+    try:
+        db.execute(text("SELECT 1"))
+    except Exception as err:
+        db_status = f"error: {str(err)}"
+
     return {
-        "status": "healthy",
+        "status": "healthy" if db_status == "connected" else "degraded",
         "service": "campaign-amplifier-backend",
+        "database": db_status,
         "version": "1.0.0"
     }

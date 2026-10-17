@@ -42,3 +42,11 @@ def test_privacy_no_leaked_emails(client):
     # Guest email from seed data must NOT appear in public output
     assert "guest.sarah@example.com" not in data
     assert "rural.operator@example.com" not in data
+
+def test_health_check_db_connectivity(client):
+    res = client.get("/health")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["status"] == "healthy"
+    assert body["database"] == "connected"
+    assert body["service"] == "campaign-amplifier-backend"

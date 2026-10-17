@@ -48,7 +48,7 @@
   <header>
     <div>
       <h1>Campaign Amplification &mdash; Moderation Console</h1>
-      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Review submissions, verify sources & creatives, start promotion schedules, and publish delivery reports.</p>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Review submissions, sources & creatives, start promotion schedules, and publish delivery reports.</p>
     </div>
     <div id="authStatus" style="font-size: 13px; font-weight: 600; color: var(--primary);"></div>
   </header>
@@ -166,7 +166,7 @@
     }
 
     async function approveCampaign(id) {
-      const note = prompt('Approval Note:', 'Content, verifiable sources, and ad creatives verified.');
+      const note = prompt('Approval Note:', 'Content, sources, creative and targeting reviewed.');
       if (note === null) return;
       const res = await fetch(`/api/v1/admin/campaigns/${id}/approve`, {
         method: 'POST',

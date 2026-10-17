@@ -58,7 +58,7 @@ def approve_campaign(
     if not campaign:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found")
 
-    note = req.note if req else "Campaign approved by platform review team"
+    note = req.note if (req and req.note) else "Content, sources, creative and targeting reviewed."
     # Transition submitted -> approved
     execute_transition(
         db=db,
@@ -75,7 +75,7 @@ def approve_campaign(
         to_status="available_for_funding",
         actor_role="admin",
         actor_id=admin.id,
-        note="Campaign opened for community amplification funding"
+        note=note
     )
 
     return {"status": "ok", "campaign_status": campaign.status}
