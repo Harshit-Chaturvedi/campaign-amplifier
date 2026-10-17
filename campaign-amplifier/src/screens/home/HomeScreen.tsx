@@ -4,13 +4,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCampaignStore } from '../../store/useCampaignStore';
 import { CampaignCard } from '../../components/campaign/CampaignCard';
 import { formatNumber } from '../../utils/formatting';
+import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import type { Campaign } from '../../types/campaign';
 
 export function HomeScreen({ navigation }: any) {
-  const featured = useCampaignStore((s) => s.getFeaturedCampaigns());
-  const approved = useCampaignStore((s) => s.getApprovedCampaigns());
-  const closingSoon = useCampaignStore((s) => s.getClosingSoonCampaigns());
-  const contributions = useCampaignStore((s) => s.contributions);
+  const getFeatured = useCampaignStore((s) => s.getFeaturedCampaigns);
+  const getApproved = useCampaignStore((s) => s.getApprovedCampaigns);
+  const getClosingSoon = useCampaignStore((s) => s.getClosingSoonCampaigns);
+  const campaigns = useCampaignStore((s) => s.campaigns);
+
+  const featured = getFeatured();
+  const approved = getApproved();
+  const closingSoon = getClosingSoon();
 
   const totalRaised = approved.reduce((s, c) => s + c.funding_current, 0);
   const totalReach = Math.round(totalRaised * 27);
@@ -26,9 +31,12 @@ export function HomeScreen({ navigation }: any) {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View>
             <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>Campaigns</Text>
-            <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>Community-funded advocacy</Text>
+            <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>Community-funded message amplification</Text>
           </View>
-          <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('ActivityTab')}
+            style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}
+          >
             <Ionicons name="notifications-outline" size={20} color="#64748b" />
           </TouchableOpacity>
         </View>
@@ -36,20 +44,26 @@ export function HomeScreen({ navigation }: any) {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Stats Banner */}
-        <View style={{ flexDirection: 'row', marginHorizontal: 20, marginTop: 16, backgroundColor: '#4f46e5', borderRadius: 16, padding: 16 }}>
-          <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff' }}>{approved.length}</Text>
-            <Text style={{ fontSize: 11, color: '#c7d2fe', marginTop: 2 }}>Active</Text>
+        <View style={{ marginHorizontal: 20, marginTop: 16, backgroundColor: '#4f46e5', borderRadius: 16, padding: 16 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <Text style={{ fontSize: 13, fontWeight: '700', color: '#c7d2fe' }}>PLATFORM METRICS</Text>
+            <DemoDataBadge size="sm" />
           </View>
-          <View style={{ width: 1, backgroundColor: '#6366f1', marginVertical: 4 }} />
-          <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff' }}>${formatNumber(totalRaised)}</Text>
-            <Text style={{ fontSize: 11, color: '#c7d2fe', marginTop: 2 }}>Raised</Text>
-          </View>
-          <View style={{ width: 1, backgroundColor: '#6366f1', marginVertical: 4 }} />
-          <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff' }}>{formatNumber(totalReach)}</Text>
-            <Text style={{ fontSize: 11, color: '#c7d2fe', marginTop: 2 }}>People Reached</Text>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff' }}>{approved.length}</Text>
+              <Text style={{ fontSize: 11, color: '#c7d2fe', marginTop: 2 }}>Active</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#6366f1', marginVertical: 4 }} />
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff' }}>${formatNumber(totalRaised)}</Text>
+              <Text style={{ fontSize: 11, color: '#c7d2fe', marginTop: 2 }}>Raised</Text>
+            </View>
+            <View style={{ width: 1, backgroundColor: '#6366f1', marginVertical: 4 }} />
+            <View style={{ flex: 1, alignItems: 'center' }}>
+              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff' }}>{formatNumber(totalReach)}</Text>
+              <Text style={{ fontSize: 11, color: '#c7d2fe', marginTop: 2 }}>Est. Reach</Text>
+            </View>
           </View>
         </View>
 

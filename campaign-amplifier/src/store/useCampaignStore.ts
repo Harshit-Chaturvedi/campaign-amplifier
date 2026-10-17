@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import type { Campaign, Contribution, CampaignCategory } from '../types/campaign';
 import { seedCampaigns, seedContributions } from '../data/seedData';
-import { calculateTrustScore } from '../services/trustScore';
 import { generateId } from '../utils/formatting';
 
 interface CampaignState {
@@ -60,7 +59,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   getUserCampaigns: (uid: string) => get().campaigns.filter((c) => c.created_by === uid),
 
   getFeaturedCampaigns: () => {
-    const ids = ['cmp-clean-water', 'cmp-transit-map', 'cmp-tree-canopy'];
+    const ids = ['cmp-clean-water', 'cmp-transit-map', 'cmp-open-science'];
     return get().campaigns.filter((c) => ids.includes(c.id));
   },
 
@@ -80,7 +79,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       short_description: data.short_description || '',
       long_description: data.long_description || '',
       why_backers_should_care: data.why_backers_should_care || '',
-      category: data.category || 'civic',
+      category: data.category || 'public_policy',
       status: 'Pending',
       currency: 'usd',
       funding_goal: data.funding_goal,
@@ -101,8 +100,6 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
       duration_days: data.duration_days || 30,
       evergreen: data.evergreen || false,
       show_countdown: true,
-      trust_score: null,
-      uuts_review_decision: null,
       campaign_sources: data.campaign_sources || [],
       ad_platforms: data.ad_platforms || ['facebook', 'instagram'],
       milestones: [],
@@ -121,17 +118,12 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   },
 
   approveCampaign: (id) => {
-    const campaign = get().getCampaign(id);
-    if (!campaign) return;
-    const score = calculateTrustScore(campaign);
     set((state) => ({
       campaigns: state.campaigns.map((c) =>
         c.id === id
           ? {
               ...c,
               status: 'Approved' as const,
-              trust_score: score.composite,
-              uuts_review_decision: score.decision,
               stripe_product_id: 'prod_demo_' + id,
             }
           : c
@@ -142,9 +134,7 @@ export const useCampaignStore = create<CampaignState>((set, get) => ({
   rejectCampaign: (id) => {
     set((state) => ({
       campaigns: state.campaigns.map((c) =>
-        c.id === id
-          ? { ...c, status: 'Rejected' as const, uuts_review_decision: 'rejected' as const }
-          : c
+        c.id === id ? { ...c, status: 'Rejected' as const } : c
       ),
     }));
   },

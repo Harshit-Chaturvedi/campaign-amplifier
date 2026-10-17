@@ -1,5 +1,4 @@
 import type { Campaign, Contribution, UserProfile, CampaignCategory } from '../types/campaign';
-import { calculateTrustScore } from '../services/trustScore';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.now();
@@ -13,7 +12,7 @@ function makeCampaign(overrides: Partial<Campaign> & { id: string; title: string
     short_description: '',
     long_description: '',
     why_backers_should_care: '',
-    category: 'civic',
+    category: 'public_policy',
     status: 'Approved',
     currency: 'usd',
     funding_current: 0,
@@ -33,8 +32,6 @@ function makeCampaign(overrides: Partial<Campaign> & { id: string; title: string
     duration_days: 30,
     evergreen: false,
     show_countdown: true,
-    trust_score: null,
-    uuts_review_decision: 'accepted',
     campaign_sources: [],
     ad_platforms: ['facebook', 'instagram'],
     milestones: [],
@@ -46,9 +43,6 @@ function makeCampaign(overrides: Partial<Campaign> & { id: string; title: string
   base.funding_current = fundingCurrent;
   base.amount_raised = fundingCurrent;
   base.percent_funded = overrides.funding_goal ? Math.round((fundingCurrent / overrides.funding_goal) * 100) : 0;
-  if (base.trust_score === null && base.status !== 'Pending') {
-    base.trust_score = calculateTrustScore(base).composite;
-  }
   return base;
 }
 
@@ -78,7 +72,7 @@ export const seedCampaigns: Campaign[] = [
     short_description: 'Most routes still converge downtown, but the jobs moved to the ring road a decade ago.',
     long_description: '<p>The current network was designed for a downtown that employed forty thousand people. It now employs eleven thousand. Meanwhile the warehouse and hospital corridor on the ring road employs twenty-six thousand, and is served by two buses an hour.</p><p>The transit authority has a redesign sitting in a drawer. It needs public comment to move.</p>',
     why_backers_should_care: '<p>A redesign costs nothing to adopt. It is the same buses, the same drivers, a different map.</p>',
-    category: 'civic',
+    category: 'public_policy',
     funding_goal: 12000,
     funding_current: 9100,
     creator_name: 'Devin Okonkwo',
@@ -95,7 +89,7 @@ export const seedCampaigns: Campaign[] = [
     short_description: 'Software locks mean a dealer technician has to authorise repairs farmers used to do themselves.',
     long_description: '<p>Modern agricultural equipment refuses to run after some repairs until a dealer technician connects and authorises the part. During harvest, the wait averages eleven days.</p><p>Four states have passed right-to-repair laws covering farm equipment. A fifth bill is in committee here.</p>',
     why_backers_should_care: '<p>This is not anti-manufacturer. It is about who holds the key to equipment someone already bought.</p>',
-    category: 'consumer',
+    category: 'business',
     funding_goal: 15000,
     funding_current: 4300,
     creator_name: 'Hannah Breit',
@@ -129,7 +123,7 @@ export const seedCampaigns: Campaign[] = [
     short_description: 'Five of seven measures on the last ballot scored above college reading level.',
     long_description: '<p>An independent readability analysis of the last county ballot put five of seven measures above a college reading level, and two above graduate level.</p><p>Nine states require a plain-language summary alongside the legal text. Adopting the same standard here needs a single administrative rule change.</p>',
     why_backers_should_care: '<p>A ballot nobody can read is a turnout problem disguised as a drafting problem.</p>',
-    category: 'civic',
+    category: 'public_policy',
     funding_goal: 9000,
     funding_current: 2100,
     creator_name: 'Priscilla Nwosu',
@@ -155,6 +149,57 @@ export const seedCampaigns: Campaign[] = [
     ad_primary_text: 'The canopy budget is split evenly by district. The heat is not spread evenly at all.',
     campaign_sources: ['https://example.org/urban-heat-mapping-august'],
   }),
+  makeCampaign({
+    id: 'cmp-open-science',
+    slug: 'taxpayer-funded-research-access',
+    title: 'Public access for taxpayer-funded research',
+    tagline: 'Citizens pay for the science, then pay $45 per PDF to read it.',
+    short_description: 'Over $14M in state university research remains behind commercial paywalls.',
+    long_description: '<p>Public university faculties published over 1,200 peer-reviewed papers funded by state tax grants last year. More than 70% remain locked behind publisher paywalls that charge independent doctors, teachers, and citizens up to $45 per article.</p><p>A proposed open-access mandate would make state-funded findings public within six months.</p>',
+    why_backers_should_care: '<p>If the public paid to produce the knowledge, the public should not have to pay again to read it.</p>',
+    category: 'science',
+    funding_goal: 7500,
+    funding_current: 3100,
+    creator_name: 'Dr. Aris Thorne',
+    target_audience: 'Educators, researchers, students, and healthcare workers.',
+    ad_headline: 'You funded the study. Now pay $45 to read it.',
+    ad_primary_text: 'State-funded research should belong to the state’s citizens. Support open access.',
+    campaign_sources: ['https://example.org/state-research-grants-audit'],
+  }),
+  makeCampaign({
+    id: 'cmp-small-biz-rates',
+    slug: 'commercial-property-tax-relief',
+    title: 'Cap sudden property assessments on neighbourhood retailers',
+    tagline: 'Small shops face 40% sudden tax hikes while vacant lots stay untaxed.',
+    short_description: 'Speculative commercial assessments are forcing multi-decade main street shops out.',
+    long_description: '<p>Downtown zoning changes have triggered speculative assessments on neighbourhood grocers and independent bookshops, doubling property tax burdens in a single assessment cycle.</p><p>A city council amendment proposing a 3-year phased transition needs 500 verified merchant and resident signatures before the May hearing.</p>',
+    why_backers_should_care: '<p>Main streets lose character overnight when long-term businesses cannot predict their tax bills.</p>',
+    category: 'economic_policy',
+    funding_goal: 8500,
+    funding_current: 4900,
+    creator_name: 'Elena Rostova',
+    target_audience: 'Small business owners, local shoppers, and civic voters.',
+    ad_headline: 'The independent shops that built your downtown are being taxed out.',
+    ad_primary_text: 'Commercial assessments increased 40% in one year. Help put the phase-in rule on the docket.',
+    campaign_sources: ['https://example.org/mainstreet-business-assessment-report'],
+  }),
+  makeCampaign({
+    id: 'cmp-local-heritage',
+    slug: 'reopen-the-odeon-cinema',
+    title: 'Restore and reopen the 1930s community cinema',
+    tagline: 'An art-deco landmark sitting dark for nine years.',
+    short_description: 'A community trust has secured the lease; public awareness is needed for council matching funds.',
+    long_description: '<p>The Odeon opened in 1934 and served as the town’s cultural centre for seven decades. A community trust has secured a conditional lease, but qualifying for the regional heritage grant requires demonstrating broad local community backing.</p>',
+    why_backers_should_care: '<p>Reviving historic venues keeps cultural programming affordable and local.</p>',
+    category: 'arts_culture',
+    funding_goal: 5500,
+    funding_current: 2800,
+    creator_name: 'Liam Vance',
+    target_audience: 'Arts patrons, families, and residents within 15 miles.',
+    ad_headline: 'The Odeon has been dark for nine years. We can turn the lights back on.',
+    ad_primary_text: 'A matching grant will fund restoration if we prove community interest this month.',
+    campaign_sources: ['https://example.org/odeon-heritage-trust'],
+  }),
   // Pending campaign
   makeCampaign({
     id: 'cmp-review-noise',
@@ -169,8 +214,6 @@ export const seedCampaigns: Campaign[] = [
     funding_current: 0,
     creator_name: 'Demo Creator',
     status: 'Pending',
-    uuts_review_decision: null,
-    trust_score: null,
     stripe_product_id: '',
     created_at: iso(NOW - 2 * DAY),
     campaign_sources: ['https://example.org/airport-operating-licence'],
@@ -184,12 +227,11 @@ export const seedCampaigns: Campaign[] = [
     short_description: 'Fully funded in eleven days.',
     long_description: '<p>The campaign reached its goal in eleven days and ran across Facebook and Reddit for three weeks.</p><p>The crossing was approved at the next committee meeting.</p>',
     why_backers_should_care: '<p>Kept as a worked example of a finished campaign.</p>',
-    category: 'community',
+    category: 'education',
     funding_goal: 4500,
     funding_current: 4500,
     creator_name: 'Esi Mensah',
     status: 'Completed',
-    uuts_review_decision: 'accepted',
     created_at: iso(NOW - 70 * DAY),
     campaign_starts_at: iso(NOW - 62 * DAY),
     launched_at: iso(NOW - 62 * DAY),
@@ -206,7 +248,7 @@ export const seedProfiles: Record<string, UserProfile> = {
     username: 'ava-mitchell',
     usernameLower: 'ava-mitchell',
     photoURL: '',
-    bio: 'Backs civic campaigns.',
+    bio: 'Backs community & civic campaigns.',
     created_at: iso(NOW - 55 * DAY),
   },
   'demo-seed-jonas': {
@@ -226,7 +268,7 @@ export const seedProfiles: Record<string, UserProfile> = {
     username: 'mei-tanaka',
     usernameLower: 'mei-tanaka',
     photoURL: '',
-    bio: 'Transit nerd.',
+    bio: 'Transit & public policy advocate.',
     created_at: iso(NOW - 28 * DAY),
   },
   'demo-seed-omar': {
@@ -256,6 +298,9 @@ const contribData: [string, string, number, number][] = [
   ['cmp-ballot-plain', 'demo-seed-jonas', 7500, 5],
   ['cmp-tree-canopy', 'demo-seed-omar', 15000, 14],
   ['cmp-tree-canopy', 'demo-seed-ava', 10000, 8],
+  ['cmp-open-science', 'demo-seed-ava', 10000, 6],
+  ['cmp-small-biz-rates', 'demo-seed-mei', 15000, 4],
+  ['cmp-local-heritage', 'demo-seed-jonas', 8000, 2],
   ['cmp-completed-crossing', 'demo-seed-mei', 30000, 60],
   ['cmp-completed-crossing', 'demo-seed-jonas', 15000, 58],
 ];
@@ -288,8 +333,12 @@ export const adPlatforms = [
 export const categories: { key: CampaignCategory; label: string; icon: string }[] = [
   { key: 'environment', label: 'Environment', icon: 'leaf' },
   { key: 'health', label: 'Health', icon: 'heart-pulse' },
+  { key: 'science', label: 'Science', icon: 'flask' },
   { key: 'education', label: 'Education', icon: 'school' },
-  { key: 'consumer', label: 'Consumer', icon: 'shield-check' },
+  { key: 'public_policy', label: 'Public Policy', icon: 'landmark' },
+  { key: 'economic_policy', label: 'Economic Policy', icon: 'trending-up' },
   { key: 'community', label: 'Community', icon: 'users' },
-  { key: 'civic', label: 'Civic', icon: 'landmark' },
+  { key: 'arts_culture', label: 'Arts & Culture', icon: 'color-palette' },
+  { key: 'business', label: 'Business', icon: 'briefcase' },
+  { key: 'other', label: 'Other', icon: 'grid' },
 ];

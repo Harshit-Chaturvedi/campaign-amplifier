@@ -24,22 +24,21 @@ export const colors = {
   info: '#3b82f6',
   infoLight: '#eff6ff',
 
-  // Trust score colors
-  trustHigh: '#22c55e',
-  trustMedium: '#f59e0b',
-  trustLow: '#ef4444',
-
-  // Category colors
+  // 10 Brief categories
   category: {
-    environment: '#22c55e',
-    health: '#ef4444',
-    education: '#3b82f6',
-    consumer: '#f59e0b',
-    community: '#a855f7',
-    civic: '#6366f1',
+    environment: '#16a34a',
+    health: '#dc2626',
+    science: '#0284c7',
+    education: '#2563eb',
+    public_policy: '#4f46e5',
+    economic_policy: '#0d9488',
+    community: '#9333ea',
+    arts_culture: '#d97706',
+    business: '#475569',
+    other: '#64748b',
   } as Record<string, string>,
 
-  // Dark mode
+  // Dark mode tokens
   dark: {
     background: '#0b1120',
     surface: '#1e293b',
@@ -53,11 +52,4 @@ export const colors = {
 
 export const getCategoryColor = (cat: string): string => {
   return colors.category[cat] || colors.primary;
-};
-
-export const getTrustColor = (score: number | null): string => {
-  if (score === null) return colors.textMuted;
-  if (score >= 70) return colors.trustHigh;
-  if (score >= 55) return colors.trustMedium;
-  return colors.trustLow;
 };

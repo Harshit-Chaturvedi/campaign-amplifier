@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../store/useAuthStore';
 
 // Screens
 import { LoginScreen, RegisterScreen } from '../screens/auth/AuthScreens';
@@ -11,18 +10,26 @@ import { HomeScreen } from '../screens/home/HomeScreen';
 import { CampaignDetailScreen } from '../screens/home/CampaignDetailScreen';
 import { ExploreScreen } from '../screens/explore/ExploreScreen';
 import { CreateCampaignScreen } from '../screens/create/CreateCampaignScreen';
-import { ImpactDashboard } from '../screens/impact/ImpactDashboard';
+import { ActivityScreen } from '../screens/activity/ActivityScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { FundCampaignScreen, ThankYouScreen } from '../screens/funding/FundingScreens';
+import type {
+  RootStackParamList,
+  MainTabParamList,
+  HomeStackParamList,
+  ExploreStackParamList,
+  CreateStackParamList,
+  ActivityStackParamList,
+  ProfileStackParamList,
+} from '../types/navigation';
 
-const AuthStack = createNativeStackNavigator();
-const HomeStack = createNativeStackNavigator();
-const ExploreStack = createNativeStackNavigator();
-const CreateStack = createNativeStackNavigator();
-const ImpactStack = createNativeStackNavigator();
-const ProfileStack = createNativeStackNavigator();
-const RootStack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const HomeStack = createNativeStackNavigator<HomeStackParamList>();
+const ExploreStack = createNativeStackNavigator<ExploreStackParamList>();
+const CreateStack = createNativeStackNavigator<CreateStackParamList>();
+const ActivityStack = createNativeStackNavigator<ActivityStackParamList>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
 function HomeNavigator() {
   return (
@@ -52,11 +59,12 @@ function CreateNavigator() {
   );
 }
 
-function ImpactNavigator() {
+function ActivityNavigator() {
   return (
-    <ImpactStack.Navigator screenOptions={{ headerShown: false }}>
-      <ImpactStack.Screen name="ImpactDashboard" component={ImpactDashboard} />
-    </ImpactStack.Navigator>
+    <ActivityStack.Navigator screenOptions={{ headerShown: false }}>
+      <ActivityStack.Screen name="Activity" component={ActivityScreen} />
+      <ActivityStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
+    </ActivityStack.Navigator>
   );
 }
 
@@ -68,15 +76,6 @@ function ProfileNavigator() {
   );
 }
 
-function AuthNavigator() {
-  return (
-    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
-      <AuthStack.Screen name="Login" component={LoginScreen} />
-      <AuthStack.Screen name="Register" component={RegisterScreen} />
-    </AuthStack.Navigator>
-  );
-}
-
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -85,12 +84,23 @@ function MainTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
           switch (route.name) {
-            case 'HomeTab': iconName = focused ? 'home' : 'home-outline'; break;
-            case 'ExploreTab': iconName = focused ? 'compass' : 'compass-outline'; break;
-            case 'CreateTab': iconName = focused ? 'add-circle' : 'add-circle-outline'; break;
-            case 'ImpactTab': iconName = focused ? 'bar-chart' : 'bar-chart-outline'; break;
-            case 'ProfileTab': iconName = focused ? 'person' : 'person-outline'; break;
-            default: iconName = 'ellipse';
+            case 'HomeTab':
+              iconName = focused ? 'home' : 'home-outline';
+              break;
+            case 'ExploreTab':
+              iconName = focused ? 'compass' : 'compass-outline';
+              break;
+            case 'CreateTab':
+              iconName = focused ? 'add-circle' : 'add-circle-outline';
+              break;
+            case 'ActivityTab':
+              iconName = focused ? 'notifications' : 'notifications-outline';
+              break;
+            case 'ProfileTab':
+              iconName = focused ? 'person' : 'person-outline';
+              break;
+            default:
+              iconName = 'ellipse';
           }
           return <Ionicons name={iconName} size={route.name === 'CreateTab' ? 32 : 24} color={color} />;
         },
@@ -113,24 +123,23 @@ function MainTabs() {
       <Tab.Screen name="HomeTab" component={HomeNavigator} options={{ tabBarLabel: 'Home' }} />
       <Tab.Screen name="ExploreTab" component={ExploreNavigator} options={{ tabBarLabel: 'Explore' }} />
       <Tab.Screen name="CreateTab" component={CreateNavigator} options={{ tabBarLabel: 'Create' }} />
-      <Tab.Screen name="ImpactTab" component={ImpactNavigator} options={{ tabBarLabel: 'Impact' }} />
+      <Tab.Screen name="ActivityTab" component={ActivityNavigator} options={{ tabBarLabel: 'Activity' }} />
       <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>
   );
 }
 
 export function RootNavigator() {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-
   return (
     <NavigationContainer>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {isAuthenticated ? (
-          <RootStack.Screen name="Main" component={MainTabs} />
-        ) : (
-          <RootStack.Screen name="Auth" component={AuthNavigator} />
-        )}
+        <RootStack.Screen name="Main" component={MainTabs} />
+        <RootStack.Group screenOptions={{ presentation: 'modal' }}>
+          <RootStack.Screen name="Login" component={LoginScreen} />
+          <RootStack.Screen name="Register" component={RegisterScreen} />
+        </RootStack.Group>
       </RootStack.Navigator>
     </NavigationContainer>
   );
 }
+

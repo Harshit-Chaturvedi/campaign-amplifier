@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StatusBar, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCampaignStore } from '../../store/useCampaignStore';
@@ -7,14 +7,16 @@ import { calculateImpact } from '../../services/impact';
 import { Card } from '../../components/ui/Card';
 import { CampaignCard } from '../../components/campaign/CampaignCard';
 import { formatCurrency, formatNumber } from '../../utils/formatting';
-import Svg, { Rect, Line, Circle, Text as SvgText } from 'react-native-svg';
+import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
+import Svg, { Line, Circle } from 'react-native-svg';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
-export function ImpactDashboard({ navigation }: any) {
+export function CreatorAnalyticsScreen({ navigation }: any) {
   const user = useAuthStore((s) => s.user);
   const getUserContributions = useCampaignStore((s) => s.getUserContributions);
   const getCampaign = useCampaignStore((s) => s.getCampaign);
+  const _allCampaigns = useCampaignStore((s) => s.campaigns);
 
   const uid = user?.uid || 'demo-user';
   const contributions = getUserContributions(uid);
@@ -28,19 +30,24 @@ export function ImpactDashboard({ navigation }: any) {
 
       {/* Header */}
       <View style={{ backgroundColor: '#4f46e5', paddingTop: 52, paddingBottom: 24, paddingHorizontal: 20, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
-        <Text style={{ fontSize: 24, fontWeight: '800', color: '#fff' }}>Your Impact</Text>
-        <Text style={{ fontSize: 14, color: '#c7d2fe', marginTop: 4 }}>See how your contributions make a difference</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View>
+            <Text style={{ fontSize: 24, fontWeight: '800', color: '#fff' }}>Analytics & Impact</Text>
+            <Text style={{ fontSize: 13, color: '#c7d2fe', marginTop: 4 }}>Distribution reach & performance</Text>
+          </View>
+          <DemoDataBadge size="sm" />
+        </View>
 
         {/* Main Stats */}
         <View style={{ flexDirection: 'row', marginTop: 20 }}>
           {[
-            { label: 'People Reached', value: formatNumber(impact.peopleReached), icon: 'radio-outline' },
-            { label: 'Campaigns', value: impact.campaignsBacked.toString(), icon: 'megaphone-outline' },
-            { label: 'Trust Score', value: impact.avgTrustScore.toString(), icon: 'shield-checkmark-outline' },
+            { label: 'Est. Reach', value: formatNumber(impact.peopleReached), icon: 'radio-outline' },
+            { label: 'Campaigns Backed', value: impact.campaignsBacked.toString(), icon: 'megaphone-outline' },
+            { label: 'Shift Metric', value: `+${impact.estimatedPerceptionShift}%`, icon: 'pulse' },
           ].map((stat) => (
             <View key={stat.label} style={{ flex: 1, alignItems: 'center' }}>
               <Ionicons name={stat.icon as any} size={20} color="#c7d2fe" />
-              <Text style={{ fontSize: 24, fontWeight: '800', color: '#fff', marginTop: 4 }}>{stat.value}</Text>
+              <Text style={{ fontSize: 22, fontWeight: '800', color: '#fff', marginTop: 4 }}>{stat.value}</Text>
               <Text style={{ fontSize: 11, color: '#a5b4fc', marginTop: 2 }}>{stat.label}</Text>
             </View>
           ))}
@@ -52,7 +59,7 @@ export function ImpactDashboard({ navigation }: any) {
         <Card style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View>
-              <Text style={{ fontSize: 13, color: '#64748b' }}>Total Contributed</Text>
+              <Text style={{ fontSize: 13, color: '#64748b' }}>Total Amplification Budget</Text>
               <Text style={{ fontSize: 28, fontWeight: '800', color: '#0f172a', marginTop: 2 }}>
                 {formatCurrency(impact.totalContributedCents / 100)}
               </Text>
@@ -68,34 +75,25 @@ export function ImpactDashboard({ navigation }: any) {
           <Card style={{ flex: 1, marginRight: 8 }}>
             <Ionicons name="eye-outline" size={20} color="#3b82f6" />
             <Text style={{ fontSize: 20, fontWeight: '700', color: '#0f172a', marginTop: 4 }}>{formatNumber(impact.totalViews)}</Text>
-            <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Views</Text>
+            <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Ad Impressions</Text>
           </Card>
           <Card style={{ flex: 1, marginLeft: 8 }}>
             <Ionicons name="hand-left-outline" size={20} color="#22c55e" />
             <Text style={{ fontSize: 20, fontWeight: '700', color: '#0f172a', marginTop: 4 }}>{formatNumber(impact.totalActions)}</Text>
-            <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Actions</Text>
+            <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Clicks & Actions</Text>
           </Card>
         </View>
 
-        {/* Perception Shift */}
-        <Card style={{ marginBottom: 16, backgroundColor: '#f0fdf4' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="pulse" size={20} color="#22c55e" />
-            <Text style={{ fontSize: 15, fontWeight: '700', color: '#166534', marginLeft: 8 }}>Perception Shift</Text>
-          </View>
-          <Text style={{ fontSize: 32, fontWeight: '800', color: '#166534', marginTop: 8 }}>+{impact.estimatedPerceptionShift}%</Text>
-          <Text style={{ fontSize: 13, color: '#15803d', marginTop: 4 }}>
-            Estimated shift in awareness among target audiences
-          </Text>
-        </Card>
-
-        {/* Mini Chart */}
+        {/* Reach Over Time Chart */}
         {impact.timeSeries.length > 1 && (
           <Card style={{ marginBottom: 16 }}>
-            <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>Reach Over Time</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>Estimated Reach Over Time</Text>
+              <DemoDataBadge size="sm" />
+            </View>
             <Svg width={SCREEN_W - 80} height={120}>
               {impact.timeSeries.map((point, i) => {
-                const maxReach = Math.max(...impact.timeSeries.map(p => p.reach));
+                const maxReach = Math.max(...impact.timeSeries.map(p => p.reach)) || 1;
                 const x = (i / (impact.timeSeries.length - 1)) * (SCREEN_W - 100);
                 const y = 110 - (point.reach / maxReach) * 100;
                 return (
@@ -119,7 +117,7 @@ export function ImpactDashboard({ navigation }: any) {
         {/* Campaign Breakdown */}
         {impact.campaignSummaries.length > 0 && (
           <View>
-            <Text style={{ fontSize: 18, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>Campaigns Backed</Text>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>Supported Campaigns</Text>
             {impact.campaignSummaries.map((cs) => {
               const c = getCampaign(cs.id);
               if (!c) return null;
@@ -127,7 +125,7 @@ export function ImpactDashboard({ navigation }: any) {
                 <CampaignCard
                   key={cs.id}
                   campaign={c}
-                  onPress={() => navigation.navigate('CampaignImpact', { campaignId: cs.id })}
+                  onPress={() => navigation.navigate('CampaignDetail', { campaignId: cs.id })}
                   variant="compact"
                 />
               );
@@ -138,9 +136,9 @@ export function ImpactDashboard({ navigation }: any) {
         {!hasData && (
           <View style={{ alignItems: 'center', paddingTop: 40 }}>
             <Ionicons name="bar-chart-outline" size={48} color="#94a3b8" />
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#64748b', marginTop: 12 }}>No impact data yet</Text>
+            <Text style={{ fontSize: 16, fontWeight: '600', color: '#64748b', marginTop: 12 }}>No performance data yet</Text>
             <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 4, textAlign: 'center' }}>
-              Fund a campaign to start seeing your impact here
+              Back a campaign or launch one to inspect distribution analytics here.
             </Text>
           </View>
         )}

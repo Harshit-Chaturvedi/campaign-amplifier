@@ -1,8 +1,7 @@
-import type { Campaign } from './campaign';
-
 export type RootStackParamList = {
-  Auth: undefined;
   Main: undefined;
+  Login: undefined;
+  Register: undefined;
 };
 
 export type AuthStackParamList = {
@@ -14,7 +13,7 @@ export type MainTabParamList = {
   HomeTab: undefined;
   ExploreTab: undefined;
   CreateTab: undefined;
-  ImpactTab: undefined;
+  ActivityTab: undefined;
   ProfileTab: undefined;
 };
 
@@ -34,9 +33,9 @@ export type CreateStackParamList = {
   CreateCampaign: undefined;
 };
 
-export type ImpactStackParamList = {
-  ImpactDashboard: undefined;
-  CampaignImpact: { campaignId: string };
+export type ActivityStackParamList = {
+  Activity: undefined;
+  CampaignDetail: { campaignId: string };
 };
 
 export type ProfileStackParamList = {

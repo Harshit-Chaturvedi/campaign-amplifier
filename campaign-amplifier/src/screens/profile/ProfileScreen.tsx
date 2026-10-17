@@ -15,6 +15,7 @@ export function ProfileScreen({ navigation }: any) {
   const getUserContributions = useCampaignStore((s) => s.getUserContributions);
   const getUserCampaigns = useCampaignStore((s) => s.getUserCampaigns);
   const getCampaign = useCampaignStore((s) => s.getCampaign);
+  const allCampaigns = useCampaignStore((s) => s.campaigns);
 
   const uid = user?.uid || '';
   const contributions = getUserContributions(uid);
@@ -26,8 +27,14 @@ export function ProfileScreen({ navigation }: any) {
       <View style={{ flex: 1, backgroundColor: '#f8fafc', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <Ionicons name="person-circle-outline" size={64} color="#94a3b8" />
         <Text style={{ fontSize: 20, fontWeight: '700', color: '#0f172a', marginTop: 16 }}>Sign in to view profile</Text>
-        <View style={{ marginTop: 24, width: '100%' }}>
-          <Button title="Sign In" onPress={() => navigation.navigate('Auth')} fullWidth />
+        <Text style={{ fontSize: 14, color: '#64748b', textAlign: 'center', marginTop: 8, marginBottom: 24, lineHeight: 20 }}>
+          Sign in or create an account to start your own campaigns, track your amplification, and follow updates.
+        </Text>
+        <View style={{ width: '100%' }}>
+          <Button title="Sign In" onPress={() => navigation.navigate('Login')} fullWidth />
+          <View style={{ marginTop: 12 }}>
+            <Button title="Create Account" onPress={() => navigation.navigate('Register')} variant="outline" fullWidth />
+          </View>
         </View>
       </View>
     );
@@ -55,11 +62,11 @@ export function ProfileScreen({ navigation }: any) {
             </View>
             <View style={{ flex: 1, alignItems: 'center' }}>
               <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a' }}>{formatNumber(impact.peopleReached)}</Text>
-              <Text style={{ fontSize: 12, color: '#64748b' }}>Reached</Text>
+              <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Reach</Text>
             </View>
             <View style={{ flex: 1, alignItems: 'center' }}>
               <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a' }}>{formatCurrency(impact.totalContributedCents / 100)}</Text>
-              <Text style={{ fontSize: 12, color: '#64748b' }}>Given</Text>
+              <Text style={{ fontSize: 12, color: '#64748b' }}>Contributed</Text>
             </View>
           </View>
         </View>

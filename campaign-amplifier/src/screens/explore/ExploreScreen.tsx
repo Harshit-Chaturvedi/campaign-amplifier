@@ -10,10 +10,14 @@ const CATEGORIES: { key: CampaignCategory | 'all'; label: string; icon: keyof ty
   { key: 'all', label: 'All', icon: 'grid-outline' },
   { key: 'environment', label: 'Environment', icon: 'leaf-outline' },
   { key: 'health', label: 'Health', icon: 'heart-outline' },
+  { key: 'science', label: 'Science', icon: 'flask-outline' },
   { key: 'education', label: 'Education', icon: 'school-outline' },
-  { key: 'consumer', label: 'Consumer', icon: 'shield-checkmark-outline' },
+  { key: 'public_policy', label: 'Public Policy', icon: 'flag-outline' },
+  { key: 'economic_policy', label: 'Economic Policy', icon: 'trending-up-outline' },
   { key: 'community', label: 'Community', icon: 'people-outline' },
-  { key: 'civic', label: 'Civic', icon: 'flag-outline' },
+  { key: 'arts_culture', label: 'Arts & Culture', icon: 'color-palette-outline' },
+  { key: 'business', label: 'Business', icon: 'briefcase-outline' },
+  { key: 'other', label: 'Other', icon: 'layers-outline' },
 ];
 
 export function ExploreScreen({ navigation }: any) {
@@ -23,8 +27,9 @@ export function ExploreScreen({ navigation }: any) {
   const searchCampaigns = useCampaignStore((s) => s.searchCampaigns);
   const getCampaignsByCategory = useCampaignStore((s) => s.getCampaignsByCategory);
   const getApproved = useCampaignStore((s) => s.getApprovedCampaigns);
+  const campaigns = useCampaignStore((s) => s.campaigns);
 
-  let campaigns = search ? searchCampaigns(search) : category === 'all' ? getApproved() : getCampaignsByCategory(category);
+  const results = search ? searchCampaigns(search) : category === 'all' ? getApproved() : getCampaignsByCategory(category);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
@@ -82,11 +87,11 @@ export function ExploreScreen({ navigation }: any) {
 
       {/* Results */}
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 100 }}>
-        <Text style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</Text>
-        {campaigns.map((c) => (
+        <Text style={{ fontSize: 13, color: '#94a3b8', marginBottom: 12 }}>{results.length} campaign{results.length !== 1 ? 's' : ''}</Text>
+        {results.map((c) => (
           <CampaignCard key={c.id} campaign={c} onPress={() => navigation.navigate('CampaignDetail', { campaignId: c.id })} />
         ))}
-        {campaigns.length === 0 && (
+        {results.length === 0 && (
           <View style={{ alignItems: 'center', paddingTop: 60 }}>
             <Ionicons name="search-outline" size={48} color="#94a3b8" />
             <Text style={{ fontSize: 16, fontWeight: '600', color: '#64748b', marginTop: 12 }}>No campaigns found</Text>

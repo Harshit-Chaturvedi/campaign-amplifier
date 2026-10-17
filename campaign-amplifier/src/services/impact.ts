@@ -1,5 +1,4 @@
 import type { Contribution, ImpactData, Campaign, TimeSeriesPoint, CampaignImpactSummary } from '../types/campaign';
-import { fnvHash } from '../utils/hash';
 
 const REACH_PER_DOLLAR = 27;
 
@@ -47,7 +46,6 @@ export function calculateImpact(
       title: camp.title,
       category: camp.category,
       thumbnail_url: camp.thumbnail_url || '',
-      trust_score: camp.trust_score,
       contributedCents: stats.totalCents,
       peopleReached: stats.reach,
     };
@@ -63,9 +61,6 @@ export function calculateImpact(
     totalActions: Math.round(reach * 0.016),
     peopleReached: reach,
     campaignsBacked: campaignIds.length,
-    avgTrustScore: campaigns.length
-      ? Math.round(campaigns.reduce((s, c) => s + (c.trust_score || 80), 0) / campaigns.length)
-      : 0,
     estimatedPerceptionShift: 7.4,
     timeSeries: buildTimeSeries(contributions),
     campaignSummaries: summaries,

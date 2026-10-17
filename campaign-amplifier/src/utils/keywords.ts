@@ -1,3 +1,5 @@
+import type { CampaignCategory } from '../types/campaign';
+
 const STOP_WORDS = new Set([
   'the', 'a', 'an', 'and', 'or', 'but', 'for', 'to', 'of', 'in', 'on', 'at', 'by',
   'with', 'from', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'it', 'its',
@@ -32,22 +34,29 @@ export function extractSummary(text: string): string {
   return (match ? match[1] : t.slice(0, 160)).trim();
 }
 
-const CATEGORY_RULES = [
-  { key: 'environment' as const, words: ['climate', 'tree', 'water', 'air', 'heat', 'pollution', 'energy', 'recycling', 'noise'] },
-  { key: 'health' as const, words: ['health', 'hospital', 'clinic', 'lead', 'disease', 'care', 'mental', 'safety'] },
-  { key: 'education' as const, words: ['school', 'student', 'teacher', 'library', 'classroom', 'literacy', 'tuition'] },
-  { key: 'consumer' as const, words: ['repair', 'price', 'fees', 'contract', 'warranty', 'refund', 'insurance', 'billing'] },
-  { key: 'community' as const, words: ['shelter', 'neighbour', 'neighbor', 'community', 'volunteer', 'housing', 'food'] },
-  { key: 'civic' as const, words: ['ballot', 'council', 'transit', 'vote', 'policy', 'permit', 'budget', 'ordinance'] },
+const CATEGORY_RULES: { key: CampaignCategory; words: string[] }[] = [
+  { key: 'environment', words: ['climate', 'tree', 'water', 'air', 'heat', 'pollution', 'energy', 'recycling', 'noise', 'green'] },
+  { key: 'health', words: ['health', 'hospital', 'clinic', 'lead', 'disease', 'care', 'mental', 'safety', 'medical', 'food'] },
+  { key: 'science', words: ['research', 'laboratory', 'technology', 'space', 'data', 'physics', 'biology', 'ai', 'discovery'] },
+  { key: 'education', words: ['school', 'student', 'teacher', 'library', 'classroom', 'literacy', 'tuition', 'college', 'books'] },
+  { key: 'public_policy', words: ['ballot', 'council', 'transit', 'vote', 'policy', 'permit', 'ordinance', 'rights', 'law'] },
+  { key: 'economic_policy', words: ['tax', 'inflation', 'wage', 'budget', 'debt', 'housing', 'interest', 'economy', 'jobs'] },
+  { key: 'community', words: ['shelter', 'neighbour', 'neighbor', 'community', 'volunteer', 'park', 'playground', 'elderly'] },
+  { key: 'arts_culture', words: ['museum', 'theater', 'music', 'art', 'heritage', 'festival', 'history', 'creative'] },
+  { key: 'business', words: ['repair', 'price', 'fees', 'contract', 'warranty', 'refund', 'startup', 'farmer', 'retail'] },
+  { key: 'other', words: ['general', 'miscellaneous'] },
 ];
 
-export function detectCategory(text: string): 'environment' | 'health' | 'education' | 'consumer' | 'community' | 'civic' {
+export function detectCategory(text: string): CampaignCategory {
   const lower = String(text || '').toLowerCase();
-  let bestKey: 'environment' | 'health' | 'education' | 'consumer' | 'community' | 'civic' = 'civic';
+  let bestKey: CampaignCategory = 'public_policy';
   let bestScore = 0;
   CATEGORY_RULES.forEach(({ key, words }) => {
     const score = words.reduce((s, w) => s + (lower.includes(w) ? 1 : 0), 0);
-    if (score > bestScore) { bestKey = key; bestScore = score; }
+    if (score > bestScore) {
+      bestKey = key;
+      bestScore = score;
+    }
   });
   return bestKey;
 }

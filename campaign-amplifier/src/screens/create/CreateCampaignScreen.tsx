@@ -4,10 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCampaignStore } from '../../store/useCampaignStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { generateCampaignContent } from '../../services/campaignAI';
-import { calculateTrustScore } from '../../services/trustScore';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { TrustScoreBadge } from '../../components/campaign/TrustScoreBadge';
 import { getCategoryColor } from '../../theme/colors';
 import type { CampaignCategory } from '../../types/campaign';
 
@@ -29,7 +27,7 @@ export function CreateCampaignScreen({ navigation }: any) {
   const [tagline, setTagline] = useState('');
   const [description, setDescription] = useState('');
   const [whyBack, setWhyBack] = useState('');
-  const [category, setCategory] = useState<CampaignCategory>('civic');
+  const [category, setCategory] = useState<CampaignCategory>('public_policy');
   const [sources, setSources] = useState<string[]>([]);
   const [newSource, setNewSource] = useState('');
   const [fundingGoal, setFundingGoal] = useState('5000');
@@ -77,7 +75,17 @@ export function CreateCampaignScreen({ navigation }: any) {
 
   const handleSubmit = () => {
     if (!title.trim()) { Alert.alert('Error', 'Please add a title'); return; }
-    if (!user) { Alert.alert('Error', 'Please sign in first'); return; }
+    if (!user) {
+      Alert.alert(
+        'Sign In Required',
+        'You can browse and back campaigns as a guest, but creating a campaign requires signing in so you can manage review and edits.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+      return;
+    }
 
     const campaign = createCampaign({
       title,
@@ -97,16 +105,9 @@ export function CreateCampaignScreen({ navigation }: any) {
     }, user.uid);
 
     Alert.alert('Campaign Submitted!', 'Your campaign has been submitted for review.', [
-      { text: 'View Campaign', onPress: () => navigation.navigate('HomeTab') },
+      { text: 'View Campaigns', onPress: () => navigation.navigate('HomeTab') },
     ]);
   };
-
-  const trustPreview = calculateTrustScore({
-    title,
-    long_description: description,
-    why_backers_should_care: whyBack,
-    campaign_sources: sources,
-  } as any);
 
   const canNext = () => {
     if (step === 0) return issueText.length >= 20;
@@ -199,7 +200,7 @@ export function CreateCampaignScreen({ navigation }: any) {
           <View>
             <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a', marginBottom: 4 }}>Add Sources</Text>
             <Text style={{ fontSize: 14, color: '#64748b', marginBottom: 16, lineHeight: 20 }}>
-              Link to evidence that supports your campaign. More sources = higher trust score.
+              Link to evidence that supports your campaign message. Clear, public citations help moderators verify that claims are traceable.
             </Text>
 
             <View style={{ flexDirection: 'row', marginBottom: 16 }}>
@@ -227,11 +228,15 @@ export function CreateCampaignScreen({ navigation }: any) {
               </View>
             ))}
 
-            <Card style={{ marginTop: 16, flexDirection: 'row', alignItems: 'center' }}>
-              <TrustScoreBadge score={trustPreview.composite} size="md" />
+            <Card style={{ marginTop: 16, flexDirection: 'row', alignItems: 'center', backgroundColor: '#f0fdf4', borderColor: '#bbf7d0' }}>
+              <Ionicons name="document-text-outline" size={24} color="#16a34a" />
               <View style={{ marginLeft: 12, flex: 1 }}>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>Trust Score Preview</Text>
-                <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>{sources.length} source{sources.length !== 1 ? 's' : ''} added</Text>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#166534' }}>
+                  {sources.length} supporting source{sources.length !== 1 ? 's' : ''} added
+                </Text>
+                <Text style={{ fontSize: 12, color: '#15803d', marginTop: 2 }}>
+                  Sources remain visible to backers on the published campaign page.
+                </Text>
               </View>
             </Card>
           </View>
@@ -312,9 +317,11 @@ export function CreateCampaignScreen({ navigation }: any) {
             <Card style={{ marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                 <View style={{ backgroundColor: catColor + '20', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3, marginRight: 8 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '600', color: catColor }}>{category.charAt(0).toUpperCase() + category.slice(1)}</Text>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: catColor }}>{category.toUpperCase()}</Text>
                 </View>
-                <TrustScoreBadge score={trustPreview.composite} size="sm" showLabel />
+                <View style={{ backgroundColor: '#fef3c7', borderRadius: 12, paddingHorizontal: 8, paddingVertical: 3 }}>
+                  <Text style={{ fontSize: 11, fontWeight: '600', color: '#b45309' }}>Pending Review</Text>
+                </View>
               </View>
               <Text style={{ fontSize: 18, fontWeight: '700', color: '#0f172a' }}>{title}</Text>
               <Text style={{ fontSize: 14, color: '#64748b', marginTop: 4 }}>{tagline}</Text>
@@ -323,7 +330,7 @@ export function CreateCampaignScreen({ navigation }: any) {
             {[
               { label: 'Funding Goal', value: `$${parseInt(fundingGoal).toLocaleString()}`, icon: 'cash-outline' },
               { label: 'Duration', value: `${durationDays} days`, icon: 'calendar-outline' },
-              { label: 'Sources', value: `${sources.length} linked`, icon: 'document-text-outline' },
+              { label: 'Sources', value: `${sources.length} cited`, icon: 'document-text-outline' },
               { label: 'Platforms', value: selectedPlatforms.join(', '), icon: 'share-social-outline' },
             ].map((item) => (
               <View key={item.label} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
@@ -338,7 +345,7 @@ export function CreateCampaignScreen({ navigation }: any) {
             </View>
 
             <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 12, lineHeight: 18 }}>
-              Your campaign will be reviewed by our trust team before going live. This usually takes less than 24 hours.
+              Your campaign will be reviewed for message clarity, supporting sources, and advertising compliance before community funding opens.
             </Text>
           </View>
         );

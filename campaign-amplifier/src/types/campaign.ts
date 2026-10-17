@@ -1,19 +1,16 @@
-export type CampaignCategory = 'environment' | 'health' | 'education' | 'consumer' | 'community' | 'civic';
+export type CampaignCategory =
+  | 'environment'
+  | 'health'
+  | 'science'
+  | 'education'
+  | 'public_policy'
+  | 'economic_policy'
+  | 'community'
+  | 'arts_culture'
+  | 'business'
+  | 'other';
 
 export type CampaignStatus = 'Approved' | 'Pending' | 'Rejected' | 'Completed';
-
-export type ReviewDecision = 'accepted' | 'on_hold' | 'rejected' | null;
-
-export interface TrustScore {
-  composite: number;
-  fact_check: number;
-  communication_integrity: number;
-  shared_reality: number;
-  decision: ReviewDecision;
-  summary: string;
-  sources_checked: number;
-  model: string;
-}
 
 export interface CampaignSlide {
   description: string;
@@ -50,8 +47,6 @@ export interface Campaign {
   duration_days: number;
   evergreen: boolean;
   show_countdown: boolean;
-  trust_score: number | null;
-  uuts_review_decision: ReviewDecision;
   campaign_sources: string[];
   ad_platforms: string[];
   milestones: string[];
@@ -96,7 +91,6 @@ export interface ImpactData {
   totalActions: number;
   peopleReached: number;
   campaignsBacked: number;
-  avgTrustScore: number;
   estimatedPerceptionShift: number;
   timeSeries: TimeSeriesPoint[];
   campaignSummaries: CampaignImpactSummary[];
@@ -115,7 +109,6 @@ export interface CampaignImpactSummary {
   title: string;
   category: CampaignCategory;
   thumbnail_url: string;
-  trust_score: number | null;
   contributedCents: number;
   peopleReached: number;
 }
