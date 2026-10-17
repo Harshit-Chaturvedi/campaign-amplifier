@@ -105,11 +105,15 @@ Generate a JSON object matching this schema exactly:
 }}
 Return ONLY raw JSON. No markdown backticks.
 """
-    model_name = settings.GEMINI_MODEL or "gemini-2.0-flash"
+    model_name = settings.GEMINI_MODEL or "gemini-3.8-flash"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
     for attempt in range(2):
         try:
-            async with httpx.AsyncClient(timeout=10.0) as client:
+            try:
+                transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
+            except Exception:
+                transport = None
+            async with httpx.AsyncClient(transport=transport, timeout=30.0) as client:
                 res = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
                 if res.status_code == 200:
                     data = res.json()
