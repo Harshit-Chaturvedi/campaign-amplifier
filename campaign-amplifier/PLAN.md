@@ -130,11 +130,11 @@ Calm, premium, credible. Primary indigo `#4f46e5` (matches the site), neutral sl
 - [x] Inspect repo — **decision: reuse** (builds & typechecks; see Section 13)
 - [x] Quick wins: remove auth gate, rename Impact→Activity, delete trust score, 10 categories
 - [x] FastAPI backend + SQLite/Postgres schema + seed script + /admin dashboard + /campaigns (Phase 3)
-- [ ] Expo Router tabs, theme tokens, core components, API client + TanStack Query
+- [x] Expo Router tabs, theme tokens, core components, API client + TanStack Query
 
 **Sun (18 Oct)** — the core journey
-- [ ] Home, Explore (real search/filter/sort), CampaignCard, states
-- [ ] Campaign Detail with sources, sticky funding bar, expandables
+- [x] Home, Explore (real search/filter/sort), CampaignCard, states
+- [x] Campaign Detail with sources, sticky funding bar, expandables
 - [ ] Creator flow Steps 1–5 + autosave + resume drafts + submit + timeline
 - [ ] **EAS APK build #1 by midday; install on phone; fix build issues**
 - [ ] Backing flow 6 steps + simulated payment + states + receipt
@@ -170,9 +170,19 @@ If time is short, **cut in this order:** comments → image generation → push 
 - **Seed Script (app/seed.py):** Seeds identical 14 campaigns, demo accounts `creator@demo.org` / `creator@demo.com`, `backer@demo.org` / `backer@demo.com`, `admin@demo.org` / `admin@demo.com` (password `demo123`), contributions, and notifications.
 - **Endpoints (/api/v1):** Auth, Public Campaigns (search, category, sort, page), Detail, Config Public, Reach Estimate, Drafts CRUD (with partial PATCH), Submit, Respond, Contributions (pending), Payments Simulate (success/pending/failed/cancelled/rejected, only success increments raised & checks milestones), Receipts, Social (follow/save), Notifications + Prefs, Analytics, Feedback, Uploads, AI endpoints (with demo-mode fallback).
 - **Admin Console (/admin):** Responsive HTML/JS dashboard for moderation queue, review actions with notes, delivery simulation, and completion.
-- **Verification:** `pytest -v` (10 passed, 0 failed); `uvicorn` running on port 8000; `/health`, `/docs`, `/admin` returning 200 OK; verified 3 complete end-to-end user flows.
+- **Verification:** `pytest -v` (11 passed, 0 failed); `uvicorn` running on port 8000; `/health`, `/docs`, `/admin` returning 200 OK.
 
-Next: Phase 4 (Explore filters/sort & Backing flow 6 steps) & Phase 5 (Creator flow 5-step wizard).
+**Phase 4 Complete (Sun 18 Oct, 01:05 IST):**
+- **TanStack Query & API Integration (src/api/client.ts & hooks.ts):** Configured with `EXPO_PUBLIC_API_URL`, request timeouts, error normalization, auth token injection, and automatic fallback to bundled seed data with an honest "Offline demo data" banner.
+- **Persistent State (Zustand + AsyncStorage):** `useAuthStore` with JWT token persistence; `usePreferencesStore` with saved/followed campaign lists and notification toggles; `useDraftStore` with draft autosave across all 5 steps.
+- **Reusable UI Design System (src/components/ui/):** `ProgressBar`, `Skeleton` (shimmer & card placeholder), `EmptyState`, `ErrorState`, `Expandable` accordion, `InfoTooltip`, `BottomSheet` modal, `Toast` notification, `SourceItem` with external link, `StatusBadge`, `DemoDataBadge`, and spacing/typography tokens in `src/theme/tokens.ts`.
+- **CampaignCard Component (src/components/campaign/CampaignCard.tsx):** Rebuilt with cover creative, category badge, title, creator, editorial summary, funding progress bar, raised vs goal, estimated reach at goal with demo badge, and a prominent **"Back This Campaign"** action button.
+- **Home Screen (src/screens/home/HomeScreen.tsx):** Rebuilt with hero section (promise headline, amplification explanation, reach-per-dollar estimate from config labelled "not a guarantee", dual CTAs), featured carousel, 3-card "How it works: Create → Review → Amplify" flow, active campaign feed with skeleton loaders and error retry.
+- **Explore Screen (src/screens/explore/ExploreScreen.tsx):** Debounced server-side search (300ms), 10 category chips + All, 5-option sort sheet (Trending, Newest, Most funded, Ending soon, Closest to goal), filter bottom sheet (lifecycle status, funding progress %), skeleton loaders, empty state with "Clear filters", error state with Retry.
+- **Campaign Detail Screen (src/screens/home/CampaignDetailScreen.tsx):** Editorial header with back, cover, category, title, creator, date, share via RN Share, status badge; story block renderer (headings, paragraphs, images with captions/credits, callout statistics, blockquotes, action blocks); visible sources list with external link opening; 4 expandable sections (Use of funds with 95% ads / 5% platform split and bold "funds distribution not the cause" notice, Audience & distribution with privacy notice, Review & trust with honest verification wording, and 2-question Reader Feedback widget); Save & Follow buttons with guest sign-in alerts; sticky bottom funding bar that never covers story content.
+- **Verification:** `npx tsc --noEmit` clean (0 errors); `npx expo-doctor` passed 20/20 checks with no issues detected; Expo web server running without bundling errors.
+
+Next: Phase 5 (The 5-Step Campaign Creation Wizard).
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

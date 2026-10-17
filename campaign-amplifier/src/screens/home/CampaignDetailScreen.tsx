@@ -1,15 +1,31 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StatusBar, Linking, Image } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StatusBar,
+  Linking,
+  Image,
+  Share,
+  Alert,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useCampaignStore } from '../../store/useCampaignStore';
+import { useCampaign, useSubmitFeedback } from '../../api/hooks';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { formatCurrency, formatNumber, timeAgo } from '../../utils/formatting';
-import { getCategoryColor } from '../../theme/colors';
-import { AmplificationNotice } from '../../components/campaign/AmplificationNotice';
-import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
+import { ProgressBar } from '../../components/ui/ProgressBar';
 import { StatusBadge } from '../../components/ui/StatusBadge';
+import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
+import { Expandable } from '../../components/ui/Expandable';
+import { SourceItem } from '../../components/ui/SourceItem';
+import { Skeleton } from '../../components/ui/Skeleton';
+import { ErrorState } from '../../components/ui/ErrorState';
+import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
+import { getCategoryColor } from '../../theme/colors';
 import { estimateReach } from '../../services/reach';
+import { useAuthStore } from '../../store/useAuthStore';
+import { usePreferencesStore } from '../../store/usePreferencesStore';
 import type { StoryBlock } from '../../types/campaign';
 
 const catLabels: Record<string, string> = {
@@ -27,17 +43,109 @@ const catLabels: Record<string, string> = {
 
 export function CampaignDetailScreen({ route, navigation }: any) {
   const { campaignId } = route.params;
-  const campaign = useCampaignStore((s) => s.getCampaign(campaignId));
-  const contributions = useCampaignStore((s) => s.getCampaignContributions(campaignId));
-  const [reviewExpanded, setReviewExpanded] = useState(false);
-  const [useOfFundsExpanded, setUseOfFundsExpanded] = useState(false);
-  const [audienceExpanded, setAudienceExpanded] = useState(false);
+  const { data, isLoading, isError, refetch } = useCampaign(campaignId);
+  const campaign = data?.campaign;
+  const isOffline = Boolean(data?.isOffline);
 
-  if (!campaign) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isSaved = usePreferencesStore((s) => s.isSaved(campaignId));
+  const isFollowed = usePreferencesStore((s) => s.isFollowed(campaignId));
+  const toggleSave = usePreferencesStore((s) => s.toggleSaveCampaign);
+  const toggleFollow = usePreferencesStore((s) => s.toggleFollowCampaign);
+
+  const submitFeedbackMutation = useSubmitFeedback(campaignId);
+  const [visualsFeedback, setVisualsFeedback] = useState<string | null>(null);
+  const [mindFeedback, setMindFeedback] = useState<string | null>(null);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+  const handleShare = async () => {
+    if (!campaign) return;
+    try {
+      await Share.share({
+        title: campaign.title,
+        message: `${campaign.title}\n\nHelp amplify this message: https://campaigns.app/c/${campaign.slug || campaign.id}`,
+      });
+    } catch {}
+  };
+
+  const handleToggleSave = () => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Sign in required',
+        'Please sign in to save campaigns to your personal profile.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => navigation.navigate('Auth', { screen: 'Login' }) },
+        ]
+      );
+      return;
+    }
+    toggleSave(campaignId);
+  };
+
+  const handleToggleFollow = () => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Sign in required',
+        'Please sign in to follow campaigns and receive milestone updates.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => navigation.navigate('Auth', { screen: 'Login' }) },
+        ]
+      );
+      return;
+    }
+    toggleFollow(campaignId);
+  };
+
+  const handleFeedbackVote = (type: 'visuals' | 'mind', val: string) => {
+    let nextVisuals = visualsFeedback;
+    let nextMind = mindFeedback;
+    if (type === 'visuals') {
+      setVisualsFeedback(val);
+      nextVisuals = val;
+    } else {
+      setMindFeedback(val);
+      nextMind = val;
+    }
+    if (nextVisuals && nextMind) {
+      submitFeedbackMutation.mutate({
+        visualsKeptReading: nextVisuals,
+        changedMind: nextMind,
+      });
+      setFeedbackSubmitted(true);
+    }
+  };
+
+  if (isLoading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
-        <Ionicons name="alert-circle-outline" size={48} color="#94a3b8" />
-        <Text style={{ fontSize: 16, color: '#64748b', marginTop: 12 }}>Campaign not found</Text>
+      <View style={{ flex: 1, backgroundColor: '#f8fafc', paddingTop: 52, paddingHorizontal: 20 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+          <Skeleton width={40} height={40} borderRadius={20} />
+          <Skeleton width={120} height={20} style={{ marginLeft: 16 }} />
+        </View>
+        <Skeleton height={200} borderRadius={18} style={{ marginBottom: 18 }} />
+        <Skeleton height={26} width="85%" style={{ marginBottom: 10 }} />
+        <Skeleton height={16} width="60%" style={{ marginBottom: 20 }} />
+        <Skeleton height={100} borderRadius={16} style={{ marginBottom: 16 }} />
+        <Skeleton height={140} borderRadius={16} />
+      </View>
+    );
+  }
+
+  if (isError || !campaign) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#f8fafc', justifyContent: 'center' }}>
+        <ErrorState
+          title="Campaign not found"
+          message="Could not load campaign details. Check your network or go back to Explore."
+          onRetry={refetch}
+        />
+        <View style={{ alignItems: 'center', marginTop: 10 }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 12 }}>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#4f46e5' }}>Back to Explore</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -48,19 +156,20 @@ export function CampaignDetailScreen({ route, navigation }: any) {
   const displayCategory = catLabels[campaign.category] || campaign.category;
   const coverUrl = campaign.adAssets?.coverUrl;
   const currentReachEstimate = estimateReach(campaign.amountRaised).estimate;
+  const isBackable = campaign.status === 'available_for_funding';
 
   const renderStoryBlock = (block: StoryBlock, index: number) => {
     switch (block.type) {
       case 'heading': {
-        const fontSize = block.level === 1 ? 20 : block.level === 2 ? 18 : 16;
+        const fontSize = block.level === 1 ? 22 : block.level === 2 ? 18 : 16;
         return (
           <Text
             key={index}
             style={{
               fontSize,
-              fontWeight: '700',
+              fontWeight: '800',
               color: '#0f172a',
-              marginTop: index === 0 ? 0 : 20,
+              marginTop: index === 0 ? 0 : 22,
               marginBottom: 8,
               lineHeight: fontSize + 6,
             }}
@@ -77,7 +186,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               fontSize: 15,
               color: '#334155',
               lineHeight: 24,
-              marginBottom: 12,
+              marginBottom: 14,
             }}
           >
             {block.text}
@@ -85,7 +194,17 @@ export function CampaignDetailScreen({ route, navigation }: any) {
         );
       case 'image':
         return (
-          <View key={index} style={{ marginVertical: 14, borderRadius: 14, overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
+          <View
+            key={index}
+            style={{
+              marginVertical: 14,
+              borderRadius: 16,
+              overflow: 'hidden',
+              backgroundColor: '#f1f5f9',
+              borderWidth: 1,
+              borderColor: '#e2e8f0',
+            }}
+          >
             <Image
               source={{ uri: block.url }}
               style={{ width: '100%', height: 210 }}
@@ -109,14 +228,24 @@ export function CampaignDetailScreen({ route, navigation }: any) {
         );
       case 'statistic':
         return (
-          <Card key={index} style={{ marginVertical: 12, backgroundColor: '#f8fafc', borderColor: '#e2e8f0', borderWidth: 1, padding: 16 }}>
-            <Text style={{ fontSize: 30, fontWeight: '900', color: '#4f46e5' }}>
+          <View
+            key={index}
+            style={{
+              marginVertical: 14,
+              backgroundColor: '#eef2ff',
+              borderRadius: 16,
+              padding: 16,
+              borderLeftWidth: 4,
+              borderLeftColor: '#4f46e5',
+            }}
+          >
+            <Text style={{ fontSize: 28, fontWeight: '900', color: '#1e1b4b' }}>
               {block.value}
             </Text>
-            <Text style={{ fontSize: 14, color: '#475569', marginTop: 4, fontWeight: '500' }}>
+            <Text style={{ fontSize: 13, fontWeight: '600', color: '#4338ca', marginTop: 4 }}>
               {block.label}
             </Text>
-          </Card>
+          </View>
         );
       case 'quote':
         return (
@@ -124,16 +253,18 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             key={index}
             style={{
               marginVertical: 14,
-              paddingLeft: 14,
+              backgroundColor: '#f8fafc',
+              borderRadius: 16,
+              padding: 18,
               borderLeftWidth: 4,
-              borderLeftColor: '#4f46e5',
+              borderLeftColor: '#0284c7',
             }}
           >
-            <Text style={{ fontSize: 15, fontStyle: 'italic', color: '#1e293b', lineHeight: 24 }}>
+            <Text style={{ fontSize: 16, fontStyle: 'italic', color: '#1e293b', lineHeight: 24 }}>
               "{block.quote}"
             </Text>
             {block.attribution && (
-              <Text style={{ fontSize: 12, fontWeight: '600', color: '#64748b', marginTop: 6 }}>
+              <Text style={{ fontSize: 13, color: '#64748b', fontWeight: '600', marginTop: 8 }}>
                 — {block.attribution}
               </Text>
             )}
@@ -141,28 +272,38 @@ export function CampaignDetailScreen({ route, navigation }: any) {
         );
       case 'action':
         return (
-          <Card key={index} style={{ marginVertical: 14, backgroundColor: '#eff6ff', borderColor: '#bfdbfe', borderWidth: 1, padding: 16 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="compass-outline" size={20} color="#2563eb" />
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#1d4ed8', marginLeft: 8 }}>
+          <View
+            key={index}
+            style={{
+              marginVertical: 14,
+              backgroundColor: '#f0fdf4',
+              borderRadius: 16,
+              padding: 16,
+              borderWidth: 1,
+              borderColor: '#bbf7d0',
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+              <Ionicons name="checkbox-outline" size={18} color="#16a34a" style={{ marginRight: 6 }} />
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#14532d' }}>
                 {block.title}
               </Text>
             </View>
-            <Text style={{ fontSize: 13, color: '#1e40af', marginTop: 6, lineHeight: 20 }}>
+            <Text style={{ fontSize: 13, color: '#166534', lineHeight: 19 }}>
               {block.description}
             </Text>
             {block.url && (
               <TouchableOpacity
-                onPress={() => Linking.openURL(block.url!)}
+                onPress={() => Linking.openURL(block.url!).catch(() => {})}
                 style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}
               >
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#2563eb', marginRight: 4 }}>
-                  Take Action
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#16a34a', marginRight: 4 }}>
+                  Take action
                 </Text>
-                <Ionicons name="arrow-forward" size={14} color="#2563eb" />
+                <Ionicons name="open-outline" size={14} color="#16a34a" />
               </TouchableOpacity>
             )}
-          </Card>
+          </View>
         );
       default:
         return null;
@@ -173,26 +314,27 @@ export function CampaignDetailScreen({ route, navigation }: any) {
     <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Top bar */}
+      {/* Top Navbar */}
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           paddingTop: 52,
           paddingBottom: 12,
           paddingHorizontal: 16,
           backgroundColor: '#fff',
           borderBottomWidth: 1,
           borderBottomColor: '#f1f5f9',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
+            width: 38,
+            height: 38,
+            borderRadius: 19,
             backgroundColor: '#f1f5f9',
             alignItems: 'center',
             justifyContent: 'center',
@@ -200,443 +342,424 @@ export function CampaignDetailScreen({ route, navigation }: any) {
         >
           <Ionicons name="arrow-back" size={20} color="#0f172a" />
         </TouchableOpacity>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
-          Campaign Story
-        </Text>
-        <TouchableOpacity
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#f1f5f9',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Ionicons name="share-outline" size={20} color="#0f172a" />
-        </TouchableOpacity>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <TouchableOpacity
+            onPress={handleToggleSave}
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 19,
+              backgroundColor: isSaved ? '#eef2ff' : '#f1f5f9',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons
+              name={isSaved ? 'bookmark' : 'bookmark-outline'}
+              size={19}
+              color={isSaved ? '#4f46e5' : '#64748b'}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleToggleFollow}
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 19,
+              backgroundColor: isFollowed ? '#f0fdf4' : '#f1f5f9',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons
+              name={isFollowed ? 'heart' : 'heart-outline'}
+              size={19}
+              color={isFollowed ? '#16a34a' : '#64748b'}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleShare}
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: 19,
+              backgroundColor: '#f1f5f9',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Ionicons name="share-social-outline" size={19} color="#64748b" />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Cover visual */}
-        <View style={{ height: 210, backgroundColor: catColor + '15', overflow: 'hidden' }}>
+      {/* Main Content (with 150 bottom padding so sticky bar never covers story) */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 160 }}
+      >
+        {/* Cover creative image */}
+        <View style={{ height: 220, backgroundColor: catColor + '15', overflow: 'hidden' }}>
           {coverUrl ? (
-            <Image source={{ uri: coverUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+            <Image
+              source={{ uri: coverUrl }}
+              style={{ width: '100%', height: '100%' }}
+              resizeMode="cover"
+            />
           ) : (
             <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="megaphone" size={56} color={catColor} />
+              <Ionicons name="megaphone-outline" size={54} color={catColor} />
             </View>
           )}
 
-          <View style={{ position: 'absolute', top: 16, left: 16 }}>
+          {isOffline && (
             <View
               style={{
-                backgroundColor: 'rgba(255,255,255,0.92)',
-                borderRadius: 20,
-                paddingHorizontal: 12,
-                paddingVertical: 5,
+                position: 'absolute',
+                top: 14,
+                right: 14,
+                backgroundColor: 'rgba(254, 243, 199, 0.95)',
+                borderRadius: 8,
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+              }}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#b45309' }}>
+                Offline demo data
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Campaign Header Info */}
+        <View style={{ padding: 20, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+            <View
+              style={{
+                backgroundColor: catColor + '18',
+                borderRadius: 16,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
               }}
             >
               <Text style={{ fontSize: 12, fontWeight: '700', color: catColor }}>
                 {displayCategory}
               </Text>
             </View>
+            <StatusBadge status={campaign.status} size="md" />
           </View>
-          <View style={{ position: 'absolute', top: 16, right: 16 }}>
-            <StatusBadge status={campaign.status} size="sm" />
-          </View>
-        </View>
 
-        <View style={{ padding: 20 }}>
-          {/* Title & Creator */}
           <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a', lineHeight: 28 }}>
             {campaign.title}
           </Text>
+
           {campaign.tagline && (
-            <Text style={{ fontSize: 15, color: '#64748b', marginTop: 6, lineHeight: 22 }}>
+            <Text style={{ fontSize: 15, fontWeight: '500', color: '#475569', marginTop: 6, lineHeight: 22 }}>
               {campaign.tagline}
             </Text>
           )}
-          <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 8 }}>
-            by {campaign.creatorName} · {timeAgo(campaign.createdAt)}
-          </Text>
 
-          {/* Amplification Notice */}
-          <View style={{ marginTop: 16 }}>
-            <AmplificationNotice />
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, flexWrap: 'wrap' }}>
+            <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>
+              {campaign.creatorName}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#94a3b8', marginHorizontal: 6 }}>•</Text>
+            <Text style={{ fontSize: 13, color: '#64748b' }}>
+              {formatDate(campaign.publishedAt || campaign.createdAt)}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#94a3b8', marginHorizontal: 6 }}>•</Text>
+            <Text style={{ fontSize: 13, color: '#64748b' }}>
+              {campaign.durationDays}d campaign
+            </Text>
           </View>
+        </View>
 
-          {/* Funding Progress Card */}
-          <Card style={{ marginTop: 20, padding: 20 }}>
+        {/* Progress summary card */}
+        <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
+          <Card style={{ padding: 18 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+              <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>
+                {formatCurrency(campaign.amountRaised)}
+              </Text>
+              <Text style={{ fontSize: 13, color: '#64748b' }}>
+                raised of {formatCurrency(campaign.fundingGoal)} goal
+              </Text>
+            </View>
+
+            <ProgressBar progress={pct} color={barColor} height={8} style={{ marginBottom: 12 }} />
+
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <Text style={{ fontSize: 28, fontWeight: '800', color: '#0f172a' }}>
-                  {formatCurrency(campaign.amountRaised)}
-                </Text>
-                <Text style={{ fontSize: 14, color: '#94a3b8', marginLeft: 8 }}>
-                  raised of {formatCurrency(campaign.fundingGoal)} goal
-                </Text>
+              <View>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>{pct}%</Text>
+                <Text style={{ fontSize: 11, color: '#94a3b8' }}>Funded</Text>
               </View>
-              <DemoDataBadge size="sm" />
-            </View>
-
-            <View style={{ height: 8, backgroundColor: '#e2e8f0', borderRadius: 4, marginTop: 12 }}>
-              <View style={{ width: `${Math.min(100, pct)}%`, height: 8, backgroundColor: barColor, borderRadius: 4 }} />
-            </View>
-
-            <View style={{ flexDirection: 'row', marginTop: 16 }}>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 22, fontWeight: '700', color: '#0f172a' }}>{pct}%</Text>
-                <Text style={{ fontSize: 12, color: '#94a3b8' }}>Funded</Text>
+              <View style={{ alignItems: 'center' }}>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>{campaign.backerCount}</Text>
+                <Text style={{ fontSize: 11, color: '#94a3b8' }}>Backers</Text>
               </View>
-              <View style={{ flex: 1, alignItems: 'center' }}>
-                <Text style={{ fontSize: 22, fontWeight: '700', color: '#0f172a' }}>{campaign.backerCount || contributions.length}</Text>
-                <Text style={{ fontSize: 12, color: '#94a3b8' }}>Backers</Text>
-              </View>
-              <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                <Text style={{ fontSize: 22, fontWeight: '700', color: '#4f46e5' }}>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={{ fontSize: 15, fontWeight: '700', color: '#4f46e5' }}>
                   {formatNumber(campaign.estimatedReachAtGoal)}
                 </Text>
-                <Text style={{ fontSize: 12, color: '#94a3b8' }}>Est. Reach @ Goal</Text>
+                <Text style={{ fontSize: 11, color: '#94a3b8' }}>Est. Reach @ Goal</Text>
               </View>
             </View>
           </Card>
+        </View>
 
-          {/* Measured Delivery (for Promoting & Completed) */}
-          {campaign.measuredDelivery && (
-            <Card style={{ marginTop: 16, backgroundColor: '#f0fdfa', borderColor: '#99f6e4', borderWidth: 1, padding: 18 }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Ionicons name="radio" size={18} color="#0d9488" />
-                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f766e', marginLeft: 8 }}>
-                    Measured Delivery Stats
-                  </Text>
-                </View>
-                <View style={{ backgroundColor: '#ccfbf1', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#0f766e' }}>AD PREVIEW</Text>
-                </View>
-              </View>
-
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f766e' }}>
-                    {formatNumber(campaign.measuredDelivery.measuredReach)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#115e59' }}>Audience Reached</Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f766e' }}>
-                    {formatNumber(campaign.measuredDelivery.impressions)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#115e59' }}>Impressions</Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f766e' }}>
-                    {formatNumber(campaign.measuredDelivery.clicks)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#115e59' }}>Clicks</Text>
-                </View>
-                <View style={{ alignItems: 'center' }}>
-                  <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f766e' }}>
-                    {formatCurrency(campaign.measuredDelivery.adSpend)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#115e59' }}>Ad Spend</Text>
-                </View>
-              </View>
-            </Card>
-          )}
-
-          {/* Final Distribution Report (for Completed) */}
-          {campaign.report && (
-            <Card style={{ marginTop: 16, backgroundColor: '#f8fafc', borderColor: '#cbd5e1', borderWidth: 1, padding: 18 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                <Ionicons name="ribbon-outline" size={20} color="#0f172a" />
-                <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a', marginLeft: 8 }}>
-                  Final Distribution Report
-                </Text>
-              </View>
-              <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20 }}>
-                {campaign.report.summaryNotes || 'The advertising campaign was completed as budgeted across selected channels.'}
-              </Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#e2e8f0' }}>
-                <Text style={{ fontSize: 12, color: '#64748b' }}>
-                  Total Raised: <Text style={{ fontWeight: '700', color: '#0f172a' }}>{formatCurrency(campaign.report.fundsRaised)}</Text>
-                </Text>
-                <Text style={{ fontSize: 12, color: '#64748b' }}>
-                  Ad Spend: <Text style={{ fontWeight: '700', color: '#0f172a' }}>{formatCurrency(campaign.report.adSpend)}</Text>
-                </Text>
-                <Text style={{ fontSize: 12, color: '#64748b' }}>
-                  Audience: <Text style={{ fontWeight: '700', color: '#0f172a' }}>{formatNumber(campaign.report.measuredReach)}</Text>
-                </Text>
-              </View>
-            </Card>
-          )}
-
-          {/* Story Blocks */}
-          <View style={{ marginTop: 24 }}>
-            <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a', marginBottom: 12 }}>
+        {/* Editorial Story Section */}
+        <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
+          <Card style={{ padding: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a', marginBottom: 14 }}>
               The Story
             </Text>
+
             {campaign.storyBlocks && campaign.storyBlocks.length > 0 ? (
-              campaign.storyBlocks.map((block, i) => renderStoryBlock(block, i))
+              campaign.storyBlocks.map((b, idx) => renderStoryBlock(b, idx))
             ) : (
               <Text style={{ fontSize: 15, color: '#334155', lineHeight: 24 }}>
                 {campaign.summary}
               </Text>
             )}
-          </View>
-
-          {/* Sources Section */}
-          {campaign.sources && campaign.sources.length > 0 && (
-            <View style={{ marginTop: 24 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                <Ionicons name="document-text-outline" size={18} color="#0f172a" />
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginLeft: 8 }}>
-                  Sources ({campaign.sources.length})
-                </Text>
-              </View>
-              <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 10 }}>
-                Sources cited by the creator for public inspection:
-              </Text>
-              {campaign.sources.map((src) => (
-                <TouchableOpacity
-                  key={src.id}
-                  onPress={() => Linking.openURL(src.url)}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    paddingVertical: 12,
-                    borderBottomWidth: 1,
-                    borderBottomColor: '#f1f5f9',
-                  }}
-                >
-                  <Ionicons name="link" size={16} color="#4f46e5" />
-                  <View style={{ flex: 1, marginLeft: 10, marginRight: 8 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>
-                      {src.title}
-                    </Text>
-                    <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }} numberOfLines={1}>
-                      {src.url.replace(/^https?:\/\//, '')}
-                    </Text>
-                  </View>
-                  <Ionicons name="open-outline" size={16} color="#94a3b8" />
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {/* Planned Ad Creative */}
-          {campaign.adAssets && (
-            <View style={{ marginTop: 28 }}>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>
-                Planned Advertising Creative
-              </Text>
-              <Card style={{ overflow: 'hidden', padding: 0 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12 }}>
-                  <View
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                      backgroundColor: '#eef2ff',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: 8,
-                    }}
-                  >
-                    <Ionicons name="megaphone" size={14} color="#4f46e5" />
-                  </View>
-                  <View>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>Sponsored Amplification</Text>
-                    <Text style={{ fontSize: 11, color: '#94a3b8' }}>Targeted Digital Ad Preview</Text>
-                  </View>
-                </View>
-
-                <Text style={{ fontSize: 14, color: '#334155', paddingHorizontal: 12, marginBottom: 8 }} numberOfLines={3}>
-                  {campaign.adAssets.description}
-                </Text>
-
-                <View style={{ height: 180, backgroundColor: catColor + '10', overflow: 'hidden' }}>
-                  {coverUrl ? (
-                    <Image source={{ uri: coverUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-                  ) : (
-                    <Ionicons name="image-outline" size={40} color="#94a3b8" />
-                  )}
-                </View>
-
-                <View style={{ padding: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
-                  <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
-                    {campaign.adAssets.headline}
-                  </Text>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 6 }}>
-                    <Text style={{ fontSize: 11, color: '#94a3b8' }}>campaigns.org</Text>
-                    <View style={{ backgroundColor: '#4f46e5', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4 }}>
-                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#fff' }}>
-                        {campaign.adAssets.cta || 'Learn More'}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </Card>
-            </View>
-          )}
-
-          {/* Expandable: Audience & Distribution */}
-          <Card style={{ marginTop: 24 }}>
-            <TouchableOpacity
-              onPress={() => setAudienceExpanded(!audienceExpanded)}
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                <Ionicons name="people-outline" size={20} color="#4f46e5" />
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', marginLeft: 8 }}>
-                  Audience & channel targeting
-                </Text>
-              </View>
-              <Ionicons
-                name={audienceExpanded ? 'chevron-up' : 'chevron-down'}
-                size={18}
-                color="#64748b"
-              />
-            </TouchableOpacity>
-
-            {audienceExpanded && (
-              <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
-                <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20 }}>
-                  <Text style={{ fontWeight: '700' }}>Target Locations:</Text>{' '}
-                  {campaign.reachSettings?.locations.join(', ') || 'All Regions'}
-                </Text>
-                <Text style={{ fontSize: 13, color: '#475569', marginTop: 6, lineHeight: 20 }}>
-                  <Text style={{ fontWeight: '700' }}>Interest Groups:</Text>{' '}
-                  {campaign.reachSettings?.interests.join(', ') || 'General Public'}
-                </Text>
-                <Text style={{ fontSize: 13, color: '#475569', marginTop: 6, lineHeight: 20 }}>
-                  <Text style={{ fontWeight: '700' }}>Distribution Channels:</Text>{' '}
-                  {campaign.reachSettings?.channels.join(', ') || 'Meta, Instagram'}
-                </Text>
-                <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 8, fontStyle: 'italic' }}>
-                  Targeting parameters are validated during editorial and compliance review before ads launch.
-                </Text>
-              </View>
-            )}
           </Card>
+        </View>
 
-          {/* Expandable: How review works */}
-          <Card style={{ marginTop: 12 }}>
-            <TouchableOpacity
-              onPress={() => setReviewExpanded(!reviewExpanded)}
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                <Ionicons name="shield-checkmark-outline" size={20} color="#4f46e5" />
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', marginLeft: 8 }}>
-                  How review works
-                </Text>
-              </View>
-              <Ionicons
-                name={reviewExpanded ? 'chevron-up' : 'chevron-down'}
-                size={18}
-                color="#64748b"
-              />
-            </TouchableOpacity>
-
-            {reviewExpanded && (
-              <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
-                <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20 }}>
-                  Submitted campaigns are reviewed by our team for content, sources, creative and targeting before they can be funded. We list sources so you can read them yourself. We do not score causes or claim independent fact-checking.
-                </Text>
-              </View>
-            )}
-          </Card>
-
-          {/* Expandable: Use of Funds */}
-          <Card style={{ marginTop: 12 }}>
-            <TouchableOpacity
-              onPress={() => setUseOfFundsExpanded(!useOfFundsExpanded)}
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                <Ionicons name="pie-chart-outline" size={20} color="#4f46e5" />
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', marginLeft: 8 }}>
-                  Use of funds & distribution
-                </Text>
-              </View>
-              <Ionicons
-                name={useOfFundsExpanded ? 'chevron-up' : 'chevron-down'}
-                size={18}
-                color="#64748b"
-              />
-            </TouchableOpacity>
-
-            {useOfFundsExpanded && (
-              <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
-                <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20 }}>
-                  Contributions pool to pay for ad distribution across digital channels.
-                </Text>
-                <Text style={{ fontSize: 13, color: '#475569', marginTop: 8, lineHeight: 20 }}>
-                  • <Text style={{ fontWeight: '600' }}>95% Advertising Media Budget:</Text> Directly pays for advertising inventory on Meta, Google, Reddit, and selected channels.{'\n'}
-                  • <Text style={{ fontWeight: '600' }}>5% Platform Operations:</Text> Covers moderation, ad optimization, and technical maintenance.{'\n'}
-                  • <Text style={{ fontWeight: '600' }}>Refund Policy:</Text> If a campaign fails moderation or is cancelled before distribution, contributions are refunded in full.
-                </Text>
-              </View>
-            )}
-          </Card>
-
-          {/* Estimated Reach & Performance Stats */}
-          <Card style={{ marginTop: 20, marginBottom: 120 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
-                Current Reach Estimates
+        {/* VISIBLE Sources List */}
+        <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
+          <Card style={{ padding: 18 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+              <Ionicons name="link-outline" size={20} color="#4f46e5" style={{ marginRight: 8 }} />
+              <Text style={{ fontSize: 17, fontWeight: '800', color: '#0f172a' }}>
+                Sources & Citations
               </Text>
-              <DemoDataBadge size="sm" />
             </View>
-            <View style={{ flexDirection: 'row' }}>
-              {[
-                { label: 'Est. Reach Raised', value: formatNumber(currentReachEstimate), icon: 'radio-outline' },
-                { label: 'Est. Views', value: formatNumber(Math.round(currentReachEstimate * 2.2)), icon: 'eye-outline' },
-                { label: 'Est. Reach @ Goal', value: formatNumber(campaign.estimatedReachAtGoal), icon: 'flag-outline' },
-              ].map((stat) => (
-                <View key={stat.label} style={{ flex: 1, alignItems: 'center' }}>
-                  <Ionicons name={stat.icon as any} size={20} color="#4f46e5" />
-                  <Text style={{ fontSize: 17, fontWeight: '800', color: '#0f172a', marginTop: 4 }}>
-                    {stat.value}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 2, textAlign: 'center' }}>
-                    {stat.label}
-                  </Text>
-                </View>
-              ))}
-            </View>
-            <Text style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', marginTop: 12 }}>
-              Reach is estimated from prototype assumptions, not a guarantee.
+            <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>
+              Traceable evidence supporting this campaign. All sources are listed for independent verification.
             </Text>
+
+            {campaign.sources && campaign.sources.length > 0 ? (
+              campaign.sources.map((src, idx) => (
+                <SourceItem key={src.id || idx} source={src} index={idx} />
+              ))
+            ) : (
+              <Text style={{ fontSize: 13, color: '#94a3b8', fontStyle: 'italic' }}>
+                No external links provided for this campaign.
+              </Text>
+            )}
           </Card>
+        </View>
+
+        {/* Expandable Sections */}
+        <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+          {/* 1. Use of Funds */}
+          <Expandable
+            title="Use of Funds & Fees"
+            icon="pie-chart-outline"
+            badgeText="95% to Ads"
+          >
+            <Text style={{ fontSize: 14, color: '#334155', lineHeight: 22, fontWeight: '700', marginBottom: 8 }}>
+              Your contribution pays for advertising that spreads this message. It is not a donation to the cause, person or organisation.
+            </Text>
+
+            <View style={{ backgroundColor: '#f8fafc', padding: 12, borderRadius: 10, marginVertical: 8 }}>
+              <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20 }}>
+                • <Text style={{ fontWeight: '700' }}>95% Direct Advertising Spend:</Text> Fully allocated to paid placement campaigns on Meta, Instagram, Reddit, and selected channels.{'\n'}
+                • <Text style={{ fontWeight: '700' }}>5% Platform Fee:</Text> Covers advertising setup, moderation infrastructure, and campaign reporting.{'\n'}
+                • <Text style={{ fontWeight: '700' }}>Refund Policy:</Text> In the event an unpromoted campaign is cancelled or fails compliance, contributions are refunded in full.
+              </Text>
+            </View>
+
+            <Text style={{ fontSize: 12, color: '#64748b', fontStyle: 'italic', marginTop: 4 }}>
+              Unspent funds are never withdrawn as creator profit; they remain in the campaign pool or trigger proportional refunds.
+            </Text>
+          </Expandable>
+
+          {/* 2. Audience & Distribution */}
+          <Expandable
+            title="Audience & Distribution"
+            icon="people-outline"
+          >
+            <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20, marginBottom: 8 }}>
+              <Text style={{ fontWeight: '700' }}>Target Locations:</Text>{' '}
+              {campaign.reachSettings?.locations.join(', ') || 'United States'}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20, marginBottom: 8 }}>
+              <Text style={{ fontWeight: '700' }}>Interest Segments:</Text>{' '}
+              {campaign.reachSettings?.interests.join(', ') || 'Local Community, Public Policy'}
+            </Text>
+            <Text style={{ fontSize: 13, color: '#475569', lineHeight: 20, marginBottom: 8 }}>
+              <Text style={{ fontWeight: '700' }}>Distribution Channels:</Text>{' '}
+              {campaign.reachSettings?.channels.join(', ') || 'Meta, Instagram, Reddit'}
+            </Text>
+
+            <View style={{ backgroundColor: '#f8fafc', padding: 10, borderRadius: 10, marginTop: 6 }}>
+              <Text style={{ fontSize: 12, color: '#64748b', lineHeight: 18 }}>
+                Privacy notice: Ad targeting strictly adheres to digital advertising regulations. Backer names and emails are never shared with ad networks or third parties.
+              </Text>
+            </View>
+          </Expandable>
+
+          {/* 3. Review & Trust */}
+          <Expandable
+            title="Review Process & Trust"
+            icon="shield-checkmark-outline"
+          >
+            <Text style={{ fontSize: 13, color: '#475569', lineHeight: 21 }}>
+              Submitted campaigns are reviewed by our team for content, sources, creative and targeting before they can be funded. We list sources so you can read them yourself. We do not score causes or claim independent fact-checking.
+            </Text>
+            <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+              <Text style={{ fontSize: 12, color: '#64748b' }}>
+                Distribution partners: Meta Advertising API, Reddit Ads Platform, and certified civic outreach networks.
+              </Text>
+            </View>
+          </Expandable>
+
+          {/* 4. Feedback Widget */}
+          <Expandable
+            title="Reader Feedback"
+            icon="chatbubbles-outline"
+            badgeText={feedbackSubmitted ? 'Voted ✓' : 'Feedback'}
+            defaultExpanded={false}
+          >
+            {feedbackSubmitted ? (
+              <View style={{ paddingVertical: 10, alignItems: 'center' }}>
+                <Ionicons name="checkmark-circle" size={28} color="#22c55e" />
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#166534', marginTop: 6 }}>
+                  Thank you for your feedback!
+                </Text>
+                <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  Your responses help evaluate message clarity.
+                </Text>
+              </View>
+            ) : (
+              <View style={{ paddingVertical: 6 }}>
+                {/* Question 1 */}
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a', marginBottom: 8 }}>
+                  Did the visuals encourage you to keep reading?
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
+                  {['No', 'Somewhat', 'Yes'].map((val) => (
+                    <TouchableOpacity
+                      key={val}
+                      onPress={() => handleFeedbackVote('visuals', val)}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 8,
+                        borderRadius: 10,
+                        backgroundColor: visualsFeedback === val ? '#4f46e5' : '#f1f5f9',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          fontWeight: visualsFeedback === val ? '700' : '500',
+                          color: visualsFeedback === val ? '#fff' : '#334155',
+                        }}
+                      >
+                        {val}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Question 2 */}
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a', marginBottom: 8 }}>
+                  Did this campaign change your perspective on this issue?
+                </Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  {['No', 'Somewhat', 'Yes'].map((val) => (
+                    <TouchableOpacity
+                      key={val}
+                      onPress={() => handleFeedbackVote('mind', val)}
+                      style={{
+                        flex: 1,
+                        paddingVertical: 8,
+                        borderRadius: 10,
+                        backgroundColor: mindFeedback === val ? '#4f46e5' : '#f1f5f9',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 13,
+                          fontWeight: mindFeedback === val ? '700' : '500',
+                          color: mindFeedback === val ? '#fff' : '#334155',
+                        }}
+                      >
+                        {val}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+          </Expandable>
         </View>
       </ScrollView>
 
-      {/* Sticky Back Button */}
-      {campaign.status === 'available_for_funding' && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: '#fff',
-            borderTopWidth: 1,
-            borderTopColor: '#f1f5f9',
-            padding: 16,
-            paddingBottom: 32,
-          }}
-        >
-          <Button
-            title="Back this campaign"
-            onPress={() => navigation.navigate('FundCampaign', { campaignId: campaign.id })}
-            icon="megaphone"
-            fullWidth
-          />
+      {/* Sticky Bottom Funding Bar that never covers the story */}
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: '#fff',
+          borderTopWidth: 1,
+          borderTopColor: '#f1f5f9',
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 28,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -3 },
+          shadowOpacity: 0.08,
+          shadowRadius: 6,
+          elevation: 10,
+        }}
+      >
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <View>
+            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+              {formatCurrency(campaign.amountRaised)}{' '}
+              <Text style={{ fontSize: 12, fontWeight: '500', color: '#64748b' }}>
+                of {formatCurrency(campaign.fundingGoal)}
+              </Text>
+            </Text>
+            <Text style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>
+              {pct}% funded • Est. reach: {formatNumber(currentReachEstimate)}
+            </Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <TouchableOpacity
+              onPress={handleShare}
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 12,
+                backgroundColor: '#f1f5f9',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Ionicons name="share-outline" size={20} color="#334155" />
+            </TouchableOpacity>
+
+            {isBackable && (
+              <Button
+                title="Back This Campaign"
+                size="md"
+                icon="megaphone-outline"
+                onPress={() => navigation.navigate('FundCampaign', { campaignId: campaign.id })}
+              />
+            )}
+          </View>
         </View>
-      )}
+      </View>
     </View>
   );
 }

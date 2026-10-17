@@ -109,6 +109,7 @@ export interface Campaign {
 
   // Reach figures
   estimatedReachAtGoal: number;
+  durationDays?: number;
   measuredDelivery?: MeasuredDelivery;
   report?: Report;
 

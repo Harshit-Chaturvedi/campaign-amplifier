@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, ViewStyle } from 'react-native';
+import { View, TouchableOpacity, ViewStyle, StyleProp, StyleSheet } from 'react-native';
 
 interface CardProps {
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   onPress?: () => void;
   padding?: number;
 }
@@ -20,7 +20,7 @@ export function Card({ children, style, onPress, padding = 16 }: CardProps) {
     shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 2,
-    ...style,
+    ...StyleSheet.flatten(style),
   };
 
   if (onPress) {
