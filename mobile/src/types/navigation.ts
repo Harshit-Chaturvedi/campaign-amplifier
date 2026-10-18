@@ -30,6 +30,8 @@ export type HomeStackParamList = {
     total?: number;
     paymentStatus?: string;
   };
+  Report: { campaignId: string };
+  InfoPage: { slug: string };
 };
 
 export type ExploreStackParamList = {
@@ -45,6 +47,8 @@ export type ExploreStackParamList = {
     total?: number;
     paymentStatus?: string;
   };
+  Report: { campaignId: string };
+  InfoPage: { slug: string };
 };
 
 export type CreateStackParamList = {
@@ -66,6 +70,7 @@ export type ActivityStackParamList = {
     total?: number;
     paymentStatus?: string;
   };
+  Report: { campaignId: string };
 };
 
 export type ProfileStackParamList = {
@@ -73,5 +78,19 @@ export type ProfileStackParamList = {
   EditProfile: undefined;
   MyContributions: undefined;
   MyCampaigns: undefined;
+  CreatorDashboard: { initialTab?: string } | undefined;
+  Report: { campaignId: string };
+  InfoPage: { slug: string };
+  CampaignDetail: { campaignId: string };
+  FundCampaign: { campaignId: string; initialAmount?: number };
+  ThankYou: {
+    campaignId: string;
+    amount: number;
+    receiptNo?: string;
+    estimatedReach?: number;
+    fee?: number;
+    total?: number;
+    paymentStatus?: string;
+  };
   Settings: undefined;
 };

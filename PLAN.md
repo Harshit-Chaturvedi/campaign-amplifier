@@ -233,7 +233,22 @@ If time is short, **cut in this order:** comments → image generation → push 
 - **Digital Receipt & Confirmation:** Dedicated receipt card and screen rendering receipt number (`#REC-YYYY-XXXXXX`), timestamp, itemized fees, total paid, estimated reach, and backer privacy flag. Includes Share action and campaign Follow toggle.
 - **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 16/16 (including new `test_phase6_backing.py` asserting guest backing, fee formula, outcome states, receipt retrieval, and goal reached non-auto-promotion); forbidden verification copy strings scanned and clean (0 instances).
 
-Next: Phase 7 (Activity tab, Profile, creator dashboard + analytics).
+**Phase 7 Complete (Sun 19 Oct, 00:55 IST):**
+- **Prominent Test Mode Notice:** Checkout screen prominently displays `"Test mode - no real payment"`.
+- **Activity & Notification Center:** Complete notification center with 4 filter tabs (`All`, `Funding`, `Updates`, `Following`), unread counters and indicators, tap to open referenced campaign, "Mark all read" action, and notification preferences sheet with per-category toggle controls.
+- **Profile & Account Management:** Full support for both guest mode and authenticated profiles. Includes created campaigns shortcut to Creator Dashboard, backed campaigns list with amount/date and digital receipt access, saved/followed campaigns lists, payment history with itemized Digital Receipt modal, settings with privacy default toggles, and direct links to all 9 platform info pages.
+- **Creator Dashboard:** 6 status tabs (`Drafts`, `In Review`, `Funding`, `Promoting`, `Completed`, `Requires Action`). Each campaign displays thumbnail, category, status badge, progress bar, reach estimates or measured reach, and contextual actions (edit draft, public link, view delivery report, post campaign update via modal, respond to changes requested). Material change safeguard warns creator that editing an active campaign pauses funding and requires editorial re-review.
+- **Delivery & Analytics Reports:** Comprehensive report screen with 4 strictly separated sections:
+  1. *Funding Summary:* Total raised, backer count, % funded, and anonymized contributor list (backer names strictly hidden unless explicitly opted in).
+  2. *Budget Allocation:* 95% ad spend, 5% platform operations fee, payment fees.
+  3. *Delivery — Measured:* Labelled `"Measured (demo data)"` — impressions, clicks, CTR, cost-per-reach, measured reach, and delivery channels.
+  4. *Estimates:* Labelled `"Estimate"` — reach projections and targeting audience breakdown.
+  5. *Definitions Info Sheet:* Modal explaining every metric and distinction between measured and estimated figures.
+- **Platform Info Pages:** Shared `InfoScreen` component rendering 9 dedicated pages: About, How It Works, FAQs, Help, Contact, Terms, Privacy, Community Guidelines, and Fees & Refunds. Linked from Profile and Home footer.
+- **Lifecycle E2E Verification:** `backend/tests/test_phase7_lifecycle_e2e.py` verifies full cycle: draft creation -> submit -> admin review-queue -> admin approval -> available for funding -> backer contribution (simulated payment) -> goal reached (non-auto-promotion) -> admin start-promotion -> simulate delivery -> completion. Asserts notifications created at each step, measured numbers in report, and backer privacy preserved.
+- **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 17/17; forbidden copy scanner clean (`0` instances in `mobile/src`, only `verify_password` in `backend/app`).
+
+Next: Phase 8 (Polish, QA, demo script, and final checks).
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

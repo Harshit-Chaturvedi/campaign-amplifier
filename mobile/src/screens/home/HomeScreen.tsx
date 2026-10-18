@@ -406,6 +406,60 @@ export function HomeScreen({ navigation }: any) {
                 onBackPress={() => goToBack(c.id)}
               />
             ))}
+
+          {/* App Footer */}
+          <View
+            style={{
+              marginTop: 30,
+              paddingTop: 24,
+              borderTopWidth: 1,
+              borderTopColor: '#e2e8f0',
+              alignItems: 'center',
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+              <Ionicons name="megaphone" size={16} color="#4f46e5" style={{ marginRight: 6 }} />
+              <Text style={{ fontSize: 13, fontWeight: '800', color: '#0f172a' }}>
+                Campaign Amplifier
+              </Text>
+            </View>
+            <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'center', marginBottom: 14, paddingHorizontal: 20 }}>
+              Civic message distribution infrastructure. Micro-contributions pool to fund digital ads for checkable messages.
+            </Text>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                gap: 12,
+                marginBottom: 16,
+              }}
+            >
+              {[
+                { title: 'About', slug: 'about' },
+                { title: 'How It Works', slug: 'how-it-works' },
+                { title: 'FAQs', slug: 'faqs' },
+                { title: 'Fees & Refunds', slug: 'fees-and-refunds' },
+                { title: 'Terms', slug: 'terms' },
+                { title: 'Privacy', slug: 'privacy' },
+              ].map((item) => (
+                <TouchableOpacity
+                  key={item.slug}
+                  onPress={() => navigation.navigate('InfoPage', { slug: item.slug })}
+                  style={{ paddingVertical: 4, paddingHorizontal: 6 }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#4f46e5' }}>
+                    {item.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={{ fontSize: 11, color: '#94a3b8' }}>
+              © 2026 Campaign Amplifier • Demo Environment
+            </Text>
+          </View>
         </View>
       </ScrollView>
     </View>

@@ -241,7 +241,8 @@ def get_campaign_analytics(
             "measured_reach": campaign.report.measured_reach,
             "clicks": campaign.report.clicks,
             "ad_spend": campaign.report.ad_spend,
-            "is_final": campaign.report.is_final
+            "is_final": campaign.report.is_final,
+            "label": "Measured (demo data)"
         }
 
     return {

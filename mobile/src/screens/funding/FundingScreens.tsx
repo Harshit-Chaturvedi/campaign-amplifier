@@ -590,7 +590,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                 <Ionicons name="card-outline" size={18} color="#2563eb" />
                 <Text style={{ fontSize: 13, fontWeight: '800', color: '#1d4ed8', textTransform: 'uppercase' }}>
-                  Simulated Checkout (Demo Mode)
+                  Test mode - no real payment
                 </Text>
               </View>
               <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 17 }}>

@@ -14,6 +14,9 @@ import { CreateFlowScreen } from '../screens/create/CreateFlowScreen';
 import { VoiceDraftScreen } from '../screens/create/VoiceDraftScreen';
 import { ActivityScreen } from '../screens/activity/ActivityScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { CreatorDashboardScreen } from '../screens/profile/CreatorDashboardScreen';
+import { ReportScreen } from '../screens/report/ReportScreen';
+import { InfoScreen } from '../screens/info/InfoScreen';
 import { FundCampaignScreen, ThankYouScreen } from '../screens/funding/FundingScreens';
 import type {
   RootStackParamList,
@@ -40,6 +43,8 @@ function HomeNavigator() {
       <HomeStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
       <HomeStack.Screen name="FundCampaign" component={FundCampaignScreen} />
       <HomeStack.Screen name="ThankYou" component={ThankYouScreen} />
+      <HomeStack.Screen name="Report" component={ReportScreen} />
+      <HomeStack.Screen name="InfoPage" component={InfoScreen} />
     </HomeStack.Navigator>
   );
 }
@@ -51,6 +56,8 @@ function ExploreNavigator() {
       <ExploreStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
       <ExploreStack.Screen name="FundCampaign" component={FundCampaignScreen} />
       <ExploreStack.Screen name="ThankYou" component={ThankYouScreen} />
+      <ExploreStack.Screen name="Report" component={ReportScreen} />
+      <ExploreStack.Screen name="InfoPage" component={InfoScreen} />
     </ExploreStack.Navigator>
   );
 }
@@ -72,6 +79,7 @@ function ActivityNavigator() {
       <ActivityStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
       <ActivityStack.Screen name="FundCampaign" component={FundCampaignScreen} />
       <ActivityStack.Screen name="ThankYou" component={ThankYouScreen} />
+      <ActivityStack.Screen name="Report" component={ReportScreen} />
     </ActivityStack.Navigator>
   );
 }
@@ -80,6 +88,12 @@ function ProfileNavigator() {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+      <ProfileStack.Screen name="CreatorDashboard" component={CreatorDashboardScreen} />
+      <ProfileStack.Screen name="Report" component={ReportScreen} />
+      <ProfileStack.Screen name="InfoPage" component={InfoScreen} />
+      <ProfileStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
+      <ProfileStack.Screen name="FundCampaign" component={FundCampaignScreen} />
+      <ProfileStack.Screen name="ThankYou" component={ThankYouScreen} />
     </ProfileStack.Navigator>
   );
 }

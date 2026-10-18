@@ -537,6 +537,48 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               </View>
             </View>
           </Card>
+
+          {/* Delivery & Analytics Report Link */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Report', { campaignId: campaign.id })}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#fff',
+              borderWidth: 1,
+              borderColor: '#e2e8f0',
+              borderRadius: 14,
+              padding: 14,
+              marginTop: 10,
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+              <View
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: 18,
+                  backgroundColor: '#eef2ff',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Ionicons name="stats-chart" size={18} color="#4f46e5" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>
+                  Delivery & Analytics Report
+                </Text>
+                <Text style={{ fontSize: 11, color: '#64748b' }}>
+                  {campaign.status === 'completed' || campaign.status === 'promoting'
+                    ? 'Measured reach and itemised ad spend'
+                    : 'Budget breakdown and reach projections'}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#94a3b8" />
+          </TouchableOpacity>
         </View>
 
         {/* Editorial Story Section */}
@@ -780,12 +822,20 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               <Ionicons name="share-outline" size={20} color="#334155" />
             </TouchableOpacity>
 
-            {isBackable && (
+            {isBackable ? (
               <Button
                 title="Back This Campaign"
                 size="md"
                 icon="megaphone-outline"
                 onPress={() => navigation.navigate('FundCampaign', { campaignId: campaign.id })}
+              />
+            ) : (
+              <Button
+                title="View Report"
+                size="md"
+                variant="outline"
+                icon="stats-chart-outline"
+                onPress={() => navigation.navigate('Report', { campaignId: campaign.id })}
               />
             )}
           </View>
