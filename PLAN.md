@@ -135,7 +135,8 @@ Calm, premium, credible. Primary indigo `#4f46e5` (matches the site), neutral sl
 **Sun (18 Oct)** — the core journey
 - [x] Home, Explore (real search/filter/sort), CampaignCard, states
 - [x] Campaign Detail with sources, sticky funding bar, expandables
-- [ ] Creator flow Steps 1–5 + autosave + resume drafts + submit + timeline
+- [x] Creator flow Steps 1–3 + landing + autosave + resume drafts (Phase 5A)
+- [ ] Creator flow Steps 4–5 + submit + timeline (Phase 5B)
 - [ ] **EAS APK build #1 by midday; install on phone; fix build issues**
 - [ ] Backing flow 6 steps + simulated payment + states + receipt
 
@@ -182,7 +183,16 @@ If time is short, **cut in this order:** comments → image generation → push 
 - **Campaign Detail Screen (src/screens/home/CampaignDetailScreen.tsx):** Editorial header with back, cover, category, title, creator, date, share via RN Share, status badge; story block renderer (headings, paragraphs, images with captions/credits, callout statistics, blockquotes, action blocks); visible sources list with external link opening; 4 expandable sections (Use of funds with 95% ads / 5% platform split and bold "funds distribution not the cause" notice, Audience & distribution with privacy notice, Review & trust with honest verification wording, and 2-question Reader Feedback widget); Save & Follow buttons with guest sign-in alerts; sticky bottom funding bar that never covers story content.
 - **Verification:** `npx tsc --noEmit` clean (0 errors); `npx expo-doctor` passed 20/20 checks with no issues detected; Expo web server running without bundling errors.
 
-Next: Phase 5 (The 5-Step Campaign Creation Wizard).
+**Phase 5A Complete (Sun 18 Oct, 01:25 IST):**
+- **Create Tab Landing (src/screens/create/CreateLandingScreen.tsx):** Saved drafts list displaying draft title, formatted last-saved date, step reached, with Resume and Delete actions; entry cards for "Create Manually" and "Create with Your Voice" (clearly labelled as "Coming in Phase 5C", not a dead button); sign-in banner with "Sign In" and "Create Account" buttons for guest users.
+- **CreateFlow Controller (src/screens/create/CreateFlowScreen.tsx):** Shared header with 5-step progress indicator and live autosave status ("Saved on this device" offline, "All changes synced" online, "Saving changes..." debounced ~800ms); resume capability restoring the exact step where the user left off.
+- **Step 1: Basics (src/screens/create/Step1Basics.tsx):** Title input (max 60 with live character counter and helper text), category picker with all 10 options and icons, creator/organisation name, short summary, optional cover image with expo-image-picker (type validation and 10MB size limit), and "Suggest with AI" card calling `POST /ai/draft-from-text` where suggestions can be accepted, edited, or dismissed individually without ever touching the funding goal.
+- **Step 2: Story (src/screens/create/Step2Story.tsx):** Editorial block composer supporting heading, paragraph, image (with caption + credit), statistic, quote, and action blocks with up/down reordering and deletion; formatting toolbar; Sources manager with URL validation; and Edit | Live preview toggle sharing the exact same `StoryBlockRenderer` as `CampaignDetailScreen`.
+- **Step 3: Campaign & Ad Visuals (src/screens/create/Step3Visuals.tsx):** Cover image display, multi-image ad creative picker with delete badges, disabled video row clearly stating "Video creatives are not supported in this prototype", ad headline defaulting to the first 60 characters of title, ad description, CTA button selector, audience placement previews (social feed 16:9, vertical story 9:16, text-only promoted card), missing assets warning banner, and optional creative quality checklist.
+- **Step 4 Placeholder:** Continue from Step 3 presents a temporary "Step 4 Coming Next" screen for this unfinished build, keeping the flow clean before Phase 5B.
+- **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest 12/12 passed.
+
+Next: Phase 5B (Step 4 Reach & Targeting + Step 5 Funding Goal & Submission + Status Timeline).
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

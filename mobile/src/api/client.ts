@@ -356,4 +356,75 @@ export const apiClient = {
       };
     }
   },
+
+  async createDraft(payload: {
+    title?: string;
+    category?: string;
+    creator_name?: string;
+    summary?: string;
+    funding_goal?: number;
+  }): Promise<{ draft: any; isOffline: boolean }> {
+    try {
+      const url = `${API_BASE_URL}/drafts`;
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return { draft: data, isOffline: false };
+    } catch {
+      return { draft: null, isOffline: true };
+    }
+  },
+
+  async patchDraft(id: string, patch: any): Promise<{ draft: any; isOffline: boolean }> {
+    try {
+      const url = `${API_BASE_URL}/drafts/${id}`;
+      const res = await fetchWithTimeout(url, {
+        method: 'PATCH',
+        body: JSON.stringify(patch),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return { draft: data, isOffline: false };
+    } catch {
+      return { draft: null, isOffline: true };
+    }
+  },
+
+  async suggestFromText(text: string): Promise<{
+    title: string;
+    category: string;
+    summary: string;
+    tagline: string;
+    target_audience: string;
+    ad_headline: string;
+    ad_description: string;
+    suggested_sources: string[];
+    demo_mode: boolean;
+  }> {
+    try {
+      const url = `${API_BASE_URL}/ai/draft-from-text`;
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch {
+      // Local fallback
+      return {
+        title: text.slice(0, 50).trim() || 'A Local Initiative That Needs Action',
+        category: 'community',
+        summary: text.slice(0, 140).trim() || 'This campaign raises public awareness for community-level reform.',
+        tagline: 'Amplifying real community priorities to decision makers.',
+        target_audience: 'Residents, civic leaders, and local voters.',
+        ad_headline: text.slice(0, 50).trim() || 'What the community records show.',
+        ad_description: 'Read the documented sources and join our awareness campaign.',
+        suggested_sources: ['https://example.org/community-report-2025'],
+        demo_mode: true,
+      };
+    }
+  },
 };

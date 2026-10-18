@@ -9,7 +9,8 @@ import { LoginScreen, RegisterScreen } from '../screens/auth/AuthScreens';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { CampaignDetailScreen } from '../screens/home/CampaignDetailScreen';
 import { ExploreScreen } from '../screens/explore/ExploreScreen';
-import { CreateCampaignScreen } from '../screens/create/CreateCampaignScreen';
+import { CreateLandingScreen } from '../screens/create/CreateLandingScreen';
+import { CreateFlowScreen } from '../screens/create/CreateFlowScreen';
 import { ActivityScreen } from '../screens/activity/ActivityScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { FundCampaignScreen, ThankYouScreen } from '../screens/funding/FundingScreens';
@@ -54,7 +55,8 @@ function ExploreNavigator() {
 function CreateNavigator() {
   return (
     <CreateStack.Navigator screenOptions={{ headerShown: false }}>
-      <CreateStack.Screen name="CreateCampaign" component={CreateCampaignScreen} />
+      <CreateStack.Screen name="CreateLanding" component={CreateLandingScreen} />
+      <CreateStack.Screen name="CreateFlow" component={CreateFlowScreen} />
     </CreateStack.Navigator>
   );
 }

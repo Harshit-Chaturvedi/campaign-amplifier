@@ -24,6 +24,7 @@ import { SourceItem } from '../../components/ui/SourceItem';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { GeneratedCover } from '../../components/ui/GeneratedCover';
 import { ErrorState } from '../../components/ui/ErrorState';
+import { StoryBlockRenderer } from '../../components/story/StoryBlockRenderer';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
 import { getCategoryColor } from '../../theme/colors';
 import { estimateReach } from '../../services/reach';
@@ -546,7 +547,9 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             </Text>
 
             {campaign.storyBlocks && campaign.storyBlocks.length > 0 ? (
-              campaign.storyBlocks.map((b, idx) => renderStoryBlock(b, idx))
+              campaign.storyBlocks.map((b, idx) => (
+                <StoryBlockRenderer key={idx} block={b} index={idx} />
+              ))
             ) : (
               <Text style={{ fontSize: 15, color: '#334155', lineHeight: 24 }}>
                 {campaign.summary}

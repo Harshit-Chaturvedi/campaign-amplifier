@@ -30,7 +30,8 @@ export type ExploreStackParamList = {
 };
 
 export type CreateStackParamList = {
-  CreateCampaign: undefined;
+  CreateLanding: undefined;
+  CreateFlow: { draftId: string; step?: number };
 };
 
 export type ActivityStackParamList = {
