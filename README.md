@@ -100,6 +100,18 @@ eas build -p android --profile preview
 
 ---
 
+## 🔑 Demo Credentials
+
+| Role | Email | Password | Permissions |
+|---|---|---|---|
+| **Creator** | `creator@demo.org` | `demo123` | Draft creation, voice drafting, submit for review, view reports |
+| **Backer** | `backer@demo.org` | `demo123` | Campaign backing, payment history, receipts, follow campaigns |
+| **Admin** | `admin@demo.org` | `demo123` | Review queue, campaign approval, start promotion, simulate delivery, complete |
+
+For a complete timestamped 3–4 minute walkthrough of all features, see [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+
+---
+
 ## 📄 License
 
 MIT

@@ -248,7 +248,23 @@ If time is short, **cut in this order:** comments → image generation → push 
 - **Lifecycle E2E Verification:** `backend/tests/test_phase7_lifecycle_e2e.py` verifies full cycle: draft creation -> submit -> admin review-queue -> admin approval -> available for funding -> backer contribution (simulated payment) -> goal reached (non-auto-promotion) -> admin start-promotion -> simulate delivery -> completion. Asserts notifications created at each step, measured numbers in report, and backer privacy preserved.
 - **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 17/17; forbidden copy scanner clean (`0` instances in `mobile/src`, only `verify_password` in `backend/app`).
 
-Next: Phase 8 (Polish, QA, demo script, and final checks).
+**Phase 8 Complete (Sun 19 Oct, 01:00 IST):**
+- **Touch Target & Layout Polish:**
+  - Added explicit `minHeight: 48` on `Button.tsx` (and `minHeight: 40` on sm), along with `accessibilityRole="button"` and `accessibilityLabel`.
+  - Re-architected Home hero dual CTAs into stacked full-width layout with `minHeight: 48`, completely eliminating text wrapping of "Explore Campaigns" on 360px widths.
+- **First-Time User Clarity & Policy Audits:**
+  - Clarified value proposition on Home hero (*"Contributions pool to pay for digital advertising that spreads the message to audiences beyond the creator's network. It is not a donation to causes."*).
+  - Ensured *"Message amplification, not a donation"* notice is unmissable across the entire backing journey: Step 1 amount selection, Step 2 review fee breakdown, and final digital receipt.
+- **Video Demo Documentation:**
+  - Created `DEMO_SCRIPT.md` with complete 3-4 minute walkthrough covering discovery, backing flow, 5-step creation, voice drafting, creator dashboard, delivery reports, and platform info pages.
+  - Documented demo accounts (`creator@demo.org`, `backer@demo.org`, `admin@demo.org` / `demo123`).
+  - Updated `README.md` with demo credentials table and link to demo script.
+- **Final Verification Checks:**
+  - `npx tsc --noEmit` passed with 0 errors.
+  - `npx expo-doctor` passed with 20/20 checks clean.
+  - Backend pytest passed with 17/17 tests passing.
+  - Forbidden copy scan verified clean (0 occurrences in `mobile/src`, only `verify_password` in `backend/app`).
+- **Status:** All Phases (1-8) successfully implemented, verified, and delivered.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

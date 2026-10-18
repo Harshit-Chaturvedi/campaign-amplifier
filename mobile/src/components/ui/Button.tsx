@@ -61,12 +61,15 @@ export function Button({
         backgroundColor: bg,
         paddingVertical: py,
         paddingHorizontal: px,
+        minHeight: size === 'sm' ? 40 : 48,
         borderRadius: 14,
         opacity: isDisabled ? 0.5 : 1,
         borderWidth: variant === 'outline' ? 1.5 : 0,
         borderColor: variant === 'outline' ? '#4f46e5' : 'transparent',
         width: fullWidth ? '100%' : undefined,
       }}
+      accessibilityRole="button"
+      accessibilityLabel={title}
     >
       {loading ? (
         <ActivityIndicator size="small" color={textColor} />

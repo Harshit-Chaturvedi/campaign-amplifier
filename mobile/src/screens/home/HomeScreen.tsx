@@ -196,39 +196,38 @@ export function HomeScreen({ navigation }: any) {
             </Text>
           </View>
 
-          {/* Dual CTAs */}
-          <View style={{ flexDirection: 'row', marginTop: 18, gap: 10 }}>
-            <View style={{ flex: 1 }}>
-              <Button
-                title="Explore Campaigns"
-                size="md"
-                variant="primary"
-                icon="compass-outline"
-                onPress={() => navigation.navigate('ExploreTab')}
-                fullWidth
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('CreateTab')}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.14)',
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.25)',
-                  paddingVertical: 12,
-                  paddingHorizontal: 14,
-                  borderRadius: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'row',
-                }}
-              >
-                <Ionicons name="add-circle-outline" size={18} color="#fff" style={{ marginRight: 6 }} />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>
-                  Start a Campaign
-                </Text>
-              </TouchableOpacity>
-            </View>
+          {/* Dual CTAs - Stacked to guarantee no text wrapping on 360px widths */}
+          <View style={{ marginTop: 18, gap: 10 }}>
+            <Button
+              title="Explore Campaigns"
+              size="md"
+              variant="primary"
+              icon="compass-outline"
+              onPress={() => navigation.navigate('ExploreTab')}
+              fullWidth
+            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('CreateTab')}
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.14)',
+                borderWidth: 1,
+                borderColor: 'rgba(255,255,255,0.25)',
+                minHeight: 48,
+                paddingHorizontal: 16,
+                borderRadius: 14,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                width: '100%',
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Start a Campaign"
+            >
+              <Ionicons name="add-circle-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>
+                Start a Campaign
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 

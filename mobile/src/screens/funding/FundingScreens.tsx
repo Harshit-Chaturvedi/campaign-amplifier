@@ -445,6 +445,11 @@ export function FundCampaignScreen({ route, navigation }: any) {
         {/* ========================================================================= */}
         {step === 2 && (
           <View>
+            {/* Unmissable Value Proposition & Non-Donation Notice */}
+            <View style={{ marginBottom: 14 }}>
+              <AmplificationNotice />
+            </View>
+
             <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>
               Contribution & Fee Breakdown
             </Text>
@@ -1089,6 +1094,10 @@ export function ThankYouScreen({ route, navigation }: any) {
               <Text style={{ fontSize: 12, color: '#94a3b8' }}>Payment Status</Text>
               <Text style={{ fontSize: 12, fontWeight: '700', color: '#16a34a' }}>Succeeded (Settled)</Text>
             </View>
+            <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 6 }} />
+            <Text style={{ fontSize: 11, color: '#64748b', fontStyle: 'italic', textAlign: 'center' }}>
+              Notice: Message amplification reach, not a charitable donation.
+            </Text>
           </View>
         </Card>
 
