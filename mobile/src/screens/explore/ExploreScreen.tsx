@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCampaigns } from '../../api/hooks';
+import { useServerStatusStore } from '../../api/client';
 import { CampaignCard } from '../../components/campaign/CampaignCard';
 import { getCategoryColor } from '../../theme/colors';
 import { CampaignCardSkeleton } from '../../components/ui/Skeleton';
@@ -89,6 +91,7 @@ export function ExploreScreen({ navigation }: any) {
 
   const campaigns = data?.items || [];
   const isOffline = Boolean(data?.isOffline);
+  const isServerWakingUp = useServerStatusStore((s) => s.isWakingUp);
 
   // Active filter count
   const activeFiltersCount =
@@ -131,12 +134,17 @@ export function ExploreScreen({ navigation }: any) {
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
           <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>Explore</Text>
-          {isOffline && (
+          {isServerWakingUp ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#eef2ff', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
+              <ActivityIndicator size="small" color="#4f46e5" style={{ marginRight: 6 }} />
+              <Text style={{ fontSize: 11, fontWeight: '600', color: '#3730a3' }}>Waking server...</Text>
+            </View>
+          ) : isOffline ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
               <Ionicons name="cloud-offline-outline" size={13} color="#b45309" style={{ marginRight: 4 }} />
               <Text style={{ fontSize: 11, fontWeight: '600', color: '#b45309' }}>Offline demo</Text>
             </View>
-          )}
+          ) : null}
         </View>
 
         {/* Search bar + filter toggle */}

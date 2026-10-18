@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   StatusBar,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCampaigns, useFeaturedCampaigns } from '../../api/hooks';
+import { useServerStatusStore } from '../../api/client';
 import { CampaignCard } from '../../components/campaign/CampaignCard';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { estimateReachPerDollar } from '../../services/reach';
@@ -26,6 +28,7 @@ export function HomeScreen({ navigation }: any) {
     isRefetching,
   } = useCampaigns();
   const { data: featuredData } = useFeaturedCampaigns();
+  const isServerWakingUp = useServerStatusStore((s) => s.isWakingUp);
 
   const isOffline = Boolean(campaignsData?.isOffline);
   const campaigns = campaignsData?.items || [];
@@ -77,8 +80,30 @@ export function HomeScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
 
+        {/* Server Waking Up Banner */}
+        {isServerWakingUp && (
+          <View
+            style={{
+              marginTop: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#eef2ff',
+              borderColor: '#c7d2fe',
+              borderWidth: 1,
+              borderRadius: 10,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+            }}
+          >
+            <ActivityIndicator size="small" color="#4f46e5" style={{ marginRight: 8 }} />
+            <Text style={{ fontSize: 12, color: '#3730a3', fontWeight: '600', flex: 1 }}>
+              Waking up the server... (Free-tier cold start may take up to 50s)
+            </Text>
+          </View>
+        )}
+
         {/* Offline Demo Data Banner */}
-        {isOffline && (
+        {isOffline && !isServerWakingUp && (
           <View
             style={{
               marginTop: 10,

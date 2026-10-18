@@ -20,7 +20,7 @@ def test_reach_estimation_formula():
 
 def test_reach_per_dollar():
     rpd = estimate_reach_per_dollar()
-    assert rpd >= 25 and rpd <= 35  # For CPM $14.50, freq 2.2, rpd is ~30
+    assert rpd == 30  # For CPM $14.50, freq 2.2, platform fee 5%, rpd is exactly 30
 
 def test_calculate_backer_fee():
     amount = 50.0

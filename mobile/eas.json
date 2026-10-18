@@ -4,6 +4,9 @@
   },
   "build": {
     "preview": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://campaign-amplifier-backend.onrender.com/api/v1"
+      },
       "android": {
         "buildType": "apk"
       }

@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { create } from 'zustand';
 import type {
   Campaign,
   CampaignCategory,
@@ -13,10 +14,20 @@ import type {
 import { seedCampaigns } from '../data/seedData';
 import { useAuthStore } from '../store/useAuthStore';
 
-// Default to 10.0.2.2 on Android emulator if localhost is provided
+interface ServerStatusState {
+  isWakingUp: boolean;
+  setIsWakingUp: (waking: boolean) => void;
+}
+
+export const useServerStatusStore = create<ServerStatusState>((set) => ({
+  isWakingUp: false,
+  setIsWakingUp: (waking) => set({ isWakingUp: waking }),
+}));
+
+// Use EXPO_PUBLIC_API_URL when set; only use localhost / 10.0.2.2 when missing in development
 function resolveApiUrl(): string {
-  const envUrl = process.env.EXPO_PUBLIC_API_URL;
-  if (envUrl) {
+  const envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (envUrl && envUrl.length > 0) {
     if (Platform.OS === 'android' && envUrl.includes('localhost')) {
       return envUrl.replace('localhost', '10.0.2.2');
     }
@@ -148,30 +159,53 @@ export function normalizeCampaign(raw: any): Campaign {
   };
 }
 
-async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 4500): Promise<Response> {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeoutMs);
-
-  const token = useAuthStore.getState().token;
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
-  };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs = 65000,
+  retries = 1
+): Promise<Response> {
+  // If request takes longer than 2.5s (free tier cold start), flag UI
+  const wakeUpTimer = setTimeout(() => {
+    useServerStatusStore.getState().setIsWakingUp(true);
+  }, 2500);
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(id);
-    return response;
-  } catch (err) {
-    clearTimeout(id);
-    throw err;
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+
+      const token = useAuthStore.getState().token;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(options.headers as Record<string, string>),
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          headers,
+          signal: controller.signal,
+        });
+        clearTimeout(id);
+        return response;
+      } catch (err: any) {
+        clearTimeout(id);
+        if (attempt < retries) {
+          useServerStatusStore.getState().setIsWakingUp(true);
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw new Error('Request failed after retries');
+  } finally {
+    clearTimeout(wakeUpTimer);
+    useServerStatusStore.getState().setIsWakingUp(false);
   }
 }
 

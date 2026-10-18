@@ -9,9 +9,11 @@ import {
   Image,
   Share,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCampaign, useSubmitFeedback } from '../../api/hooks';
+import { useServerStatusStore } from '../../api/client';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { ProgressBar } from '../../components/ui/ProgressBar';
@@ -46,6 +48,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
   const { data, isLoading, isError, refetch } = useCampaign(campaignId);
   const campaign = data?.campaign;
   const isOffline = Boolean(data?.isOffline);
+  const isServerWakingUp = useServerStatusStore((s) => s.isWakingUp);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isSaved = usePreferencesStore((s) => s.isSaved(campaignId));
@@ -415,7 +418,26 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             </View>
           )}
 
-          {isOffline && (
+          {isServerWakingUp ? (
+            <View
+              style={{
+                position: 'absolute',
+                top: 14,
+                right: 14,
+                backgroundColor: 'rgba(238, 242, 255, 0.95)',
+                borderRadius: 8,
+                paddingHorizontal: 8,
+                paddingVertical: 4,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <ActivityIndicator size="small" color="#4f46e5" style={{ marginRight: 4 }} />
+              <Text style={{ fontSize: 11, fontWeight: '700', color: '#3730a3' }}>
+                Waking server...
+              </Text>
+            </View>
+          ) : isOffline ? (
             <View
               style={{
                 position: 'absolute',
@@ -431,7 +453,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
                 Offline demo data
               </Text>
             </View>
-          )}
+          ) : null}
         </View>
 
         {/* Campaign Header Info */}
