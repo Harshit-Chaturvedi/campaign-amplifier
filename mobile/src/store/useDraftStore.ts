@@ -30,6 +30,8 @@ export interface CampaignDraft {
   durationDays: number;
   // Step 5: Goal
   fundingGoal?: number;
+  isDemoSample?: boolean;
+  demo_mode?: boolean;
 }
 
 interface DraftState {

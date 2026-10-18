@@ -88,10 +88,7 @@ function getFallbackResponse() {
     ad_headline: 'Eleven schools. Elevated lead. One deadline.',
     ad_description:
       'The state will pay to replace the pipes, but only if the district applies. See the water test results.',
-    suggested_sources: [
-      'https://example.org/county-water-testing-2026',
-      'https://example.org/state-lead-service-line-fund',
-    ],
+    suggested_sources: [],
     suggested_channels: ['Meta', 'Instagram', 'Reddit'],
     demo_mode: true,
   };

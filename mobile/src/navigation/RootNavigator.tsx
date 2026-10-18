@@ -49,6 +49,8 @@ function ExploreNavigator() {
     <ExploreStack.Navigator screenOptions={{ headerShown: false }}>
       <ExploreStack.Screen name="Explore" component={ExploreScreen} />
       <ExploreStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
+      <ExploreStack.Screen name="FundCampaign" component={FundCampaignScreen} />
+      <ExploreStack.Screen name="ThankYou" component={ThankYouScreen} />
     </ExploreStack.Navigator>
   );
 }
@@ -68,6 +70,8 @@ function ActivityNavigator() {
     <ActivityStack.Navigator screenOptions={{ headerShown: false }}>
       <ActivityStack.Screen name="Activity" component={ActivityScreen} />
       <ActivityStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
+      <ActivityStack.Screen name="FundCampaign" component={FundCampaignScreen} />
+      <ActivityStack.Screen name="ThankYou" component={ThankYouScreen} />
     </ActivityStack.Navigator>
   );
 }

@@ -10,6 +10,17 @@ CATEGORIES = [
     "economic_policy", "community", "arts_culture", "business", "other"
 ]
 
+def extract_explicit_urls(text: str) -> List[str]:
+    raw_urls = re.findall(r"https?://[^\s,;'\"<>]+|www\.[^\s,;'\"<>]+", text or "")
+    cleaned: List[str] = []
+    for u in raw_urls:
+        u_clean = u.rstrip(".,;!?:)")
+        if not u_clean.startswith("http"):
+            u_clean = "https://" + u_clean
+        if u_clean not in cleaned:
+            cleaned.append(u_clean)
+    return cleaned
+
 def fallback_draft(text: str) -> AIDraftResponse:
     clean = re.sub(r"[^\w\s-]", " ", text).strip()
     words = [w for w in clean.split() if len(w) > 3]
@@ -47,10 +58,7 @@ def fallback_draft(text: str) -> AIDraftResponse:
         target_audience="Local residents, municipal voters, and community stakeholders aged 25-64.",
         ad_headline=f"{first} {second}. The documented facts."[:60],
         ad_description=f"Evidence shows that public action is overdue. See the traceable citations and learn what needs to happen.",
-        suggested_sources=[
-            "https://example.org/public-records-assessment-2025",
-            "https://example.org/independent-policy-brief"
-        ],
+        suggested_sources=extract_explicit_urls(text),
         suggested_channels=["Meta", "Instagram", "Reddit"],
         demo_mode=True
     )
@@ -87,6 +95,7 @@ async def generate_draft_with_gemini(text: str) -> AIDraftResponse:
 You are an expert campaign messaging strategist for an advertising amplification platform.
 The user wants to run a digital advertising campaign to spread a checkable message.
 Note: DO NOT generate a funding goal under any circumstances.
+CRITICAL SOURCES RULE: Never invent or hallucinate sources or URLs. "suggested_sources" may contain ONLY valid URLs that the user explicitly typed or spoke in the text below. If no URLs were given by the user, return an empty array [] for "suggested_sources".
 
 User provided text:
 \"\"\"{text}\"\"\"
@@ -100,7 +109,7 @@ Generate a JSON object matching this schema exactly:
   "target_audience": "Who should see this ad",
   "ad_headline": "Ad headline, max 60 chars",
   "ad_description": "2-3 sentences of ad copy",
-  "suggested_sources": ["url1", "url2"],
+  "suggested_sources": [],
   "suggested_channels": ["Meta", "Instagram", "Reddit"]
 }}
 Return ONLY raw JSON. No markdown backticks.
@@ -123,6 +132,16 @@ Return ONLY raw JSON. No markdown backticks.
                         raw_text = re.sub(r"\n```$", "", raw_text)
                     parsed = json.loads(raw_text)
                     parsed["demo_mode"] = False
+                    
+                    # Strictly filter sources: only URLs explicitly mentioned in user text
+                    explicit_urls = extract_explicit_urls(text)
+                    raw_sources = parsed.get("suggested_sources", [])
+                    filtered_sources = [s for s in raw_sources if any(eu in s or s in eu for eu in explicit_urls)]
+                    for eu in explicit_urls:
+                        if eu not in filtered_sources:
+                            filtered_sources.append(eu)
+                    parsed["suggested_sources"] = filtered_sources
+                    
                     logger.info("Successfully generated campaign draft using Gemini model: %s", model_name)
                     return AIDraftResponse(**parsed)
                 else:

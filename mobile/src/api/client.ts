@@ -14,6 +14,7 @@ import type {
 import { seedCampaigns } from '../data/seedData';
 import { useAuthStore } from '../store/useAuthStore';
 import { useDraftStore } from '../store/useDraftStore';
+import { calculateBackerFee } from '../services/reach';
 
 interface ServerStatusState {
   isWakingUp: boolean;
@@ -414,7 +415,9 @@ export const apiClient = {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch {
-      // Local fallback
+      // Local fallback - only extract URLs explicitly present in text, never invent sources
+      const rawUrls = text.match(/https?:\/\/[^\s,;'\"<>]+|www\.[^\s,;'\"<>]+/g) || [];
+      const sources = rawUrls.map((u) => (u.startsWith('http') ? u : `https://${u}`));
       return {
         title: text.slice(0, 50).trim() || 'A Local Initiative That Needs Action',
         category: 'community',
@@ -423,7 +426,7 @@ export const apiClient = {
         target_audience: 'Residents, civic leaders, and local voters.',
         ad_headline: text.slice(0, 50).trim() || 'What the community records show.',
         ad_description: 'Read the documented sources and join our awareness campaign.',
-        suggested_sources: ['https://example.org/community-report-2025'],
+        suggested_sources: sources,
         demo_mode: true,
       };
     }
@@ -450,7 +453,9 @@ export const apiClient = {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
     } catch {
-      // Local fallback
+      // Local fallback - only extract URLs explicitly present in transcript, never invent sources
+      const rawUrls = transcript.match(/https?:\/\/[^\s,;'\"<>]+|www\.[^\s,;'\"<>]+/g) || [];
+      const sources = rawUrls.map((u) => (u.startsWith('http') ? u : `https://${u}`));
       return {
         title: 'Clean Drinking Water for Every Public School',
         category: 'health',
@@ -459,10 +464,7 @@ export const apiClient = {
         target_audience: 'Parents, teachers, and municipal voters in the school district.',
         ad_headline: 'Eleven schools. Elevated lead. One deadline.',
         ad_description: 'The state will pay to replace the pipes, but only if the district applies. See the water test results.',
-        suggested_sources: [
-          'https://example.org/county-water-testing-2026',
-          'https://example.org/state-lead-service-line-fund',
-        ],
+        suggested_sources: sources,
         suggested_channels: ['Meta', 'Instagram', 'Reddit'],
         demo_mode: true,
       };
@@ -569,6 +571,152 @@ export const apiClient = {
         },
         isOffline: true,
       };
+    }
+  },
+
+  async createContribution(params: {
+    campaignId: string;
+    amount: number;
+    showName?: boolean;
+    guestEmail?: string | null;
+  }): Promise<{
+    id: string;
+    campaignId: string;
+    amount: number;
+    fee: number;
+    total: number;
+    status: string;
+    showName: boolean;
+    receiptNo: string;
+    createdAt: string;
+    backerName?: string;
+    isOffline: boolean;
+  }> {
+    try {
+      const url = `${API_BASE_URL}/contributions`;
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          campaign_id: params.campaignId,
+          amount: params.amount,
+          show_name: !!params.showName,
+          guest_email: params.guestEmail?.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || `Server error: ${res.status}`);
+      }
+      const data = await res.json();
+      return {
+        id: data.id,
+        campaignId: data.campaign_id,
+        amount: data.amount,
+        fee: data.fee,
+        total: data.total,
+        status: data.status,
+        showName: data.show_name,
+        receiptNo: data.receipt_no,
+        createdAt: data.created_at,
+        backerName: data.backer_name,
+        isOffline: false,
+      };
+    } catch (err: any) {
+      if (
+        err.message &&
+        !err.message.includes('fetch') &&
+        !err.message.includes('Network') &&
+        !err.message.includes('Failed to fetch') &&
+        !err.message.includes('timed out')
+      ) {
+        throw err;
+      }
+      // Offline fallback
+      const { fee, total } = calculateBackerFee(params.amount);
+      const contribId = `con-${Math.random().toString(36).slice(2, 10)}`;
+      const receiptNo = `REC-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+      return {
+        id: contribId,
+        campaignId: params.campaignId,
+        amount: params.amount,
+        fee,
+        total,
+        status: 'pending',
+        showName: !!params.showName,
+        receiptNo,
+        createdAt: new Date().toISOString(),
+        backerName: params.showName ? 'Community Backer' : 'Anonymous',
+        isOffline: true,
+      };
+    }
+  },
+
+  async simulatePayment(params: {
+    contributionId: string;
+    outcome: 'success' | 'pending' | 'failed' | 'cancelled' | 'rejected';
+  }): Promise<{
+    status: string;
+    contributionId: string;
+    paymentStatus: string;
+    receiptNo: string;
+    amount: number;
+    campaignAmountRaised?: number;
+    campaignStatus?: string;
+    isOffline: boolean;
+  }> {
+    try {
+      const url = `${API_BASE_URL}/payments/simulate`;
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          contribution_id: params.contributionId,
+          outcome: params.outcome,
+        }),
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || `Server error: ${res.status}`);
+      }
+      const data = await res.json();
+      return {
+        status: data.status,
+        contributionId: data.contribution_id,
+        paymentStatus: data.payment_status,
+        receiptNo: data.receipt_no,
+        amount: data.amount,
+        campaignAmountRaised: data.campaign_amount_raised,
+        campaignStatus: data.campaign_status,
+        isOffline: false,
+      };
+    } catch (err: any) {
+      if (
+        err.message &&
+        !err.message.includes('fetch') &&
+        !err.message.includes('Network') &&
+        !err.message.includes('Failed to fetch') &&
+        !err.message.includes('timed out')
+      ) {
+        throw err;
+      }
+      return {
+        status: 'ok',
+        contributionId: params.contributionId,
+        paymentStatus: params.outcome === 'success' ? 'succeeded' : params.outcome,
+        receiptNo: `REC-${new Date().getFullYear()}-OFFLINE`,
+        amount: 50,
+        isOffline: true,
+      };
+    }
+  },
+
+  async getReceipt(receiptNoOrId: string): Promise<any> {
+    try {
+      const url = `${API_BASE_URL}/receipts/${encodeURIComponent(receiptNoOrId)}`;
+      const res = await fetchWithTimeout(url, { method: 'GET' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch {
+      return null;
     }
   },
 };

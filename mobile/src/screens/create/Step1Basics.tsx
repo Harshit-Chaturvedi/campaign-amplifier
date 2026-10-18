@@ -96,6 +96,38 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
 
   return (
     <View style={{ gap: 20 }}>
+      {/* Demo Sample Banner */}
+      {(draft.isDemoSample || draft.demo_mode) && (
+        <View
+          style={{
+            backgroundColor: '#eff6ff',
+            borderColor: '#93c5fd',
+            borderWidth: 1,
+            borderRadius: 12,
+            padding: 12,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#3b82f6',
+              paddingHorizontal: 8,
+              paddingVertical: 3,
+              borderRadius: 6,
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              Demo sample
+            </Text>
+          </View>
+          <Text style={{ flex: 1, fontSize: 12, color: '#1e40af', lineHeight: 17 }}>
+            This draft was pre-filled with demo sample content. All fields are editable and deletable. Funding goal is never set by AI.
+          </Text>
+        </View>
+      )}
+
       {/* 1. Title */}
       <View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>

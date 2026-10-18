@@ -137,8 +137,7 @@ Calm, premium, credible. Primary indigo `#4f46e5` (matches the site), neutral sl
 - [x] Campaign Detail with sources, sticky funding bar, expandables
 - [x] Creator flow Steps 1–3 + landing + autosave + resume drafts (Phase 5A)
 - [x] Creator flow Steps 4–5 + submit + timeline (Phase 5B)
-- [ ] **EAS APK build #1 by midday; install on phone; fix build issues**
-- [ ] Backing flow 6 steps + simulated payment + states + receipt
+- [x] Backing flow 6 steps + simulated payment + states + receipt (Phase 6)
 
 **Mon (19 Oct)** — completeness & polish
 - [x] State machine + admin page + notifications generation (backend complete)
@@ -210,7 +209,31 @@ If time is short, **cut in this order:** comments → image generation → push 
   - "Create Manually": loads a blank draft directly on Step 1.
 - **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 14/14 (including `test_phase5c_voice.py`); verification runner `mobile/scripts/verify_voice_flow.js` completed with 7/7 passing stages.
 
-Next: Phase 6 (Backing flow: amount selection, live reach calculation, fees breakdown, simulated checkout with pending/failed/cancelled states, receipt).
+**Fix (AI Sources & Demo Sample Labeling):**
+- Strict policy enforced in `POST /ai/voice-draft`, `POST /ai/draft-from-text`, and client fallbacks: AI never invents or hallucinates sources or URLs. "sources" only contains URLs the creator actually typed or spoke; otherwise an empty list `[]` is returned so the creator adds sources manually in Step 2.
+- Removed every `example.org` placeholder URL from AI responses and demo drafts.
+- Added explicit assert in `test_phase5c_voice.py` verifying empty sources when no URLs are spoken, and exact URL preservation when spoken.
+- Prominent "Demo sample" banner with badge clearly displayed on Step 1 Basics when loading a canned demo sample draft.
+
+**Phase 6 Complete (Sun 19 Oct, 00:35 IST):**
+- **Guest Backing & Discovery Flow:** Guests can browse all approved/funding campaigns and back without an account. Optional email input provided for digital receipt delivery. Pre-fills backer information for authenticated users.
+- **Itemized Fee Breakdown:** Clear, honest breakdown displayed across Amount and Review steps:
+  1. Chosen contribution: e.g. `$50.00`
+  2. Payment processing fee (2.9% + $0.30): `$1.75`
+  3. Platform fee (5% allocated from contribution towards moderation & platform operations): `$2.50`
+  4. Net advertising budget deployed directly to targeted ad platforms (95%): `$47.50`
+  5. Total charged to card: `$51.75`
+- **Simulated Checkout (Demo Mode):** Clearly labelled demo payment sandbox with mock credit card representation (`•••• •••• •••• 4242`). Supports testing all 5 demonstrable states:
+  - `success`: Creates pending contribution, simulates success, updates campaign `amount_raised` and backer count, generates digital receipt.
+  - `pending`: Simulates ACH / clearing delay, displays pending notice, does not increment raised yet.
+  - `failed`: Simulates card decline / fraud protection check, offers retry.
+  - `cancelled`: Simulates checkout cancellation, allows backer to adjust amount or try again.
+- **Backer Names Private by Default:** The "Show my name publicly" toggle is strictly **default: OFF (`false`)** across backend schemas and mobile UI. Backer names and guest emails are kept private.
+- **Goal Reached Policy:** Server lifecycle state machine and mobile store strictly enforce that when `amount_raised >= funding_goal`, the campaign transitions to `goal_reached`, but **never** starts ads (`promoting`) automatically. Ads launch only after platform editorial review and admin placement setup.
+- **Digital Receipt & Confirmation:** Dedicated receipt card and screen rendering receipt number (`#REC-YYYY-XXXXXX`), timestamp, itemized fees, total paid, estimated reach, and backer privacy flag. Includes Share action and campaign Follow toggle.
+- **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 16/16 (including new `test_phase6_backing.py` asserting guest backing, fee formula, outcome states, receipt retrieval, and goal reached non-auto-promotion); forbidden verification copy strings scanned and clean (0 instances).
+
+Next: Phase 7 (Activity tab, Profile, creator dashboard + analytics).
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

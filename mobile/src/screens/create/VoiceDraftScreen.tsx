@@ -325,12 +325,12 @@ export function VoiceDraftScreen({ navigation }: any) {
         {
           id: `blk-${generateId()}`,
           type: 'paragraph',
-          text: answers[4] || 'All claims in this campaign are drawn from public documentation and verified local records.',
+          text: answers[4] || 'All claims in this campaign are drawn from public documentation and documented local records.',
         },
       ],
-      sources: (aiResult.suggested_sources || []).map((url, idx) => ({
+      sources: (aiResult.suggested_sources || []).map((url: string, idx: number) => ({
         id: `src-${generateId()}`,
-        title: idx === 0 ? 'County Records & Testing Report' : 'State Infrastructure Grant Portal',
+        title: `Source Link ${idx + 1}`,
         url,
       })),
       adImages: [],
@@ -341,6 +341,7 @@ export function VoiceDraftScreen({ navigation }: any) {
       durationDays: 30,
       // FUNDING GOAL IS NEVER FILLED IN BY AI!
       fundingGoal: undefined,
+      isDemoSample: !!(aiResult as any).demo_mode || !!(aiResult as any).isDemoSample,
     };
 
     // 1. Save locally in Zustand
@@ -412,12 +413,10 @@ export function VoiceDraftScreen({ navigation }: any) {
       ad_headline: 'Eleven schools. Elevated lead. One deadline.',
       ad_description:
         'The state will pay to replace the pipes, but only if the district applies. See the water test results.',
-      suggested_sources: [
-        'https://example.org/county-water-testing-2026',
-        'https://example.org/state-lead-service-line-fund',
-      ],
+      suggested_sources: [], // NEVER invent sources; empty list so creator adds sources manually in Step 2
       suggested_channels: ['Meta', 'Instagram', 'Reddit'],
       demo_mode: true,
+      isDemoSample: true,
     };
 
     await populateAndLandOnStep1(cannedResult);

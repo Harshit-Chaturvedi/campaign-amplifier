@@ -20,13 +20,31 @@ export type MainTabParamList = {
 export type HomeStackParamList = {
   Home: undefined;
   CampaignDetail: { campaignId: string };
-  FundCampaign: { campaignId: string };
-  ThankYou: { campaignId: string; amount: number };
+  FundCampaign: { campaignId: string; initialAmount?: number };
+  ThankYou: {
+    campaignId: string;
+    amount: number;
+    receiptNo?: string;
+    estimatedReach?: number;
+    fee?: number;
+    total?: number;
+    paymentStatus?: string;
+  };
 };
 
 export type ExploreStackParamList = {
   Explore: undefined;
   CampaignDetail: { campaignId: string };
+  FundCampaign: { campaignId: string; initialAmount?: number };
+  ThankYou: {
+    campaignId: string;
+    amount: number;
+    receiptNo?: string;
+    estimatedReach?: number;
+    fee?: number;
+    total?: number;
+    paymentStatus?: string;
+  };
 };
 
 export type CreateStackParamList = {
@@ -38,6 +56,16 @@ export type CreateStackParamList = {
 export type ActivityStackParamList = {
   Activity: undefined;
   CampaignDetail: { campaignId: string };
+  FundCampaign: { campaignId: string; initialAmount?: number };
+  ThankYou: {
+    campaignId: string;
+    amount: number;
+    receiptNo?: string;
+    estimatedReach?: number;
+    fee?: number;
+    total?: number;
+    paymentStatus?: string;
+  };
 };
 
 export type ProfileStackParamList = {
