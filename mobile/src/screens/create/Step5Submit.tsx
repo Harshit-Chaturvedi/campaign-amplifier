@@ -128,6 +128,7 @@ export function Step5Submit({
             $
           </Text>
           <TextInput
+            accessibilityLabel="Campaign funding goal in dollars"
             value={goalText}
             onChangeText={handleGoalChange}
             placeholder="e.g. 5000 (No default value)"

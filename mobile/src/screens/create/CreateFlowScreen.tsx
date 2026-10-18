@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useDraftStore, CampaignDraft } from '../../store/useDraftStore';
 import { apiClient } from '../../api/client';
@@ -200,6 +201,9 @@ export function CreateFlowScreen({ route, navigation }: any) {
   // Submit for review handler
   const handleSubmitForReview = async () => {
     if (!draftState.fundingGoal || draftState.fundingGoal < 500) {
+      try {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      } catch {}
       Alert.alert('Required Field', 'Please enter a funding goal of at least $500.');
       return;
     }
@@ -247,8 +251,14 @@ export function CreateFlowScreen({ route, navigation }: any) {
       });
 
       setSaveStatus('synced');
+      try {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {}
       setShowConfirmation(true);
     } catch (err: any) {
+      try {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      } catch {}
       const msg = err.message || 'Submission failed. Please check your fields and try again.';
       if (msg.toLowerCase().includes('title')) {
         Alert.alert('Missing Title', msg, [{ text: 'Go to Basics', onPress: () => setCurrentStep(1) }]);
@@ -289,6 +299,8 @@ export function CreateFlowScreen({ route, navigation }: any) {
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Go back to previous step"
             onPress={goToPrevStep}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             style={{
@@ -348,6 +360,8 @@ export function CreateFlowScreen({ route, navigation }: any) {
           </View>
 
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Close draft and exit"
             onPress={() => navigation.navigate('CreateLanding')}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             style={{
@@ -386,37 +400,44 @@ export function CreateFlowScreen({ route, navigation }: any) {
       </View>
 
       {/* Main Content Area */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 18, paddingBottom: currentStep === 5 ? 40 : 120 }}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
       >
-        {currentStep === 1 && (
-          <Step1Basics draft={draftState} onChange={handleFieldChange} />
-        )}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ padding: 18, paddingBottom: currentStep === 5 ? 60 : 130 }}
+        >
+          {currentStep === 1 && (
+            <Step1Basics draft={draftState} onChange={handleFieldChange} />
+          )}
 
-        {currentStep === 2 && (
-          <Step2Story draft={draftState} onChange={handleFieldChange} />
-        )}
+          {currentStep === 2 && (
+            <Step2Story draft={draftState} onChange={handleFieldChange} />
+          )}
 
-        {currentStep === 3 && (
-          <Step3Visuals draft={draftState} onChange={handleFieldChange} />
-        )}
+          {currentStep === 3 && (
+            <Step3Visuals draft={draftState} onChange={handleFieldChange} />
+          )}
 
-        {currentStep === 4 && (
-          <Step4Reach draft={draftState} onChange={handleFieldChange} />
-        )}
+          {currentStep === 4 && (
+            <Step4Reach draft={draftState} onChange={handleFieldChange} />
+          )}
 
-        {currentStep === 5 && (
-          <Step5Submit
-            draft={draftState}
-            onChange={handleFieldChange}
-            onBack={goToPrevStep}
-            onSaveAsDraft={handleManualSave}
-            onSubmitForReview={handleSubmitForReview}
-            isSubmitting={isSubmitting}
-          />
-        )}
-      </ScrollView>
+          {currentStep === 5 && (
+            <Step5Submit
+              draft={draftState}
+              onChange={handleFieldChange}
+              onBack={goToPrevStep}
+              onSaveAsDraft={handleManualSave}
+              onSubmitForReview={handleSubmitForReview}
+              isSubmitting={isSubmitting}
+            />
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Bottom Sticky Action Bar (visible on Steps 1 to 4; Step 5 has its own full action buttons) */}
       {currentStep < 5 && (

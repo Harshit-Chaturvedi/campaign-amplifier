@@ -162,6 +162,7 @@ export function ExploreScreen({ navigation }: any) {
           >
             <Ionicons name="search" size={18} color="#94a3b8" />
             <TextInput
+              accessibilityLabel="Search campaigns by title, topic, creator"
               value={searchInput}
               onChangeText={setSearchInput}
               placeholder="Search by title, topic, creator..."
@@ -169,7 +170,12 @@ export function ExploreScreen({ navigation }: any) {
               style={{ flex: 1, fontSize: 14, color: '#0f172a', marginLeft: 8 }}
             />
             {searchInput.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchInput('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Clear search text"
+                onPress={() => setSearchInput('')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
                 <Ionicons name="close-circle" size={18} color="#94a3b8" />
               </TouchableOpacity>
             )}
@@ -177,6 +183,8 @@ export function ExploreScreen({ navigation }: any) {
 
           {/* Filter button with badge */}
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={`Filter campaigns (${activeFiltersCount} active)`}
             onPress={() => setFilterSheetVisible(true)}
             style={{
               height: 44,
@@ -213,6 +221,8 @@ export function ExploreScreen({ navigation }: any) {
         {/* Sort & Filter pills row */}
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Change sorting order"
             onPress={() => setSortSheetVisible(true)}
             style={{
               flexDirection: 'row',

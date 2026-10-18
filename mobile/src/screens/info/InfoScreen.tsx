@@ -322,6 +322,8 @@ export function InfoScreen({ route, navigation }: any) {
         }}
       >
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           onPress={() => navigation.goBack()}
           style={{
             width: 40,

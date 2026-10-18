@@ -11,6 +11,8 @@ import {
   Modal,
   TextInput,
   Share,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../../components/ui/Card';
@@ -186,6 +188,8 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
         }}
       >
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           onPress={() => navigation.goBack()}
           style={{
             width: 40,
@@ -202,6 +206,8 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
           Creator Dashboard
         </Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Create new campaign"
           onPress={() => navigation.navigate('CreateTab')}
           style={{
             width: 40,
@@ -504,13 +510,20 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
         transparent
         onRequestClose={() => setUpdateModalCampaignId(null)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
+        <KeyboardAvoidingView
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
           <View style={{ backgroundColor: '#ffffff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
                 Post Campaign Update
               </Text>
-              <TouchableOpacity onPress={() => setUpdateModalCampaignId(null)}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Close update modal"
+                onPress={() => setUpdateModalCampaignId(null)}
+              >
                 <Ionicons name="close" size={22} color="#64748b" />
               </TouchableOpacity>
             </View>
@@ -520,6 +533,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
             </Text>
 
             <TextInput
+              accessibilityLabel="Campaign update title"
               value={updateTitle}
               onChangeText={setUpdateTitle}
               placeholder="Update Title (e.g. City Council schedules committee review)"
@@ -537,6 +551,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
             />
 
             <TextInput
+              accessibilityLabel="Campaign update body text"
               value={updateBody}
               onChangeText={setUpdateBody}
               placeholder="Write your update message..."
@@ -566,7 +581,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               size="lg"
             />
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );

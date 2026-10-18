@@ -119,6 +119,8 @@ export function ReportScreen({ route, navigation }: any) {
         }}
       >
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           onPress={() => navigation.goBack()}
           style={{
             width: 40,
@@ -135,6 +137,8 @@ export function ReportScreen({ route, navigation }: any) {
           Distribution Report
         </Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={showInfoSheet ? 'Hide metrics explanation' : 'View metrics explanation'}
           onPress={() => setShowInfoSheet(!showInfoSheet)}
           style={{
             width: 40,
@@ -196,7 +200,11 @@ export function ReportScreen({ route, navigation }: any) {
               <Text style={{ fontSize: 14, fontWeight: '700', color: '#1d4ed8' }}>
                 Metric Definitions & Accounting Policy
               </Text>
-              <TouchableOpacity onPress={() => setShowInfoSheet(false)}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Close metric definitions"
+                onPress={() => setShowInfoSheet(false)}
+              >
                 <Ionicons name="close" size={18} color="#1d4ed8" />
               </TouchableOpacity>
             </View>

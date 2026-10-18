@@ -388,6 +388,8 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={`Decrease ${chMeta?.name || chId} budget allocation`}
                     onPress={() => adjustAllocation(chId, -5)}
                     style={{
                       width: 30,
@@ -408,6 +410,8 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                   </View>
 
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={`Increase ${chMeta?.name || chId} budget allocation`}
                     onPress={() => adjustAllocation(chId, 5)}
                     style={{
                       width: 30,

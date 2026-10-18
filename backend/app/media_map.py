@@ -1,4 +1,7 @@
-import urllib.request
+"""
+Static mapping of verified campaign media assets to campaign IDs and topics.
+Pure data module with no side effects or network calls.
+"""
 
 IMAGE_MAP = {
     'cmp-clean-water': {
@@ -73,33 +76,3 @@ IMAGE_MAP = {
         'topic': 'Red commuter transit bus and urban transit network',
     },
 }
-
-print(f"{'Campaign ID':<20} | {'Field':<12} | {'HTTP':<5} | {'Content-Type':<12} | {'Matches Topic'}")
-print("-" * 80)
-
-all_verified = True
-for cid, data in IMAGE_MAP.items():
-    urls_to_check = [('cover_url', data['cover_url'])]
-    for idx, ad_url in enumerate(data['ad_images']):
-        urls_to_check.append((f'ad_image_{idx+1}', ad_url))
-    if 'story_image' in data:
-        urls_to_check.append(('story_image', data['story_image']))
-    
-    for field_name, url in urls_to_check:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
-        try:
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                status = resp.status
-                ctype = resp.headers.get('Content-Type', '').split(';')[0]
-                if status == 200 and 'image' in ctype:
-                    match = 'yes'
-                else:
-                    match = 'unverified'
-                    all_verified = False
-                print(f"{cid:<20} | {field_name:<12} | {status:<5} | {ctype:<12} | {match} ({data['topic'][:25]}...)")
-        except Exception as e:
-            print(f"{cid:<20} | {field_name:<12} | ERR   | {str(e)[:12]} | unverified")
-            all_verified = False
-
-print("-" * 80)
-print(f"All images verified HTTP 200: {all_verified}")

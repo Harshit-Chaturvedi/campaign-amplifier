@@ -755,7 +755,7 @@ def seed():
                     url=campaign.cover_url,
                     meta={}
                 ))
-            from app.verify_all_images import IMAGE_MAP
+            from app.media_map import IMAGE_MAP
             if campaign.id in IMAGE_MAP:
                 for a_idx, ad_u in enumerate(IMAGE_MAP[campaign.id].get("ad_images", [])):
                     db.add(CampaignAsset(
@@ -944,7 +944,7 @@ def sync_media(db_session=None):
     Updates ONLY media fields (cover_url, CampaignAsset, StoryBlock image)
     to seed values without altering amounts, statuses, or contributions.
     """
-    from app.verify_all_images import IMAGE_MAP
+    from app.media_map import IMAGE_MAP
 
     own_session = False
     if db_session is None:
@@ -1009,7 +1009,7 @@ def sync_media(db_session=None):
                         blk.content = content
 
         db.commit()
-        print(f"Media sync completed: verified assets synchronized for {len(IMAGE_MAP)} campaigns.")
+        print(f"Media sync completed: media synchronized for {len(IMAGE_MAP)} campaigns.")
     except Exception as e:
         db.rollback()
         print(f"Error syncing media: {e}")

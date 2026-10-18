@@ -10,7 +10,10 @@ import {
   Switch,
   ActivityIndicator,
   Share,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useCampaignStore } from '../../store/useCampaignStore';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -109,6 +112,10 @@ export function FundCampaignScreen({ route, navigation }: any) {
       setLoading(false);
 
       if (outcome === 'success') {
+        try {
+          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        } catch {}
+
         // Increment locally in Zustand store so UI updates immediately
         addContribution({
           campaignId: campaign.id,
@@ -134,6 +141,9 @@ export function FundCampaignScreen({ route, navigation }: any) {
           'Your bank transfer / clearing payment is currently pending confirmation. The campaign raised amount will update once settlement clears.'
         );
       } else if (outcome === 'failed') {
+        try {
+          await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        } catch {}
         setSimulationState('failed');
         setSimulationMessage(
           'Simulated Payment Declined: The bank returned an insufficient funds / risk check decline. No funds were charged.'
@@ -146,12 +156,18 @@ export function FundCampaignScreen({ route, navigation }: any) {
       }
     } catch (err: any) {
       setLoading(false);
+      try {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      } catch {}
       Alert.alert('Payment Error', err.message || 'Unable to process contribution.');
     }
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: '#f8fafc' }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <StatusBar barStyle="dark-content" />
 
       {/* Top Header */}
@@ -170,6 +186,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
       >
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
             onPress={() => {
               if (step > 1) {
                 setStep((s) => ((s - 1) as 1 | 2));
@@ -219,6 +237,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
       <ScrollView
         contentContainerStyle={{ padding: 20, paddingBottom: 130 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         {/* Campaign Header Summary */}
         <Card style={{ marginBottom: 16 }}>
@@ -235,6 +254,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
               {campaign.category.replace('_', ' ')}
             </Text>
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={showInspectModal ? 'Hide campaign details' : 'Inspect campaign details'}
               onPress={() => setShowInspectModal(!showInspectModal)}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
             >
@@ -306,6 +327,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 return (
                   <TouchableOpacity
                     key={preset}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Preset $${preset}`}
                     onPress={() => {
                       setSelectedPreset(preset);
                       setCustomAmount('');
@@ -358,6 +381,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
             >
               <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a' }}>$</Text>
               <TextInput
+                accessibilityLabel="Custom contribution amount in dollars"
                 value={customAmount}
                 onChangeText={(t) => {
                   setCustomAmount(t);
@@ -632,6 +656,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                     Optional: Provide an email address to receive your confirmation and digital receipt.
                   </Text>
                   <TextInput
+                    accessibilityLabel="Guest email address for digital receipt"
                     value={guestEmail}
                     onChangeText={setGuestEmail}
                     placeholder="you@example.com (optional)"
@@ -785,6 +810,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
             <View style={{ gap: 10, marginBottom: 20 }}>
               {/* 1. Simulate Success */}
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={`Simulate successful payment of ${formatCurrency(total)}`}
                 onPress={() => handleSimulatePayment('success')}
                 disabled={loading}
                 activeOpacity={0.8}
@@ -812,6 +839,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
 
               {/* 2. Simulate Pending */}
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Simulate pending payment"
                 onPress={() => handleSimulatePayment('pending')}
                 disabled={loading}
                 activeOpacity={0.8}
@@ -833,6 +862,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
 
               {/* 3. Simulate Failed */}
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Simulate payment failure"
                 onPress={() => handleSimulatePayment('failed')}
                 disabled={loading}
                 activeOpacity={0.8}
@@ -854,6 +885,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
 
               {/* 4. Simulate Cancelled */}
               <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Simulate cancelled payment"
                 onPress={() => handleSimulatePayment('cancelled')}
                 disabled={loading}
                 activeOpacity={0.8}
@@ -922,7 +955,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
           </View>
         </View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

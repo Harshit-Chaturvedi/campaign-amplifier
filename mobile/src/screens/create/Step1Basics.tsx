@@ -145,6 +145,7 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
           </Text>
         </View>
         <Input
+          accessibilityLabel="Campaign Title"
           value={draft.title || ''}
           onChangeText={(val) => onChange({ title: val })}
           maxLength={60}
@@ -167,6 +168,8 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
             return (
               <TouchableOpacity
                 key={cat.key}
+                accessibilityRole="button"
+                accessibilityLabel={`Category ${cat.label}`}
                 onPress={() => onChange({ category: cat.key })}
                 style={{
                   flexDirection: 'row',
@@ -206,6 +209,7 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
           Creator or Organisation Name <Text style={{ color: '#ef4444' }}>*</Text>
         </Text>
         <Input
+          accessibilityLabel="Creator or Organisation Name"
           value={draft.creatorName || ''}
           onChangeText={(val) => onChange({ creatorName: val })}
           placeholder="e.g. County Clean Water Coalition or Jane Doe"
@@ -219,6 +223,7 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
           Short Summary
         </Text>
         <Input
+          accessibilityLabel="Short Summary"
           value={draft.summary || ''}
           onChangeText={(val) => onChange({ summary: val })}
           multiline

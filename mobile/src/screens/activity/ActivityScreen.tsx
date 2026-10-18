@@ -155,6 +155,8 @@ export function ActivityScreen({ navigation }: any) {
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <DemoDataBadge size="sm" />
             <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Open notification preferences"
               onPress={() => setShowPrefsModal(true)}
               style={{
                 width: 36,
@@ -339,7 +341,11 @@ export function ActivityScreen({ navigation }: any) {
               <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
                 Notification Preferences
               </Text>
-              <TouchableOpacity onPress={() => setShowPrefsModal(false)}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Close notification preferences modal"
+                onPress={() => setShowPrefsModal(false)}
+              >
                 <Ionicons name="close" size={22} color="#64748b" />
               </TouchableOpacity>
             </View>

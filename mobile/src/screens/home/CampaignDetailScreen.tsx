@@ -336,6 +336,8 @@ export function CampaignDetailScreen({ route, navigation }: any) {
         }}
       >
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           onPress={() => navigation.goBack()}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={{
@@ -352,6 +354,8 @@ export function CampaignDetailScreen({ route, navigation }: any) {
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={isSaved ? 'Remove from saved campaigns' : 'Save campaign'}
             onPress={handleToggleSave}
             style={{
               width: 38,
@@ -370,6 +374,8 @@ export function CampaignDetailScreen({ route, navigation }: any) {
           </TouchableOpacity>
 
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={isFollowed ? 'Unfollow campaign' : 'Follow campaign'}
             onPress={handleToggleFollow}
             style={{
               width: 38,
@@ -388,6 +394,8 @@ export function CampaignDetailScreen({ route, navigation }: any) {
           </TouchableOpacity>
 
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Share campaign"
             onPress={handleShare}
             style={{
               width: 38,

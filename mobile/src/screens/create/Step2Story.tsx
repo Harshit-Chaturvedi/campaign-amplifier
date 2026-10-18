@@ -304,6 +304,8 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                     {/* Move Up */}
                     <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={`Move block ${idx + 1} up`}
                       onPress={() => moveBlock(idx, 'up')}
                       disabled={idx === 0}
                       style={{ padding: 4, opacity: idx === 0 ? 0.3 : 1 }}
@@ -312,6 +314,8 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                     </TouchableOpacity>
                     {/* Move Down */}
                     <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={`Move block ${idx + 1} down`}
                       onPress={() => moveBlock(idx, 'down')}
                       disabled={idx === storyBlocks.length - 1}
                       style={{ padding: 4, opacity: idx === storyBlocks.length - 1 ? 0.3 : 1 }}
@@ -320,6 +324,8 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                     </TouchableOpacity>
                     {/* Delete */}
                     <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={`Delete block ${idx + 1}`}
                       onPress={() => removeBlock(idx)}
                       style={{ padding: 4, marginLeft: 4 }}
                     >
@@ -513,6 +519,8 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                       </Text>
                     </View>
                     <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={`Remove source ${src.title}`}
                       onPress={() => handleRemoveSource(src.id)}
                       style={{ padding: 4 }}
                     >

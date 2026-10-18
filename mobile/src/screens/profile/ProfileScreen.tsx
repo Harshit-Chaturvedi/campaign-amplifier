@@ -66,6 +66,8 @@ export function ProfileScreen({ navigation }: any) {
           Profile & Account
         </Text>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Open settings modal"
           onPress={() => setShowSettingsModal(true)}
           style={{
             width: 38,
@@ -412,7 +414,11 @@ export function ProfileScreen({ navigation }: any) {
                 <Ionicons name="receipt-outline" size={20} color="#4f46e5" />
                 <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>Digital Receipt</Text>
               </View>
-              <TouchableOpacity onPress={() => setActiveReceipt(null)}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Close receipt modal"
+                onPress={() => setActiveReceipt(null)}
+              >
                 <Ionicons name="close" size={22} color="#64748b" />
               </TouchableOpacity>
             </View>
@@ -488,7 +494,11 @@ export function ProfileScreen({ navigation }: any) {
               <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
                 Account Settings
               </Text>
-              <TouchableOpacity onPress={() => setShowSettingsModal(false)}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Close settings modal"
+                onPress={() => setShowSettingsModal(false)}
+              >
                 <Ionicons name="close" size={22} color="#64748b" />
               </TouchableOpacity>
             </View>

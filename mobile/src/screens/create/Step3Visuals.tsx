@@ -123,6 +123,7 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
           Ad Primary Text / Description
         </Text>
         <Input
+          accessibilityLabel="Ad Primary Text / Description"
           value={draft.adDescription ?? (draft.summary || '')}
           onChangeText={(val) => onChange({ adDescription: val })}
           multiline
@@ -220,6 +221,8 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
               >
                 <Image source={{ uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
                 <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel={`Remove ad image ${i + 1}`}
                   onPress={() => removeAdImage(i)}
                   style={{
                     position: 'absolute',

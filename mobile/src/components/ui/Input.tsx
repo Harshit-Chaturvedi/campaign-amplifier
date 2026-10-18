@@ -18,6 +18,7 @@ export function Input({ label, error, helper, ...props }: InputProps) {
         </Text>
       )}
       <TextInput
+        accessibilityLabel={props.accessibilityLabel || label}
         placeholderTextColor="#94a3b8"
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
