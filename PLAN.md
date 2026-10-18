@@ -2,7 +2,7 @@
 
 **Submit:** Android **APK + demo video** → Telegram group (https://t.me/+brkDpS8rYfBjNzll). Deadline Tue 11:59 AM (brief says 19 Oct). **Target: finished Mon 19 Oct night; Tuesday morning = buffer only.**
 **Source code is NOT required.** They judge: UI/UX (top), product thinking, end-to-end journey, state handling, backend logic, security/privacy.
-Reference site: https://campaign-one-pearl.vercel.app/ · Repo: https://github.com/Harshit-Chaturvedi/campaign-amplifier (app in nested `campaign-amplifier/campaign-amplifier/`) · Local: `C:\Users\harsh\Documents\antigravity\bold-volta\campaign-amplifier`
+Reference site: https://campaign-one-pearl.vercel.app/ · Repo: https://github.com/Harshit-Chaturvedi/campaign-amplifier · Mobile: `mobile/` · Backend: `backend/`
 
 ## 0. Non-negotiable product rules (get these wrong = lose points)
 
@@ -220,4 +220,4 @@ Backend (FastAPI + Postgres) and API client · draft autosave + resume · 5 crea
 Use `npx expo install <pkg>` for every new dependency (SDK 58 compatibility) and run `npx tsc --noEmit` + `npx expo-doctor` before each EAS build.
 
 **Resume prompt for a new Claude session:**
-> I'm building the Campaign Amplification hackathon app (Expo SDK 58 RN + React Navigation, FastAPI + Postgres backend) per the attached PLAN.md and original brief. Repo: github.com/Harshit-Chaturvedi/campaign-amplifier (app is in the nested `campaign-amplifier/campaign-amplifier` folder). Section 13 lists what to change/keep/build. Continue from the first unchecked item in Section 10, respecting the rules in Section 0.
+> I'm building the Campaign Amplification hackathon app (Expo SDK 58 RN + React Navigation, FastAPI + Postgres backend) per the attached PLAN.md and original brief. Repo: github.com/Harshit-Chaturvedi/campaign-amplifier (app is in the `mobile/` folder; backend is in `backend/`). Section 13 lists what to change/keep/build. Continue from the first unchecked item in Section 10, respecting the rules in Section 0.

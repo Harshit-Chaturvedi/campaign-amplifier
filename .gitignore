@@ -1,0 +1,22 @@
+# Dependencies & builds
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+.pytest_cache/
+.venv/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
