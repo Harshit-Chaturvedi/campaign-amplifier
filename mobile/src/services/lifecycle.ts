@@ -188,7 +188,7 @@ export function canStartPromotion(campaign: Campaign): { canStart: boolean; reas
 }
 
 /**
- * Verifies if a transition is valid for a given role and campaign state.
+ * Determines if a transition is valid for a given role and campaign state.
  */
 export function canTransition(
   campaign: Campaign,

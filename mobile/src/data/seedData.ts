@@ -91,7 +91,7 @@ export const seedCampaigns: Campaign[] = [
       { type: 'paragraph', text: 'Thirty schools in this county still draw drinking water through service lines installed before 1970. Testing last spring found elevated lead in eleven of them.' },
       { type: 'statistic', value: '11 of 30', label: 'Tested schools showed lead levels exceeding health guidelines' },
       { type: 'image', url: 'https://picsum.photos/seed/water-test-piping/800/500', caption: 'Lead line intake valve at Roosevelt Elementary, installed 1968', credit: 'Water Coalition Field Inspection' },
-      { type: 'paragraph', text: 'The replacement program is already fully funded at the state level, but school districts must file targeted applications with certified water test records to release the capital.' },
+      { type: 'paragraph', text: 'The replacement program is already fully funded at the state level, but school districts must file targeted applications with official water test records to release the capital.' },
       { type: 'quote', quote: 'The money to fix this already exists in the state capital budget. What is missing is public awareness that the filing deadline is ninety days away.', attribution: 'Marisol Everett, Water Coalition Director' },
       { type: 'action', title: 'Check Your School District', description: 'See whether your local district has filed its lead abatement grant application.', url: 'https://example.org/check-my-school-lead' },
     ],
@@ -348,8 +348,8 @@ export const seedCampaigns: Campaign[] = [
     ],
     storyBlocks: [
       { type: 'heading', text: 'More Than Books on Shelves', level: 1 },
-      { type: 'paragraph', text: 'Certified school librarians teach digital research literacy, recommend tailored materials, and keep collections current with reading curricula.' },
-      { type: 'statistic', value: '14', label: 'Middle schools currently operating without certified library media staff' },
+      { type: 'paragraph', text: 'Professional school librarians teach digital research literacy, recommend tailored materials, and keep collections current with reading curricula.' },
+      { type: 'statistic', value: '14', label: 'Middle schools currently operating without dedicated library media staff' },
     ],
     createdAt: iso(NOW - 8 * DAY),
     submittedAt: iso(NOW - 7 * DAY),
@@ -421,7 +421,7 @@ export const seedCampaigns: Campaign[] = [
     percentFunded: 0,
     backerCount: 0,
     estimatedReachAtGoal: estimateReach(7000).estimate,
-    moderationFeedback: 'Please provide official municipal noise ordinances and certified monitor locations rather than community forum quotes in Section 2.',
+    moderationFeedback: 'Please provide official municipal noise ordinances and official monitor locations rather than community forum quotes in Section 2.',
     adAssets: {
       coverUrl: 'https://picsum.photos/seed/plane-night-sky/800/500',
       adImages: ['https://picsum.photos/seed/decibel-monitor-ad/800/500'],

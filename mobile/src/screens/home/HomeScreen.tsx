@@ -282,7 +282,7 @@ export function HomeScreen({ navigation }: any) {
               How It Works
             </Text>
             <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>
-              A transparent sequence designed for verifiable reach
+              A clear sequence from message to reach
             </Text>
           </View>
 

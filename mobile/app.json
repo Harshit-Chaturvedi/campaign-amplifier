@@ -7,14 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "plugins": [
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/splash-icon.png",
-          "backgroundColor": "#4f46e5",
-          "resizeMode": "contain"
-        }
-      ]
+      "expo-font"
     ],
     "ios": {
       "supportsTablet": true,
@@ -32,8 +25,11 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-font"
-    ]
+    "extra": {
+      "eas": {
+        "projectId": "dbca6035-e061-4836-92aa-8c8e8e572911"
+      }
+    },
+    "owner": "harshit_0911"
   }
 }

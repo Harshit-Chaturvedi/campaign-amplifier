@@ -152,7 +152,7 @@ def seed():
                     {"type": "paragraph", "content": {"text": "Thirty schools in this county still draw drinking water through service lines installed before 1970. Testing last spring found elevated lead in eleven of them."}},
                     {"type": "statistic", "content": {"value": "11 of 30", "label": "Tested schools showed lead levels exceeding health guidelines"}},
                     {"type": "image", "content": {"url": "https://picsum.photos/seed/water-test-piping/800/500", "caption": "Lead line intake valve at Roosevelt Elementary, installed 1968", "credit": "Water Coalition Field Inspection"}},
-                    {"type": "paragraph", "content": {"text": "The replacement program is already fully funded at the state level, but school districts must file targeted applications with certified water test records to release the capital."}},
+                    {"type": "paragraph", "content": {"text": "The replacement program is already fully funded at the state level, but school districts must file targeted applications with official water test records to release the capital."}},
                     {"type": "quote", "content": {"quote": "The money to fix this already exists in the state capital budget. What is missing is public awareness that the filing deadline is ninety days away.", "attribution": "Marisol Everett, Water Coalition Director"}},
                     {"type": "action", "content": {"title": "Check Your School District", "description": "See whether your local district has filed its lead abatement grant application.", "url": "https://example.org/check-my-school-lead"}}
                 ]
@@ -360,7 +360,7 @@ def seed():
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "More Than Books on Shelves", "level": 1}},
-                    {"type": "paragraph", "content": {"text": "Certified school librarians teach digital research literacy, recommend tailored materials, and keep collections current."}}
+                    {"type": "paragraph", "content": {"text": "Professional school librarians teach digital research literacy, recommend tailored materials, and keep collections current."}}
                 ]
             },
             # 7. Ballot Plain (public_policy - submitted)

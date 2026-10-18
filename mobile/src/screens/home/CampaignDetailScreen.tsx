@@ -559,7 +559,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               </Text>
             </View>
             <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>
-              Traceable evidence supporting this campaign. All sources are listed for independent verification.
+              Traceable evidence supporting this campaign. All sources are listed so you can review them directly.
             </Text>
 
             {campaign.sources && campaign.sources.length > 0 ? (
@@ -630,11 +630,11 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             icon="shield-checkmark-outline"
           >
             <Text style={{ fontSize: 13, color: '#475569', lineHeight: 21 }}>
-              Submitted campaigns are reviewed by our team for content, sources, creative and targeting before they can be funded. We list sources so you can read them yourself. We do not score causes or claim independent fact-checking.
+              Submitted campaigns are reviewed by our team for content, sources, creative and targeting before they can be funded. We list sources so you can read them yourself. We do not score causes or claim independent evaluation of claims.
             </Text>
             <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
               <Text style={{ fontSize: 12, color: '#64748b' }}>
-                Distribution partners: Meta Advertising API, Reddit Ads Platform, and certified civic outreach networks.
+                Distribution partners: Meta Advertising API, Reddit Ads Platform, and registered civic outreach networks.
               </Text>
             </View>
           </Expandable>
