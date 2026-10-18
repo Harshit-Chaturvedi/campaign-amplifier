@@ -32,6 +32,7 @@ export type ExploreStackParamList = {
 export type CreateStackParamList = {
   CreateLanding: undefined;
   CreateFlow: { draftId: string; step?: number };
+  VoiceDraft: undefined;
 };
 
 export type ActivityStackParamList = {

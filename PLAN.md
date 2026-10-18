@@ -143,7 +143,7 @@ Calm, premium, credible. Primary indigo `#4f46e5` (matches the site), neutral sl
 **Mon (19 Oct)** — completeness & polish
 - [x] State machine + admin page + notifications generation (backend complete)
 - [ ] Activity tab, Profile (created/backed/saved/payments), creator dashboard + analytics (measured vs estimated)
-- [ ] Voice creation + AI suggest (with demo fallback); static info pages
+- [x] Voice creation + AI suggest (Phase 5C: 4 guided questions, expo-audio recording, transcript review, Step 1 landing with empty goal, demo/manual fallback); static info pages
 - [ ] Polish pass: loading/empty/error everywhere, a11y contrast, back behaviour, remove dead buttons
 - [ ] Final APK; clean install test; **record demo**; submit to Telegram
 
@@ -196,9 +196,21 @@ If time is short, **cut in this order:** comments → image generation → push 
 - **Submission Confirmation Modal (src/screens/create/SubmitConfirmationModal.tsx):** Status timeline displaying `Submitted -> In review -> Changes requested or Approved -> Available for funding`, with actions to view in My Campaigns or return Home.
 - **CreateFlow Integration (src/screens/create/CreateFlowScreen.tsx):** Removed temporary Step 4 placeholder; wired Step 4 and Step 5 with full state, autosave with reach settings, and submit handling.
 - **Profile Created Campaigns (src/screens/profile/ProfileScreen.tsx):** Real `useMyCampaigns` integration, filter tabs (All, Under Review, Published, Drafts), status badges, and "Under Review" notice banner (*"Content, sources, creative and targeting reviewed. Your campaign is queued for editorial approval."*).
-- **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 13/13 (including new end-to-end test in `backend/tests/test_phase5b_e2e.py` verifying draft creation, reach/goal patch, submit, and admin approval); forbidden verification copy strings verified clean.
+**Phase 5C Complete (Sun 18 Oct, 02:15 IST):**
+- **Guided Voice Creation (src/screens/create/VoiceDraftScreen.tsx):** 4 sequential guided questions with tailored prompts and sample answers: (1) "What is this about?", (2) "Who should see it?", (3) "Why does it matter?", (4) "What evidence supports it?".
+- **Audio Recording & Permission Handling:** Uses `expo-audio` (`useAudioRecorder`) with `requestRecordingPermissionsAsync()`, clear in-app permission rationale explaining why microphone access is requested. Live recording state, timer (MM:SS), and active waveform pulse.
+- **Transcript Review & Editing:** Editable transcript cards per question plus full review stage before AI draft generation.
+- **Backend AI Integration & Guardrails:** Calls `POST /ai/voice-draft` via `generateVoiceDraft()` in `client.ts`. Strictly enforces:
+  1. AI never sets or touches `funding_goal` (goal remains empty/undefined until creator types it in Step 5).
+  2. Always lands on editable **Step 1 (Basics)** via `navigation.replace('CreateFlow', { draftId, step: 1 })` — never skips ahead to submission.
+  3. Populates title (constrained to <= 60 characters), category (10 valid categories), summary, ad headline, ad description, story blocks, and sources.
+  4. All AI-populated fields remain completely editable and deletable by the creator on Step 1.
+- **Robust Failure & Permission Denied Fallbacks:** If microphone permission is denied, audio fails, or AI request fails, displays a clear message and offers:
+  - "Use Demo Mode": loads a pre-populated sample draft explicitly labelled with a Demo badge, landing on Step 1 with empty goal.
+  - "Create Manually": loads a blank draft directly on Step 1.
+- **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 14/14 (including `test_phase5c_voice.py`); verification runner `mobile/scripts/verify_voice_flow.js` completed with 7/7 passing stages.
 
-Next: Phase 5C (Voice creation) or Phase 6 (Backing flow).
+Next: Phase 6 (Backing flow: amount selection, live reach calculation, fees breakdown, simulated checkout with pending/failed/cancelled states, receipt).
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

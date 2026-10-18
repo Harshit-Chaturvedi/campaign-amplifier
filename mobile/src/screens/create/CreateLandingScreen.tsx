@@ -49,6 +49,21 @@ export function CreateLandingScreen({ navigation }: any) {
     navigation.navigate('CreateFlow', { draftId: newId, step: 1 });
   };
 
+  const handleStartVoice = () => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Sign in required',
+        'Campaigns undergo editorial review. Please sign in or create an account to start creating campaigns.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+      return;
+    }
+    navigation.navigate('VoiceDraft');
+  };
+
   const handleResume = (draft: CampaignDraft) => {
     setActiveDraft(draft.id);
     navigation.navigate('CreateFlow', {
@@ -186,17 +201,18 @@ export function CreateLandingScreen({ navigation }: any) {
             <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
           </TouchableOpacity>
 
-          {/* Card 2: Create with Your Voice (Disabled placeholder for 5C) */}
-          <View
+          {/* Card 2: Create with Your Voice */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleStartVoice}
             style={{
-              backgroundColor: '#f8fafc',
+              backgroundColor: '#fff',
               borderRadius: 16,
               padding: 18,
-              borderWidth: 1,
+              borderWidth: 1.5,
               borderColor: '#e2e8f0',
               flexDirection: 'row',
               alignItems: 'center',
-              opacity: 0.85,
             }}
           >
             <View
@@ -204,37 +220,38 @@ export function CreateLandingScreen({ navigation }: any) {
                 width: 48,
                 height: 48,
                 borderRadius: 12,
-                backgroundColor: '#f1f5f9',
+                backgroundColor: '#eef2ff',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginRight: 14,
               }}
             >
-              <Ionicons name="mic-outline" size={24} color="#64748b" />
+              <Ionicons name="mic" size={24} color="#4f46e5" />
             </View>
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#475569' }}>
+                <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
                   Create with Your Voice
                 </Text>
                 <View
                   style={{
-                    backgroundColor: '#e2e8f0',
+                    backgroundColor: '#e0e7ff',
                     borderRadius: 6,
                     paddingHorizontal: 6,
                     paddingVertical: 2,
                   }}
                 >
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#475569' }}>
-                    Coming in Phase 5C
+                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#4338ca' }}>
+                    AI Guided
                   </Text>
                 </View>
               </View>
-              <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 3 }}>
-                Speak your campaign brief naturally and let AI draft the evidence and ad angles
+              <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>
+                Speak your answers to 4 guided questions and let AI formulate your campaign draft
               </Text>
             </View>
-          </View>
+            <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
+          </TouchableOpacity>
         </View>
 
         {/* Section: Saved Drafts */}

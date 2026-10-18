@@ -428,6 +428,47 @@ export const apiClient = {
       };
     }
   },
+
+  async generateVoiceDraft(transcript: string): Promise<{
+    title: string;
+    category: string;
+    summary: string;
+    tagline: string;
+    target_audience: string;
+    ad_headline: string;
+    ad_description: string;
+    suggested_sources: string[];
+    suggested_channels: string[];
+    demo_mode: boolean;
+  }> {
+    try {
+      const url = `${API_BASE_URL}/ai/voice-draft`;
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        body: JSON.stringify({ transcript }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.json();
+    } catch {
+      // Local fallback
+      return {
+        title: 'Clean Drinking Water for Every Public School',
+        category: 'health',
+        summary: 'Elevated lead was documented across 11 county public schools. State replacement funds are active but require immediate district application.',
+        tagline: 'Fixing school drinking water with existing state infrastructure grants.',
+        target_audience: 'Parents, teachers, and municipal voters in the school district.',
+        ad_headline: 'Eleven schools. Elevated lead. One deadline.',
+        ad_description: 'The state will pay to replace the pipes, but only if the district applies. See the water test results.',
+        suggested_sources: [
+          'https://example.org/county-water-testing-2026',
+          'https://example.org/state-lead-service-line-fund',
+        ],
+        suggested_channels: ['Meta', 'Instagram', 'Reddit'],
+        demo_mode: true,
+      };
+    }
+  },
+
   async submitDraft(id: string): Promise<{ success: boolean; isOffline: boolean; campaignStatus?: string }> {
     try {
       const url = `${API_BASE_URL}/drafts/${id}/submit`;
