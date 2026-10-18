@@ -55,3 +55,23 @@ export function useSubmitFeedback(campaignId: string) {
     },
   });
 }
+
+export function useMyCampaigns(status?: string) {
+  return useQuery({
+    queryKey: ['my-campaigns', status],
+    queryFn: () => apiClient.getMyCampaigns(status),
+    staleTime: 1000 * 30, // 30s
+  });
+}
+
+export function useSubmitDraft() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (draftId: string) => apiClient.submitDraft(draftId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['my-campaigns'] });
+      queryClient.invalidateQueries({ queryKey: campaignKeys.all });
+    },
+  });
+}
+

@@ -15,6 +15,9 @@ import { apiClient } from '../../api/client';
 import { Step1Basics } from './Step1Basics';
 import { Step2Story } from './Step2Story';
 import { Step3Visuals } from './Step3Visuals';
+import { Step4Reach } from './Step4Reach';
+import { Step5Submit } from './Step5Submit';
+import { SubmitConfirmationModal } from './SubmitConfirmationModal';
 import { Button } from '../../components/ui/Button';
 
 const STEPS = [
@@ -22,7 +25,7 @@ const STEPS = [
   { step: 2, title: 'Story' },
   { step: 3, title: 'Visuals' },
   { step: 4, title: 'Reach' },
-  { step: 5, title: 'Goal' },
+  { step: 5, title: 'Submit' },
 ];
 
 export function CreateFlowScreen({ route, navigation }: any) {
@@ -49,10 +52,17 @@ export function CreateFlowScreen({ route, navigation }: any) {
       headline: '',
       adDescription: '',
       cta: 'Learn More',
+      locations: ['Cook County'],
+      interests: ['Public Health & Clean Water'],
+      channels: ['Meta', 'Instagram'],
+      budgetAllocation: { Meta: 60, Instagram: 40 },
+      durationDays: 30,
     }
   );
 
   const [saveStatus, setSaveStatus] = useState<'saved_local' | 'synced' | 'saving'>('saved_local');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const debounceTimerRef = useRef<any>(null);
 
   // Autosave handler (debounce 800ms)
@@ -85,6 +95,13 @@ export function CreateFlowScreen({ route, navigation }: any) {
           ad_description: nextDraft.adDescription,
           cta: nextDraft.cta,
           draft_step: nextDraft.step,
+          duration_days: nextDraft.durationDays || 30,
+          reach: {
+            locations: nextDraft.locations || ['Cook County'],
+            interests: nextDraft.interests || ['Public Health & Clean Water'],
+            channels: nextDraft.channels || ['Meta', 'Instagram'],
+            budget_alloc: nextDraft.budgetAllocation || { Meta: 60, Instagram: 40 },
+          },
           story_blocks: nextDraft.storyBlocks?.map((b: any, idx: number) => ({
             id: b.id || `blk-${idx}`,
             position: idx,
@@ -93,6 +110,10 @@ export function CreateFlowScreen({ route, navigation }: any) {
           })),
           sources: nextDraft.sources,
         };
+
+        if (nextDraft.fundingGoal && nextDraft.fundingGoal >= 500) {
+          patchPayload.funding_goal = nextDraft.fundingGoal;
+        }
 
         const res = await apiClient.patchDraft(draftId, patchPayload);
         if (res.isOffline) {
@@ -116,10 +137,16 @@ export function CreateFlowScreen({ route, navigation }: any) {
       return Boolean(draftState.title?.trim() && draftState.creatorName?.trim());
     }
     if (currentStep === 2) {
-      return true; // Allow proceeding with draft story
+      return true;
     }
     if (currentStep === 3) {
       return true;
+    }
+    if (currentStep === 4) {
+      const chs = draftState.channels || ['Meta', 'Instagram'];
+      const alloc = draftState.budgetAllocation || { Meta: 60, Instagram: 40 };
+      const sum = chs.reduce((s, c) => s + (alloc[c] || 0), 0);
+      return chs.length > 0 && sum === 100;
     }
     return true;
   };
@@ -136,15 +163,27 @@ export function CreateFlowScreen({ route, navigation }: any) {
       }
     }
 
-    if (currentStep < 3) {
+    if (currentStep === 4) {
+      const chs = draftState.channels || [];
+      if (chs.length === 0) {
+        Alert.alert('Select Channels', 'Please select at least one advertising channel.');
+        return;
+      }
+      const alloc = draftState.budgetAllocation || {};
+      const sum = chs.reduce((s, c) => s + (alloc[c] || 0), 0);
+      if (sum !== 100) {
+        Alert.alert(
+          'Invalid Budget Allocation',
+          `Budget allocation must sum to exactly 100% (currently ${sum}%). Please adjust before continuing.`
+        );
+        return;
+      }
+    }
+
+    if (currentStep < 5) {
       const next = currentStep + 1;
       setCurrentStep(next);
       triggerAutosave({ step: next }, next);
-    } else if (currentStep === 3) {
-      // Step 4 is Phase 5B; prompt explicitly notes:
-      // "the Continue button on Step 3 goes to a temporary 'Step 4 coming next' screen ONLY inside this unfinished build"
-      setCurrentStep(4);
-      triggerAutosave({ step: 4 }, 4);
     }
   };
 
@@ -156,6 +195,78 @@ export function CreateFlowScreen({ route, navigation }: any) {
     } else {
       navigation.goBack();
     }
+  };
+
+  // Submit for review handler
+  const handleSubmitForReview = async () => {
+    if (!draftState.fundingGoal || draftState.fundingGoal < 500) {
+      Alert.alert('Required Field', 'Please enter a funding goal of at least $500.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // 1. Immediately sync latest draft payload to backend
+      const patchPayload: any = {
+        title: draftState.title,
+        category: draftState.category,
+        creator_name: draftState.creatorName,
+        summary: draftState.summary,
+        cover_url: draftState.coverUrl,
+        headline: draftState.headline,
+        ad_description: draftState.adDescription,
+        cta: draftState.cta,
+        draft_step: 5,
+        funding_goal: draftState.fundingGoal,
+        duration_days: draftState.durationDays || 30,
+        reach: {
+          locations: draftState.locations || ['Cook County'],
+          interests: draftState.interests || ['Public Health & Clean Water'],
+          channels: draftState.channels || ['Meta', 'Instagram'],
+          budget_alloc: draftState.budgetAllocation || { Meta: 60, Instagram: 40 },
+        },
+        story_blocks: draftState.storyBlocks?.map((b: any, idx: number) => ({
+          id: b.id || `blk-${idx}`,
+          position: idx,
+          type: b.type,
+          content: b,
+        })),
+        sources: draftState.sources,
+      };
+
+      await apiClient.patchDraft(draftId, patchPayload);
+
+      // 2. Call backend transition endpoint
+      const submitRes = await apiClient.submitDraft(draftId);
+
+      // 3. Mark draft locally as submitted
+      saveDraft({
+        ...draftState,
+        id: draftId,
+        step: 5,
+      });
+
+      setSaveStatus('synced');
+      setShowConfirmation(true);
+    } catch (err: any) {
+      const msg = err.message || 'Submission failed. Please check your fields and try again.';
+      if (msg.toLowerCase().includes('title')) {
+        Alert.alert('Missing Title', msg, [{ text: 'Go to Basics', onPress: () => setCurrentStep(1) }]);
+      } else if (msg.toLowerCase().includes('goal') || msg.toLowerCase().includes('500')) {
+        Alert.alert('Invalid Funding Goal', msg);
+      } else if (msg.toLowerCase().includes('channel') || msg.toLowerCase().includes('reach')) {
+        Alert.alert('Targeting Settings', msg, [{ text: 'Go to Reach', onPress: () => setCurrentStep(4) }]);
+      } else {
+        Alert.alert('Submission Error', msg);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleManualSave = () => {
+    triggerAutosave(draftState);
+    Alert.alert('Draft Saved', 'Your campaign draft has been saved. You can resume editing anytime.');
   };
 
   return (
@@ -277,7 +388,7 @@ export function CreateFlowScreen({ route, navigation }: any) {
       {/* Main Content Area */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 18, paddingBottom: 120 }}
+        contentContainerStyle={{ padding: 18, paddingBottom: currentStep === 5 ? 40 : 120 }}
       >
         {currentStep === 1 && (
           <Step1Basics draft={draftState} onChange={handleFieldChange} />
@@ -291,88 +402,77 @@ export function CreateFlowScreen({ route, navigation }: any) {
           <Step3Visuals draft={draftState} onChange={handleFieldChange} />
         )}
 
-        {currentStep >= 4 && (
-          <View
-            style={{
-              padding: 24,
-              backgroundColor: '#fff',
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: '#e2e8f0',
-              alignItems: 'center',
-            }}
-          >
-            <Ionicons name="construct-outline" size={48} color="#4f46e5" />
-            <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a', marginTop: 12 }}>
-              Step {currentStep} Coming Next
-            </Text>
-            <Text
-              style={{
-                fontSize: 13,
-                color: '#64748b',
-                textAlign: 'center',
-                marginTop: 6,
-                lineHeight: 19,
-                maxWidth: 280,
-              }}
-            >
-              Steps 1-3 (Basics, Story & Citations, Visuals & Previews) are complete and saved. Steps 4 (Audience & Targeting) and 5 (Funding Goal & Review) will be built in Phase 5B.
-            </Text>
-            <View style={{ marginTop: 20 }}>
-              <Button
-                title="Return to Step 3 (Visuals)"
-                variant="outline"
-                size="sm"
-                onPress={() => setCurrentStep(3)}
-              />
-            </View>
-          </View>
+        {currentStep === 4 && (
+          <Step4Reach draft={draftState} onChange={handleFieldChange} />
+        )}
+
+        {currentStep === 5 && (
+          <Step5Submit
+            draft={draftState}
+            onChange={handleFieldChange}
+            onBack={goToPrevStep}
+            onSaveAsDraft={handleManualSave}
+            onSubmitForReview={handleSubmitForReview}
+            isSubmitting={isSubmitting}
+          />
         )}
       </ScrollView>
 
-      {/* Bottom Sticky Action Bar */}
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderTopColor: '#f1f5f9',
-          padding: 16,
-          paddingBottom: Platform.OS === 'ios' ? 32 : 16,
-          flexDirection: 'row',
-          gap: 12,
-        }}
-      >
-        {currentStep > 1 && (
-          <Button
-            title="Back"
-            variant="secondary"
-            size="md"
-            onPress={goToPrevStep}
-          />
-        )}
-        <View style={{ flex: 1 }}>
-          <Button
-            title={
-              currentStep === 3
-                ? 'Save & Continue'
-                : currentStep > 3
-                ? 'Done (Saved)'
-                : 'Continue'
-            }
-            variant="primary"
-            size="md"
-            icon={currentStep <= 3 ? 'arrow-forward' : undefined}
-            iconPosition="right"
-            disabled={!canContinue()}
-            onPress={goToNextStep}
-            fullWidth
-          />
+      {/* Bottom Sticky Action Bar (visible on Steps 1 to 4; Step 5 has its own full action buttons) */}
+      {currentStep < 5 && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#fff',
+            borderTopWidth: 1,
+            borderTopColor: '#f1f5f9',
+            padding: 16,
+            paddingBottom: Platform.OS === 'ios' ? 32 : 16,
+            flexDirection: 'row',
+            gap: 12,
+          }}
+        >
+          {currentStep > 1 && (
+            <Button
+              title="Back"
+              variant="secondary"
+              size="md"
+              onPress={goToPrevStep}
+            />
+          )}
+          <View style={{ flex: 1 }}>
+            <Button
+              title={currentStep === 4 ? 'Continue to Submit' : 'Continue'}
+              variant="primary"
+              size="md"
+              icon="arrow-forward"
+              iconPosition="right"
+              disabled={!canContinue()}
+              onPress={goToNextStep}
+              fullWidth
+            />
+          </View>
         </View>
-      </View>
+      )}
+
+      {/* Confirmation Modal */}
+      <SubmitConfirmationModal
+        visible={showConfirmation}
+        campaignTitle={draftState.title || 'Untitled Campaign'}
+        campaignId={draftId}
+        fundingGoal={draftState.fundingGoal || 0}
+        onGoToMyCampaigns={() => {
+          setShowConfirmation(false);
+          navigation.navigate('ProfileTab');
+        }}
+        onGoHome={() => {
+          setShowConfirmation(false);
+          navigation.navigate('HomeTab');
+        }}
+      />
     </KeyboardAvoidingView>
   );
 }

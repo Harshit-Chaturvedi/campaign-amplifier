@@ -13,6 +13,7 @@ import type {
 } from '../types/campaign';
 import { seedCampaigns } from '../data/seedData';
 import { useAuthStore } from '../store/useAuthStore';
+import { useDraftStore } from '../store/useDraftStore';
 
 interface ServerStatusState {
   isWakingUp: boolean;
@@ -424,6 +425,108 @@ export const apiClient = {
         ad_description: 'Read the documented sources and join our awareness campaign.',
         suggested_sources: ['https://example.org/community-report-2025'],
         demo_mode: true,
+      };
+    }
+  },
+  async submitDraft(id: string): Promise<{ success: boolean; isOffline: boolean; campaignStatus?: string }> {
+    try {
+      const url = `${API_BASE_URL}/drafts/${id}/submit`;
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        const detail = errJson.detail || `Server returned ${res.status}`;
+        throw new Error(detail);
+      }
+      const data = await res.json();
+      return {
+        success: true,
+        isOffline: false,
+        campaignStatus: data.campaign_status || 'submitted',
+      };
+    } catch (err: any) {
+      if (err.message && !err.message.includes('fetch') && !err.message.includes('Network') && !err.message.includes('Failed to fetch')) {
+        throw err;
+      }
+      // Offline fallback: mark local draft as submitted
+      return {
+        success: true,
+        isOffline: true,
+        campaignStatus: 'submitted',
+      };
+    }
+  },
+
+  async getMyCampaigns(status?: string): Promise<{ items: Campaign[]; isOffline: boolean }> {
+    try {
+      const qs = status ? `?status=${encodeURIComponent(status)}` : '';
+      const url = `${API_BASE_URL}/me/campaigns${qs}`;
+      const res = await fetchWithTimeout(url, { method: 'GET' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const rawList = Array.isArray(data) ? data : data.items || [];
+      const items = rawList.map(normalizeCampaign);
+      return { items, isOffline: false };
+    } catch {
+      // Offline fallback: gather from useDraftStore and seed
+      const allDrafts = Object.values(useDraftStore.getState().drafts);
+      const convertedDrafts: Campaign[] = allDrafts.map((d) =>
+        normalizeCampaign({
+          id: d.id,
+          slug: d.id,
+          title: d.title || 'Untitled Draft',
+          category: d.category || 'community',
+          creator_name: d.creatorName || 'Organizer',
+          creator_type: 'individual',
+          summary: d.summary || '',
+          tagline: d.headline || '',
+          cover_url: d.coverUrl || '',
+          status: d.step === 5 && d.fundingGoal ? 'submitted' : 'draft',
+          funding_goal: d.fundingGoal || 1000,
+          amount_raised: 0,
+          percent_funded: 0,
+          backer_count: 0,
+          estimated_reach_at_goal: d.fundingGoal ? Math.round((d.fundingGoal * 0.95 / 14.5) * 1000 / 2.2) : 0,
+          duration_days: d.durationDays || 30,
+          created_at: d.updatedAt || new Date().toISOString(),
+        })
+      );
+      let items = convertedDrafts;
+      if (status) {
+        items = items.filter((c) => c.status === status);
+      }
+      return { items, isOffline: true };
+    }
+  },
+
+  async login(email: string, password = 'demo123'): Promise<{ token: string; user: any; isOffline: boolean }> {
+    try {
+      const url = `${API_BASE_URL}/auth/login`;
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        body: JSON.stringify({ email: email.toLowerCase(), password }),
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.detail || 'Login failed');
+      }
+      const data = await res.json();
+      return { token: data.access_token, user: data.user, isOffline: false };
+    } catch (err: any) {
+      if (err.message && !err.message.includes('fetch') && !err.message.includes('Network')) {
+        throw err;
+      }
+      return {
+        token: `demo-token-${email.split('@')[0]}`,
+        user: {
+          id: `user-${email.split('@')[0]}`,
+          email,
+          name: email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+          username: email.split('@')[0].toLowerCase(),
+          role: 'user',
+        },
+        isOffline: true,
       };
     }
   },

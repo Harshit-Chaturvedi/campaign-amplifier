@@ -485,7 +485,7 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
               </Text>
             </View>
             <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>
-              All campaigns must cite verifiable public sources (government audits, published research, meeting minutes).
+              All campaigns must cite grounded public sources (government audits, published research, meeting minutes).
             </Text>
 
             {/* Existing Sources List */}

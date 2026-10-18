@@ -5,27 +5,46 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 
+import { apiClient } from '../../api/client';
+
 export function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const login = useAuthStore((s) => s.login);
   const loginAsDemo = useAuthStore((s) => s.loginAsDemo);
 
-  const handleLogin = (userEmail: string, pass: string) => {
-    login(userEmail, pass);
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('Main');
+  const handleLogin = async (userEmail: string, pass: string) => {
+    setLoading(true);
+    try {
+      const res = await apiClient.login(userEmail, pass || 'demo123');
+      login(userEmail, pass, res.token);
+    } catch {
+      login(userEmail, pass);
+    } finally {
+      setLoading(false);
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Main');
+      }
     }
   };
 
-  const handleDemo = () => {
-    loginAsDemo();
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('Main');
+  const handleDemo = async () => {
+    setLoading(true);
+    try {
+      const res = await apiClient.login('creator@demo.org', 'demo123');
+      login('creator@demo.org', 'demo123', res.token);
+    } catch {
+      loginAsDemo();
+    } finally {
+      setLoading(false);
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Main');
+      }
     }
   };
 

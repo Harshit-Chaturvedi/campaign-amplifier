@@ -136,7 +136,7 @@ Calm, premium, credible. Primary indigo `#4f46e5` (matches the site), neutral sl
 - [x] Home, Explore (real search/filter/sort), CampaignCard, states
 - [x] Campaign Detail with sources, sticky funding bar, expandables
 - [x] Creator flow Steps 1–3 + landing + autosave + resume drafts (Phase 5A)
-- [ ] Creator flow Steps 4–5 + submit + timeline (Phase 5B)
+- [x] Creator flow Steps 4–5 + submit + timeline (Phase 5B)
 - [ ] **EAS APK build #1 by midday; install on phone; fix build issues**
 - [ ] Backing flow 6 steps + simulated payment + states + receipt
 
@@ -189,10 +189,16 @@ If time is short, **cut in this order:** comments → image generation → push 
 - **Step 1: Basics (src/screens/create/Step1Basics.tsx):** Title input (max 60 with live character counter and helper text), category picker with all 10 options and icons, creator/organisation name, short summary, optional cover image with expo-image-picker (type validation and 10MB size limit), and "Suggest with AI" card calling `POST /ai/draft-from-text` where suggestions can be accepted, edited, or dismissed individually without ever touching the funding goal.
 - **Step 2: Story (src/screens/create/Step2Story.tsx):** Editorial block composer supporting heading, paragraph, image (with caption + credit), statistic, quote, and action blocks with up/down reordering and deletion; formatting toolbar; Sources manager with URL validation; and Edit | Live preview toggle sharing the exact same `StoryBlockRenderer` as `CampaignDetailScreen`.
 - **Step 3: Campaign & Ad Visuals (src/screens/create/Step3Visuals.tsx):** Cover image display, multi-image ad creative picker with delete badges, disabled video row clearly stating "Video creatives are not supported in this prototype", ad headline defaulting to the first 60 characters of title, ad description, CTA button selector, audience placement previews (social feed 16:9, vertical story 9:16, text-only promoted card), missing assets warning banner, and optional creative quality checklist.
-- **Step 4 Placeholder:** Continue from Step 3 presents a temporary "Step 4 Coming Next" screen for this unfinished build, keeping the flow clean before Phase 5B.
-- **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest 12/12 passed.
 
-Next: Phase 5B (Step 4 Reach & Targeting + Step 5 Funding Goal & Submission + Status Timeline).
+**Phase 5B Complete (Sun 18 Oct, 01:50 IST):**
+- **Step 4: Reach (src/screens/create/Step4Reach.tsx):** Locations (multi-select chips), interests (multi-select chips), channels (Meta, Instagram, Reddit, YouTube, X), budget allocation across channels (running total, stepper controls, "Distribute Evenly" quick helper, strict 100% total validation with warning banner), duration selector (7/14/30 days). Two clearly separated sections: "You choose" and "The platform may finalise during review". Prominent copy: *"Actual reach depends on inventory, prices, targeting, delivery and performance."* Audience preview card showing target profile and sample ad mockup without promised audience sizes.
+- **Step 5: Funding Goal & Submit (src/screens/create/Step5Submit.tsx):** Complete campaign preview reusing `StoryBlockRenderer`, `SourceItem`, and `FeedPlacementPreview`; REQUIRED funding goal typed by creator (strictly no default value, validated between $500 and $50,000, with dynamic live estimated reach recalculation clearly labelled as `"Estimate"`); fees and funding policy breakdown; required submission checkboxes for grounded sources and platform policies; action buttons (Back, Save as Draft, Preview Campaign, Submit for Review); submission calling `POST /drafts/:id/submit` with field error mapping.
+- **Submission Confirmation Modal (src/screens/create/SubmitConfirmationModal.tsx):** Status timeline displaying `Submitted -> In review -> Changes requested or Approved -> Available for funding`, with actions to view in My Campaigns or return Home.
+- **CreateFlow Integration (src/screens/create/CreateFlowScreen.tsx):** Removed temporary Step 4 placeholder; wired Step 4 and Step 5 with full state, autosave with reach settings, and submit handling.
+- **Profile Created Campaigns (src/screens/profile/ProfileScreen.tsx):** Real `useMyCampaigns` integration, filter tabs (All, Under Review, Published, Drafts), status badges, and "Under Review" notice banner (*"Content, sources, creative and targeting reviewed. Your campaign is queued for editorial approval."*).
+- **Verification:** `npx tsc --noEmit` passed (0 errors); `npx expo-doctor` passed 20/20 checks; backend pytest passed 13/13 (including new end-to-end test in `backend/tests/test_phase5b_e2e.py` verifying draft creation, reach/goal patch, submit, and admin approval); forbidden verification copy strings verified clean.
+
+Next: Phase 5C (Voice creation) or Phase 6 (Backing flow).
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

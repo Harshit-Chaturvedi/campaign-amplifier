@@ -200,7 +200,7 @@ export function VerticalStoryPlacementPreview({
           {headline || 'Campaign Headline'}
         </Text>
         <Text style={{ fontSize: 11, color: '#cbd5e1', lineHeight: 15, marginBottom: 10 }} numberOfLines={2}>
-          {description || 'Swipe up to read the verified citations and help reach residents.'}
+          {description || 'Swipe up to read the public citations and help reach residents.'}
         </Text>
         <View
           style={{
