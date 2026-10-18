@@ -48,7 +48,7 @@ export const useAuthStore = create<AuthState>()(
           username: 'elena-rostova',
           role: 'creator',
           bio: 'Independent environmental reporter and community campaign organizer.',
-          photoURL: 'https://picsum.photos/seed/creator-elena/200/200',
+          photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80',
           createdAt: new Date().toISOString(),
         };
         set({

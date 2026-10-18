@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { formatCurrency, formatNumber } from '../../utils/formatting';
@@ -7,6 +7,7 @@ import { DemoDataBadge } from '../ui/DemoDataBadge';
 import { StatusBadge } from '../ui/StatusBadge';
 import { ProgressBar } from '../ui/ProgressBar';
 import { Button } from '../ui/Button';
+import { GeneratedCover } from '../ui/GeneratedCover';
 import type { Campaign } from '../../types/campaign';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -56,6 +57,7 @@ export function CampaignCard({
   const displayCategory = catLabels[campaign.category] || campaign.category;
   const coverUrl = campaign.adAssets?.coverUrl;
   const isBackable = campaign.status === 'available_for_funding';
+  const [imageError, setImageError] = useState(false);
 
   // Compact variant (used in lists, recent views, or activity)
   if (variant === 'compact') {
@@ -85,11 +87,12 @@ export function CampaignCard({
             overflow: 'hidden',
           }}
         >
-          {coverUrl ? (
+          {coverUrl && !imageError ? (
             <Image
               source={{ uri: coverUrl }}
               style={{ width: '100%', height: '100%' }}
               resizeMode="cover"
+              onError={() => setImageError(true)}
             />
           ) : (
             <Ionicons
@@ -143,16 +146,15 @@ export function CampaignCard({
         }}
       >
         <View style={{ height: 155, backgroundColor: catColor + '15', overflow: 'hidden' }}>
-          {coverUrl ? (
+          {coverUrl && !imageError ? (
             <Image
               source={{ uri: coverUrl }}
               style={{ width: '100%', height: '100%' }}
               resizeMode="cover"
+              onError={() => setImageError(true)}
             />
           ) : (
-            <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name={catIcons[campaign.category] || 'megaphone'} size={40} color={catColor} />
-            </View>
+            <GeneratedCover category={campaign.category} title={campaign.title} height={155} />
           )}
 
           <View
@@ -247,15 +249,15 @@ export function CampaignCard({
     >
       {/* Cover Creative */}
       <View style={{ height: 160, backgroundColor: catColor + '12', overflow: 'hidden' }}>
-        {coverUrl ? (
-          <Image source={{ uri: coverUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+        {coverUrl && !imageError ? (
+          <Image
+            source={{ uri: coverUrl }}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+            onError={() => setImageError(true)}
+          />
         ) : (
-          <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name={catIcons[campaign.category] || 'megaphone-outline'} size={38} color={catColor} />
-            <Text style={{ fontSize: 13, color: catColor, marginTop: 6, fontWeight: '600' }}>
-              {displayCategory}
-            </Text>
-          </View>
+          <GeneratedCover category={campaign.category} title={campaign.title} height={160} />
         )}
 
         <View

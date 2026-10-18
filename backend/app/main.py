@@ -6,7 +6,7 @@ from fastapi.responses import FileResponse
 
 from app.config import settings
 from app.database import engine, Base
-from app.seed import seed
+from app.seed import seed, sync_media
 from app.routers import (
     auth, campaigns, drafts, contributions,
     social, notifications, admin, ai, uploads
@@ -24,6 +24,8 @@ from contextlib import asynccontextmanager
 async def lifespan(app: FastAPI):
     # Auto-seed database if empty on startup
     seed()
+    # Idempotently sync media URLs for existing seed campaigns
+    sync_media()
     yield
 
 app = FastAPI(

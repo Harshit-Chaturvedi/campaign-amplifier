@@ -22,6 +22,7 @@ import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { Expandable } from '../../components/ui/Expandable';
 import { SourceItem } from '../../components/ui/SourceItem';
 import { Skeleton } from '../../components/ui/Skeleton';
+import { GeneratedCover } from '../../components/ui/GeneratedCover';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
 import { getCategoryColor } from '../../theme/colors';
@@ -60,6 +61,8 @@ export function CampaignDetailScreen({ route, navigation }: any) {
   const [visualsFeedback, setVisualsFeedback] = useState<string | null>(null);
   const [mindFeedback, setMindFeedback] = useState<string | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [coverError, setCoverError] = useState(false);
+  const [adError, setAdError] = useState(false);
 
   const handleShare = async () => {
     if (!campaign) return;
@@ -406,16 +409,19 @@ export function CampaignDetailScreen({ route, navigation }: any) {
       >
         {/* Cover creative image */}
         <View style={{ height: 220, backgroundColor: catColor + '15', overflow: 'hidden' }}>
-          {coverUrl ? (
+          {coverUrl && !coverError ? (
             <Image
               source={{ uri: coverUrl }}
               style={{ width: '100%', height: '100%' }}
               resizeMode="cover"
+              onError={() => setCoverError(true)}
             />
           ) : (
-            <View style={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="megaphone-outline" size={54} color={catColor} />
-            </View>
+            <GeneratedCover
+              category={campaign.category}
+              title={campaign.title}
+              height={220}
+            />
           )}
 
           {isServerWakingUp ? (

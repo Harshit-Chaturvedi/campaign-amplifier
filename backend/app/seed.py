@@ -37,7 +37,7 @@ def seed():
                 password_hash=pw_hash,
                 role="creator",
                 bio="Independent environmental reporter and community campaign organizer.",
-                photo_url="https://picsum.photos/seed/creator-elena/200/200",
+                photo_url="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80",
                 created_at=now - 90 * day
             ),
             User(
@@ -48,7 +48,7 @@ def seed():
                 password_hash=pw_hash,
                 role="creator",
                 bio="Independent environmental reporter and community campaign organizer.",
-                photo_url="https://picsum.photos/seed/creator-elena/200/200",
+                photo_url="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80",
                 created_at=now - 90 * day
             ),
             # Backer
@@ -60,7 +60,7 @@ def seed():
                 password_hash=pw_hash,
                 role="user",
                 bio="Backing civic and evidence-based policy amplification.",
-                photo_url="https://picsum.photos/seed/backer-marcus/200/200",
+                photo_url="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
                 created_at=now - 60 * day
             ),
             User(
@@ -71,7 +71,7 @@ def seed():
                 password_hash=pw_hash,
                 role="user",
                 bio="Backing civic and evidence-based policy amplification.",
-                photo_url="https://picsum.photos/seed/backer-marcus/200/200",
+                photo_url="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
                 created_at=now - 60 * day
             ),
             # Admin
@@ -83,7 +83,7 @@ def seed():
                 password_hash=pw_hash,
                 role="admin",
                 bio="Review team lead for evidence, advertising compliance, and distribution.",
-                photo_url="https://picsum.photos/seed/admin-lead/200/200",
+                photo_url="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
                 created_at=now - 120 * day
             ),
             User(
@@ -94,7 +94,7 @@ def seed():
                 password_hash=pw_hash,
                 role="admin",
                 bio="Review team lead for evidence, advertising compliance, and distribution.",
-                photo_url="https://picsum.photos/seed/admin-lead/200/200",
+                photo_url="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80",
                 created_at=now - 120 * day
             ),
         ]
@@ -127,7 +127,7 @@ def seed():
                 "amount_raised": 5240.0,
                 "backer_count": 38,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/water-school-cover/800/500",
+                "cover_url": "https://images.unsplash.com/photo-1521207418485-99c705420785?w=1200&q=80",
                 "headline": "Eleven schools. Elevated lead. One deadline.",
                 "ad_description": "The state will fund pipe replacements, but only if districts apply before June. Help alert parents and school boards.",
                 "cta": "Learn More",
@@ -151,7 +151,7 @@ def seed():
                     {"type": "heading", "content": {"text": "The Lead We Know Is There", "level": 1}},
                     {"type": "paragraph", "content": {"text": "Thirty schools in this county still draw drinking water through service lines installed before 1970. Testing last spring found elevated lead in eleven of them."}},
                     {"type": "statistic", "content": {"value": "11 of 30", "label": "Tested schools showed lead levels exceeding health guidelines"}},
-                    {"type": "image", "content": {"url": "https://picsum.photos/seed/water-test-piping/800/500", "caption": "Lead line intake valve at Roosevelt Elementary, installed 1968", "credit": "Water Coalition Field Inspection"}},
+                    {"type": "image", "content": {"url": "https://images.unsplash.com/photo-1521207418485-99c705420785?w=1200&q=80", "caption": "Lead line intake valve at Roosevelt Elementary, installed 1968", "credit": "Water Coalition Field Inspection"}},
                     {"type": "paragraph", "content": {"text": "The replacement program is already fully funded at the state level, but school districts must file targeted applications with official water test records to release the capital."}},
                     {"type": "quote", "content": {"quote": "The money to fix this already exists in the state capital budget. What is missing is public awareness that the filing deadline is ninety days away.", "attribution": "Marisol Everett, Water Coalition Director"}},
                     {"type": "action", "content": {"title": "Check Your School District", "description": "See whether your local district has filed its lead abatement grant application.", "url": "https://example.org/check-my-school-lead"}}
@@ -172,7 +172,7 @@ def seed():
                 "amount_raised": 7650.0,
                 "backer_count": 52,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/heat-canopy-cover/800/500",
+                "cover_url": "https://images.pexels.com/photos/34439096/pexels-photo-34439096.jpeg?auto=compress&cs=tinysrgb&w=1200",
                 "headline": "11°C hotter four blocks apart. Time to fix canopy funding.",
                 "ad_description": "The city canopy budget is split equally by district instead of heat vulnerability. See the thermal map.",
                 "cta": "View the Map",
@@ -212,7 +212,7 @@ def seed():
                 "amount_raised": 1950.0,
                 "backer_count": 19,
                 "duration_days": 21,
-                "cover_url": "https://picsum.photos/seed/clean-air-classroom/800/500",
+                "cover_url": "https://images.unsplash.com/photo-1617721928610-4d953b81bba8?w=1200&q=80",
                 "headline": "Classroom CO2 is 2,400 ppm by 11am. Here is the data.",
                 "ad_description": "Continuous monitoring across 40 classrooms proves ventilation is failing our kids. Support our awareness push.",
                 "cta": "See Results",
@@ -252,7 +252,7 @@ def seed():
                 "amount_raised": 10000.0,
                 "backer_count": 84,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/rural-clinic-bus/800/500",
+                "cover_url": "https://images.pexels.com/photos/12585206/pexels-photo-12585206.jpeg?auto=compress&cs=tinysrgb&w=1200",
                 "headline": "Free preventative screenings in your town this weekend.",
                 "ad_description": "The mobile health clinic will be at the county fairgrounds Saturday and Sunday. No insurance required.",
                 "cta": "View Schedule",
@@ -301,7 +301,7 @@ def seed():
                 "amount_raised": 4200.0,
                 "backer_count": 31,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/sequencing-lab-cover/800/500",
+                "cover_url": "https://images.pexels.com/photos/3786245/pexels-photo-3786245.jpeg?auto=compress&cs=tinysrgb&w=1200",
                 "headline": "Antibiotic-resistant markers in wastewater doubled in 6 months.",
                 "ad_description": "Independent sequencing data is published openly. Fund amplification to alert doctors and local health officials.",
                 "cta": "Inspect Data",
@@ -340,7 +340,7 @@ def seed():
                 "amount_raised": 3950.0,
                 "backer_count": 46,
                 "duration_days": 14,
-                "cover_url": "https://picsum.photos/seed/school-library-books/800/500",
+                "cover_url": "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1200&q=80",
                 "headline": "14 middle schools have locked library doors this semester.",
                 "ad_description": "Reading scores dropped 12% in schools that cut credentialed librarians. The district budget vote is this Tuesday.",
                 "cta": "Read the Brief",
@@ -378,7 +378,7 @@ def seed():
                 "amount_raised": 0.0,
                 "backer_count": 0,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/ballot-voting-booth/800/500",
+                "cover_url": "https://images.pexels.com/photos/8846076/pexels-photo-8846076.jpeg?auto=compress&cs=tinysrgb&w=1200",
                 "headline": "Could you read the last ballot? Honestly?",
                 "ad_description": "Five of seven measures scored above college reading level. Nine states already mandate plain-language summaries.",
                 "cta": "Take the Test",
@@ -413,7 +413,7 @@ def seed():
                 "amount_raised": 0.0,
                 "backer_count": 0,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/plane-night-sky/800/500",
+                "cover_url": "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=1200&q=80",
                 "headline": "Eleven noise monitors ring the airport. Where are the logs?",
                 "ad_description": "Night freight flights exceed 85dB over residential neighborhoods. Back the campaign to mandate live public reporting.",
                 "cta": "View Map",
@@ -448,7 +448,7 @@ def seed():
                 "amount_raised": 4300.0,
                 "backer_count": 35,
                 "duration_days": 45,
-                "cover_url": "https://picsum.photos/seed/tractor-combine-field/800/500",
+                "cover_url": "https://images.pexels.com/photos/29253996/pexels-photo-29253996.jpeg?auto=compress&cs=tinysrgb&w=1200",
                 "headline": "You own the combine. You do not own the password.",
                 "ad_description": "An eleven-day wait for a dealer technician mid-harvest costs tens of thousands in lost grain. Four states fixed this.",
                 "cta": "See the Bill",
@@ -488,7 +488,7 @@ def seed():
                 "amount_raised": 6000.0,
                 "backer_count": 62,
                 "duration_days": 20,
-                "cover_url": "https://picsum.photos/seed/winter-shelter-steps/800/500",
+                "cover_url": "https://images.pexels.com/photos/6675103/pexels-photo-6675103.jpeg?auto=compress&cs=tinysrgb&w=1200",
                 "headline": "Turned out at 7am into a freeze warning.",
                 "ad_description": "Emergency services log nine hypothermia calls every freeze morning. Keeping doors open costs $340. A transport costs more.",
                 "cta": "Contact Council",
@@ -537,7 +537,7 @@ def seed():
                 "amount_raised": 4500.0,
                 "backer_count": 39,
                 "duration_days": 21,
-                "cover_url": "https://picsum.photos/seed/crosswalk-school-safe/800/500",
+                "cover_url": "https://images.pexels.com/photos/17500082/pexels-photo-17500082.jpeg?auto=compress&cs=tinysrgb&w=1200",
                 "headline": "350 children cross four lanes of traffic every morning.",
                 "ad_description": "No crossing guard. No signal. Help demand safe school crossings before the next district review.",
                 "cta": "View Petition",
@@ -586,7 +586,7 @@ def seed():
                 "amount_raised": 8000.0,
                 "backer_count": 71,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/odeon-art-deco/800/500",
+                "cover_url": "https://images.unsplash.com/photo-1561722798-9a732d141027?w=1200&q=80",
                 "headline": "The Odeon survived 90 years. It needs you this week.",
                 "ad_description": "The regional arts grant requires broad public engagement. Help amplify the trust campaign before the council deadline.",
                 "cta": "View Heritage Plan",
@@ -624,7 +624,7 @@ def seed():
                 "amount_raised": 15000.0,
                 "backer_count": 110,
                 "duration_days": 45,
-                "cover_url": "https://picsum.photos/seed/solar-panels-roof/800/500",
+                "cover_url": "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=1200&q=80",
                 "headline": "Renting an apartment? You can still use solar power.",
                 "ad_description": "Subscribe to the neighborhood community solar farm and cut your electric bill by 18%. No rooftop needed.",
                 "cta": "Calculate Savings",
@@ -673,7 +673,7 @@ def seed():
                 "amount_raised": 12000.0,
                 "backer_count": 88,
                 "duration_days": 30,
-                "cover_url": "https://picsum.photos/seed/transit-bus-stop/800/500",
+                "cover_url": "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=1200&q=80",
                 "headline": "The buses still go where the jobs used to be.",
                 "ad_description": "Twenty-six thousand jobs on the ring road. Two buses an hour. The redesigned network draft is sitting in a drawer.",
                 "cta": "View the Redesign",
@@ -745,6 +745,26 @@ def seed():
                     content=b["content"]
                 )
                 db.add(block)
+
+            # Campaign Assets
+            if campaign.cover_url:
+                db.add(CampaignAsset(
+                    id=f"ast-cov-{campaign.id}",
+                    campaign_id=campaign.id,
+                    kind="cover",
+                    url=campaign.cover_url,
+                    meta={}
+                ))
+            from app.verify_all_images import IMAGE_MAP
+            if campaign.id in IMAGE_MAP:
+                for a_idx, ad_u in enumerate(IMAGE_MAP[campaign.id].get("ad_images", [])):
+                    db.add(CampaignAsset(
+                        id=f"ast-ad-{campaign.id}-{a_idx}",
+                        campaign_id=campaign.id,
+                        kind="ad_image",
+                        url=ad_u,
+                        meta={}
+                    ))
 
             # Report
             if report_info:
@@ -918,5 +938,86 @@ def seed():
     finally:
         db.close()
 
+def sync_media(db_session=None):
+    """
+    Idempotent media sync for existing seed campaigns.
+    Updates ONLY media fields (cover_url, CampaignAsset, StoryBlock image)
+    to seed values without altering amounts, statuses, or contributions.
+    """
+    from app.verify_all_images import IMAGE_MAP
+
+    own_session = False
+    if db_session is None:
+        db = SessionLocal()
+        own_session = True
+    else:
+        db = db_session
+
+    try:
+        updated_count = 0
+        for cid, data in IMAGE_MAP.items():
+            camp = db.query(Campaign).filter(Campaign.id == cid).first()
+            if not camp:
+                continue
+
+            # 1. Update cover_url if different
+            if camp.cover_url != data["cover_url"]:
+                camp.cover_url = data["cover_url"]
+                updated_count += 1
+
+            # 2. Update or insert cover asset
+            cov_asset = db.query(CampaignAsset).filter(
+                CampaignAsset.campaign_id == cid,
+                CampaignAsset.kind == "cover"
+            ).first()
+            if cov_asset:
+                cov_asset.url = data["cover_url"]
+            else:
+                db.add(CampaignAsset(
+                    id=f"ast-cov-{cid}",
+                    campaign_id=cid,
+                    kind="cover",
+                    url=data["cover_url"],
+                    meta={}
+                ))
+
+            # 3. Synchronize ad_image assets
+            # Remove existing ad_image assets for this campaign to ensure clean alignment
+            db.query(CampaignAsset).filter(
+                CampaignAsset.campaign_id == cid,
+                CampaignAsset.kind == "ad_image"
+            ).delete()
+            for a_idx, ad_u in enumerate(data.get("ad_images", [])):
+                db.add(CampaignAsset(
+                    id=f"ast-ad-{cid}-{a_idx}",
+                    campaign_id=cid,
+                    kind="ad_image",
+                    url=ad_u,
+                    meta={}
+                ))
+
+            # 4. Synchronize image story blocks if any
+            if "story_image" in data:
+                img_blocks = db.query(StoryBlock).filter(
+                    StoryBlock.campaign_id == cid,
+                    StoryBlock.type == "image"
+                ).all()
+                for blk in img_blocks:
+                    content = dict(blk.content) if blk.content else {}
+                    if content.get("url") != data["story_image"]:
+                        content["url"] = data["story_image"]
+                        blk.content = content
+
+        db.commit()
+        print(f"Media sync completed: verified assets synchronized for {len(IMAGE_MAP)} campaigns.")
+    except Exception as e:
+        db.rollback()
+        print(f"Error syncing media: {e}")
+        raise e
+    finally:
+        if own_session:
+            db.close()
+
 if __name__ == "__main__":
     seed()
+    sync_media()
