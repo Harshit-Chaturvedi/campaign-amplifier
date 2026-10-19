@@ -7,6 +7,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  BackHandler,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
@@ -257,6 +258,19 @@ export function CreateFlowScreen({ route, navigation }: any) {
       navigation.goBack();
     }
   };
+
+  useEffect(() => {
+    const onBackPress = () => {
+      if (currentStep > 1) {
+        goToPrevStep();
+        return true;
+      }
+      return false;
+    };
+
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [currentStep, draftState]);
 
   // Submit for review handler
   const handleSubmitForReview = async () => {

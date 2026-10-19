@@ -363,7 +363,7 @@ export function CreateLandingScreen({ navigation }: any) {
               No saved drafts yet
             </Text>
             <MetaLabel style={{ textAlign: 'center', marginTop: 4, maxWidth: 260 }}>
-              Drafts are autosaved locally and synced when online so you can safely leave and return at any time.
+              Your draft is saved to your account as you go, so you can leave and come back.
             </MetaLabel>
           </Card>
         ) : (

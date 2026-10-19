@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   AccessibilityInfo,
+  BackHandler,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -174,6 +175,21 @@ export function FundCampaignScreen({ route, navigation }: any) {
       Alert.alert('Payment Error', err.message || 'Unable to process contribution.');
     }
   };
+
+  useEffect(() => {
+    const onBackPress = () => {
+      if (step > 1) {
+        setStep(1);
+        setSimulationState('idle');
+        setSimulationMessage(null);
+        return true;
+      }
+      return false;
+    };
+
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [step]);
 
   return (
     <KeyboardAvoidingView

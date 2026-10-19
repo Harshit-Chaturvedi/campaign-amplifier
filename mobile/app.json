@@ -8,7 +8,14 @@
     "userInterfaceStyle": "light",
     "plugins": [
       "expo-font",
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow Campaign Amplifier to access your microphone to record your campaign voice note.",
+          "enableBackgroundPlayback": false,
+          "enableBackgroundRecording": false
+        }
+      ],
       "expo-asset",
       [
         "expo-splash-screen",
@@ -27,6 +34,11 @@
     "android": {
       "package": "com.campaigns.amplifier",
       "versionCode": 1,
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "RECORD_AUDIO",
+        "INTERNET"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "monochromeImage": "./assets/adaptive-icon-monochrome.png",

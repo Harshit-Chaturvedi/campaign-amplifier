@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Animated,
   Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -649,10 +650,14 @@ export function VoiceDraftScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: tokens.spacing.lg, paddingBottom: 100 }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
       >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ padding: tokens.spacing.lg, paddingBottom: 100 }}
+        >
         {/* Permission Request Card (shown if permission is not yet granted) */}
         {permissionStatus === 'undetermined' && (
           <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
@@ -986,6 +991,7 @@ export function VoiceDraftScreen({ navigation }: any) {
           </View>
         )}
       </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
