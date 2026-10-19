@@ -60,6 +60,9 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
   const [updateBody, setUpdateBody] = useState('');
   const [submittingUpdate, setSubmittingUpdate] = useState(false);
 
+  // In-app editorial re-review notice modal state
+  const [editNoticeCampaign, setEditNoticeCampaign] = useState<any | null>(null);
+
   useEffect(() => {
     let isMounted = true;
     async function loadCampaigns() {
@@ -146,57 +149,37 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
     }
   };
 
-  // Handle editing published campaign
+  // Confirm and proceed with editing campaign
+  const proceedWithEdit = (camp: any) => {
+    transitionCampaign(camp.id, 'changes_requested', 'creator', 'Creator initiated revisions.');
+    useDraftStore.getState().saveDraft({
+      id: camp.id,
+      step: 1,
+      title: camp.title || '',
+      category: camp.category || 'environment',
+      creatorName: camp.creatorName || camp.creator_name || '',
+      summary: camp.summary || camp.tagline || '',
+      coverUrl: camp.coverUrl || camp.ad_image_url || '',
+      storyBlocks: camp.storyBlocks || [],
+      sources: camp.sources || [],
+      adImages: camp.adImages || (camp.ad_image_url ? [camp.ad_image_url] : []),
+      headline: camp.headline || camp.ad_headline || '',
+      adDescription: camp.adDescription || camp.ad_primary_text || '',
+      cta: camp.cta || 'Learn More',
+      locations: camp.locations || ['Cook County'],
+      interests: camp.interests || ['Civic Engagement'],
+      channels: camp.channels || ['Meta', 'Instagram'],
+      budgetAllocation: camp.budgetAllocation || { Meta: 60, Instagram: 40 },
+      durationDays: camp.durationDays || 30,
+      fundingGoal: camp.fundingGoal || camp.funding_goal || 5000,
+    });
+    setEditNoticeCampaign(null);
+    navigation.navigate('CreateFlow', { draftId: camp.id, step: 1 });
+  };
+
+  // Handle editing published campaign (opens in-app review notification)
   const handleEditPublishedCampaign = (camp: any) => {
-    const performEdit = () => {
-      transitionCampaign(camp.id, 'changes_requested', 'creator', 'Creator initiated revisions.');
-      useDraftStore.getState().saveDraft({
-        id: camp.id,
-        step: 1,
-        title: camp.title || '',
-        category: camp.category || 'environment',
-        creatorName: camp.creatorName || camp.creator_name || '',
-        summary: camp.summary || camp.tagline || '',
-        coverUrl: camp.coverUrl || camp.ad_image_url || '',
-        storyBlocks: camp.storyBlocks || [],
-        sources: camp.sources || [],
-        adImages: camp.adImages || (camp.ad_image_url ? [camp.ad_image_url] : []),
-        headline: camp.headline || camp.ad_headline || '',
-        adDescription: camp.adDescription || camp.ad_primary_text || '',
-        cta: camp.cta || 'Learn More',
-        locations: camp.locations || ['Cook County'],
-        interests: camp.interests || ['Civic Engagement'],
-        channels: camp.channels || ['Meta', 'Instagram'],
-        budgetAllocation: camp.budgetAllocation || { Meta: 60, Instagram: 40 },
-        durationDays: camp.durationDays || 30,
-        fundingGoal: camp.fundingGoal || camp.funding_goal || 5000,
-      });
-      navigation.navigate('CreateFlow', { draftId: camp.id, step: 1 });
-    };
-
-    if (Platform.OS === 'web') {
-      const confirmed = typeof window !== 'undefined' && window.confirm
-        ? window.confirm(
-            'Material Changes Require Re-review\n\nEditing an active campaign sends modified copy and assets back to the editorial desk for review before updated ads can run. Do you want to continue?'
-          )
-        : true;
-      if (confirmed) {
-        performEdit();
-      }
-      return;
-    }
-
-    Alert.alert(
-      'Material Changes Require Re-review',
-      'Editing an active campaign sends modified copy and assets back to the editorial desk for review before updated ads can run. Do you want to continue?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Edit & Send to Review',
-          onPress: performEdit,
-        },
-      ]
-    );
+    setEditNoticeCampaign(camp);
   };
 
   // Handle resubmit for changes requested
@@ -541,9 +524,10 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                         />
                         <Button
                           title="Edit"
+                          icon="pencil-outline"
                           onPress={() => handleEditPublishedCampaign(camp)}
                           size="sm"
-                          variant="ghost"
+                          variant="secondary"
                         />
                       </>
                     )}
@@ -660,6 +644,103 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
             />
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Editorial Re-Review In-App Notification Modal */}
+      <Modal
+        visible={!!editNoticeCampaign}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setEditNoticeCampaign(null)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: tokens.radii.md,
+              borderWidth: 1,
+              borderColor: colors.border,
+              width: '100%',
+              maxWidth: 420,
+              padding: 24,
+            }}
+          >
+            {/* Notification Header with Icon */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <View
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: colors.warningFaint,
+                  borderWidth: 1,
+                  borderColor: colors.warning,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Ionicons name="notifications-outline" size={24} color={colors.warning} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: colors.warning, textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                  Editorial Desk Notice
+                </Text>
+                <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+                  Material Changes Require Re-review
+                </Text>
+              </View>
+            </View>
+
+            {/* Notification Content */}
+            <View
+              style={{
+                backgroundColor: colors.surfaceSecondary,
+                borderRadius: tokens.radii.xs,
+                borderWidth: 1,
+                borderColor: colors.border,
+                padding: 14,
+                marginBottom: 16,
+              }}
+            >
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.ink, lineHeight: 19 }}>
+                Editing an active campaign temporarily pauses ad delivery. Modified copy, claims, and media assets will be sent back to our editorial review desk to ensure evidence citations remain accurate.
+              </Text>
+            </View>
+
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 20 }}>
+              Campaign: <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>{editNoticeCampaign?.title}</Text>
+            </Text>
+
+            {/* Action Buttons */}
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title="Keep Active"
+                  variant="outline"
+                  onPress={() => setEditNoticeCampaign(null)}
+                  fullWidth
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button
+                  title="Edit & Re-review"
+                  variant="primary"
+                  icon="create-outline"
+                  onPress={() => proceedWithEdit(editNoticeCampaign)}
+                  fullWidth
+                />
+              </View>
+            </View>
+          </View>
+        </View>
       </Modal>
     </View>
   );
