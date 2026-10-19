@@ -50,3 +50,35 @@ def test_health_check_db_connectivity(client):
     assert body["status"] == "healthy"
     assert body["database"] == "connected"
     assert body["service"] == "campaign-amplifier-backend"
+
+def test_delete_campaign_permissions(client, user_token, admin_token):
+    # Unauthenticated gets 401
+    unauth_res = client.delete("/api/v1/admin/campaigns/cmp-clean-water")
+    assert unauth_res.status_code == 401
+
+    # Non-admin gets 403 Forbidden
+    non_admin_res = client.delete(
+        "/api/v1/admin/campaigns/cmp-clean-water",
+        headers={"Authorization": f"Bearer {user_token}"}
+    )
+    assert non_admin_res.status_code == 403
+
+    # Admin gets 200 on a test campaign
+    from app.models import Campaign
+    # Create a throwaway test campaign to delete
+    create_res = client.post(
+        "/api/v1/drafts",
+        headers={"Authorization": f"Bearer {admin_token}"},
+        json={"title": "Throwaway for delete test", "category": "environment"}
+    )
+    assert create_res.status_code == 200
+    test_id = create_res.json()["id"]
+
+    admin_del_res = client.delete(
+        f"/api/v1/admin/campaigns/{test_id}",
+        headers={"Authorization": f"Bearer {admin_token}"}
+    )
+    assert admin_del_res.status_code == 200
+    assert admin_del_res.json()["status"] == "ok"
+    assert admin_del_res.json()["deleted_id"] == test_id
+

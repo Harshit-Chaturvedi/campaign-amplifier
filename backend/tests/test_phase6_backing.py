@@ -11,8 +11,8 @@ def test_phase6_guest_backing_flow_and_rules():
     campaigns = res.json()
     assert len(campaigns) > 0
 
-    # Pick an available_for_funding campaign
-    target_campaign = next((c for c in campaigns if c["status"] == "available_for_funding"), campaigns[0])
+    # Pick an available_for_funding campaign (exclude benchmark consistency campaigns)
+    target_campaign = next((c for c in campaigns if c["status"] == "available_for_funding" and c["id"] not in ["cmp-clean-water", "cmp-antibiotic-watch", "cmp-tree-canopy"]), campaigns[0])
     cid = target_campaign["id"]
     initial_raised = target_campaign["amount_raised"]
     initial_backers = target_campaign["backer_count"]
@@ -105,9 +105,9 @@ def test_phase6_guest_backing_flow_and_rules():
 def test_phase6_goal_reached_never_starts_ads():
     client = TestClient(app)
 
-    # Find or pick an available campaign
+    # Find an available campaign (excluding the 3 benchmark consistency campaigns)
     res = client.get("/api/v1/campaigns")
-    available = [c for c in res.json() if c["status"] == "available_for_funding"]
+    available = [c for c in res.json() if c["status"] == "available_for_funding" and c["id"] not in ["cmp-clean-water", "cmp-antibiotic-watch", "cmp-tree-canopy"]]
     assert len(available) > 0
     camp = available[0]
     cid = camp["id"]

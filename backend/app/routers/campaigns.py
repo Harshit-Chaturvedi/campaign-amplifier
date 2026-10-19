@@ -232,6 +232,7 @@ def get_campaign_analytics(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found")
 
     est = estimate_reach(campaign.amount_raised)
+    est_goal = estimate_reach(campaign.funding_goal)
     pct = int(round((campaign.amount_raised / campaign.funding_goal) * 100)) if campaign.funding_goal > 0 else 0
 
     measured = None
@@ -266,6 +267,11 @@ def get_campaign_analytics(
                 "reach": est["estimate"],
                 "impressions": est["impressions"],
                 "label": "Estimated (based on demo assumptions, not a guarantee)"
+            },
+            "estimated_at_goal": {
+                "reach": est_goal["estimate"],
+                "impressions": est_goal["impressions"],
+                "label": "Estimated Reach at Goal"
             },
             "measured": measured
         }

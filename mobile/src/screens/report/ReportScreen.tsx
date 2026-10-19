@@ -23,6 +23,7 @@ import {
 } from '../../components/ui/Typography';
 import { useCampaignStore } from '../../store/useCampaignStore';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
+import { estimateReach } from '../../services/reach';
 import { apiClient } from '../../api/client';
 import { colors, fonts, tokens } from '../../theme/tokens';
 
@@ -411,39 +412,57 @@ export function ReportScreen({ route, navigation }: any) {
           )}
         </Card>
 
-        {/* SECTION 4: ESTIMATES (LABELED "Estimate") */}
-        <Card style={{ marginBottom: tokens.spacing.lg, backgroundColor: colors.paperSecondary }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: tokens.spacing.sm }}>
-            <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
-              4. Estimates
-            </SmallCapsLabel>
-            <View style={{ backgroundColor: colors.warningFaint, paddingHorizontal: 6, paddingVertical: 2, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.border }}>
-              <SmallCapsLabel style={{ fontSize: 10, color: colors.warning }}>
-                ESTIMATE
-              </SmallCapsLabel>
-            </View>
-          </View>
+        {/* SECTION 4: ESTIMATES */}
+        {(() => {
+          const reachAtGoal = storeCampaign?.estimatedReachAtGoal || estimateReach(fundingData.funding_goal).estimate;
+          const reachAtCurrentFunding = estimateReach(fundingData.amount_raised).estimate;
+          const impressionsAtCurrent = estimateReach(fundingData.amount_raised).impressions;
+          return (
+            <Card style={{ marginBottom: tokens.spacing.lg, backgroundColor: colors.paperSecondary }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: tokens.spacing.sm }}>
+                <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
+                  4. Reach Estimates
+                </SmallCapsLabel>
+                <View style={{ backgroundColor: colors.warningFaint, paddingHorizontal: 6, paddingVertical: 2, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.border }}>
+                  <SmallCapsLabel style={{ fontSize: 10, color: colors.warning }}>
+                    ESTIMATE
+                  </SmallCapsLabel>
+                </View>
+              </View>
 
-          <MetaLabel style={{ marginBottom: tokens.spacing.sm }}>
-            Projections based on campaign funding goal and standard platform CPM ($14.50, 2.2x frequency).
-          </MetaLabel>
+              <MetaLabel style={{ marginBottom: tokens.spacing.sm }}>
+                Projections calculated using standard platform CPM ($14.50 per 1,000 impressions, 2.2x average frequency, 5% platform fee).
+              </MetaLabel>
 
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1, backgroundColor: colors.surface, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
-              <StatHero style={{ fontSize: 20, color: colors.accent }}>
-                {formatNumber(deliveryData.estimated.reach)}
-              </StatHero>
-              <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>PROJECTED REACH (ESTIMATE)</SmallCapsLabel>
-            </View>
+              <View style={{ flexDirection: 'row', gap: 10, marginBottom: tokens.spacing.sm }}>
+                <View style={{ flex: 1, backgroundColor: colors.surface, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                  <StatHero style={{ fontSize: 20, color: colors.accent }}>
+                    ~{formatNumber(reachAtCurrentFunding)}
+                  </StatHero>
+                  <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>EST. REACH AT CURRENT FUNDING</SmallCapsLabel>
+                </View>
 
-            <View style={{ flex: 1, backgroundColor: colors.surface, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
-              <StatHero style={{ fontSize: 20, color: colors.accent }}>
-                {formatNumber(deliveryData.estimated.impressions)}
-              </StatHero>
-              <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>PROJECTED IMPRESSIONS (ESTIMATE)</SmallCapsLabel>
-            </View>
-          </View>
-        </Card>
+                <View style={{ flex: 1, backgroundColor: colors.surface, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                  <StatHero style={{ fontSize: 20, color: colors.ink }}>
+                    ~{formatNumber(reachAtGoal)}
+                  </StatHero>
+                  <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>EST. REACH AT GOAL</SmallCapsLabel>
+                </View>
+              </View>
+
+              <View style={{ backgroundColor: colors.surface, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>
+                    Projected ad impressions at current funding:
+                  </Text>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.ink }}>
+                    ~{formatNumber(impressionsAtCurrent)}
+                  </Text>
+                </View>
+              </View>
+            </Card>
+          );
+        })()}
 
         {/* Actions */}
         <View style={{ gap: 10 }}>

@@ -6,7 +6,7 @@ def test_contribution_and_payment_simulation(client, user_token):
         "/api/v1/contributions",
         headers={"Authorization": f"Bearer {user_token}"},
         json={
-            "campaign_id": "cmp-clean-water",
+            "campaign_id": "cmp-repair-right",
             "amount": 100.0,
             "show_name": False
         }
@@ -19,7 +19,7 @@ def test_contribution_and_payment_simulation(client, user_token):
     contrib_id = contrib["id"]
 
     # 2. Get campaign before simulation
-    camp_before = client.get("/api/v1/campaigns/cmp-clean-water").json()
+    camp_before = client.get("/api/v1/campaigns/cmp-repair-right").json()
     initial_raised = camp_before["amount_raised"]
     initial_backers = camp_before["backer_count"]
 
@@ -39,7 +39,7 @@ def test_contribution_and_payment_simulation(client, user_token):
     assert fail_res.status_code == 200
     assert fail_res.json()["payment_status"] == "failed"
 
-    camp_after_fail = client.get("/api/v1/campaigns/cmp-clean-water").json()
+    camp_after_fail = client.get("/api/v1/campaigns/cmp-repair-right").json()
     assert camp_after_fail["amount_raised"] == initial_raised
     assert camp_after_fail["backer_count"] == initial_backers
 
@@ -52,7 +52,7 @@ def test_contribution_and_payment_simulation(client, user_token):
     assert succ_res.status_code == 200
     assert succ_res.json()["payment_status"] == "succeeded"
 
-    camp_after_succ = client.get("/api/v1/campaigns/cmp-clean-water").json()
+    camp_after_succ = client.get("/api/v1/campaigns/cmp-repair-right").json()
     assert camp_after_succ["amount_raised"] == initial_raised + 100.0
     assert camp_after_succ["backer_count"] == initial_backers + 1
 
@@ -67,7 +67,7 @@ def test_contribution_and_payment_simulation(client, user_token):
     assert retry_fail.json()["payment_status"] == "succeeded"
 
     # Verify campaign amount was NOT altered by the ignored call
-    camp_after_retry = client.get("/api/v1/campaigns/cmp-clean-water").json()
+    camp_after_retry = client.get("/api/v1/campaigns/cmp-repair-right").json()
     assert camp_after_retry["amount_raised"] == initial_raised + 100.0
     assert camp_after_retry["backer_count"] == initial_backers + 1
 
@@ -81,7 +81,7 @@ def test_contribution_and_payment_simulation(client, user_token):
     assert retry_succ.json().get("ignored") is True
     assert retry_succ.json()["payment_status"] == "succeeded"
 
-    camp_final = client.get("/api/v1/campaigns/cmp-clean-water").json()
+    camp_final = client.get("/api/v1/campaigns/cmp-repair-right").json()
     assert camp_final["amount_raised"] == initial_raised + 100.0
     assert camp_final["backer_count"] == initial_backers + 1
 

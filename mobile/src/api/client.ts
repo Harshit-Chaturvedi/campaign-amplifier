@@ -945,15 +945,15 @@ export const apiClient = {
           title: 'Amplification Campaign',
           status: 'available_for_funding',
           funding: {
-            amount_raised: 5240,
+            amount_raised: 5340,
             funding_goal: 8000,
-            percent_funded: 66,
+            percent_funded: 67,
             backer_count: 4,
           },
           budget: {
-            total_raised: 5240,
-            ad_budget: 4978,
-            platform_fee: 262,
+            total_raised: 5340,
+            ad_budget: 5073,
+            platform_fee: 267,
             spent: 0,
           },
           delivery: {

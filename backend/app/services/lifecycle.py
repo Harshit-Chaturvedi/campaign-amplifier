@@ -35,18 +35,6 @@ TRANSITION_RULES = {
         "roles": ["creator", "admin"],
         "desc": "Resubmit revised campaign for review",
     },
-    ("available_for_funding", "draft"): {
-        "roles": ["creator", "admin"],
-        "desc": "Creator paused campaign to draft revisions for re-review",
-    },
-    ("approved", "draft"): {
-        "roles": ["creator", "admin"],
-        "desc": "Creator paused approved campaign to draft revisions",
-    },
-    ("available_for_funding", "changes_requested"): {
-        "roles": ["creator", "reviewer", "admin"],
-        "desc": "Revisions initiated on active campaign for editorial re-review",
-    },
     # 4. Publishing approved campaign for funding
     ("approved", "available_for_funding"): {
         "roles": ["creator", "reviewer", "admin", "system"],
