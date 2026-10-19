@@ -230,7 +230,7 @@ export function ReportScreen({ route, navigation }: any) {
               </TouchableOpacity>
             </View>
             <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 18, marginBottom: 6 }}>
-              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Estimated Reach:</Text> Projected audience size calculated from advertising CPM and frequency prior to launch. Always labelled as "Estimate" and never guaranteed.
+              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Estimated Reach:</Text> Projected audience size calculated from advertising CPM and frequency prior to launch. Always labelled as "Estimate".
             </BodyText>
             <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 18, marginBottom: 6 }}>
               • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Measured (demo data):</Text> Actual delivery metrics recorded from ad platforms. Never combined or confused with estimates.
@@ -239,7 +239,7 @@ export function ReportScreen({ route, navigation }: any) {
               • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Ad Spend (95%):</Text> Direct expenditure on digital advertising inventory.
             </BodyText>
             <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 18 }}>
-              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Platform Fee (5%):</Text> Retained to cover editorial moderation, source verification, and delivery infrastructure.
+              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Platform Fee (5%):</Text> Retained to cover editorial moderation, source review, and delivery infrastructure.
             </BodyText>
           </Card>
         )}

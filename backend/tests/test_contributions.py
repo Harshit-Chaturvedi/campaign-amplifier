@@ -84,3 +84,17 @@ def test_contribution_and_payment_simulation(client, user_token):
     camp_final = client.get("/api/v1/campaigns/cmp-clean-water").json()
     assert camp_final["amount_raised"] == initial_raised + 100.0
     assert camp_final["backer_count"] == initial_backers + 1
+
+def test_closed_campaign_rejected(client, user_token):
+    # Attempting to contribute to completed campaign 'cmp-school-crossing' must fail with 409
+    res = client.post(
+        "/api/v1/contributions",
+        headers={"Authorization": f"Bearer {user_token}"},
+        json={
+            "campaign_id": "cmp-school-crossing",
+            "amount": 50.0,
+            "show_name": False
+        }
+    )
+    assert res.status_code == 409
+    assert "not open for funding" in res.text

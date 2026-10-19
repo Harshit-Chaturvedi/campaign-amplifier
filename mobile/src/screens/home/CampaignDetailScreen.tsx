@@ -548,7 +548,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             badgeText="Estimate"
           >
             <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 19, marginBottom: 8 }}>
-              <Text style={{ fontFamily: fonts.sansBold, color: colors.ink }}>Estimated Reach at Goal:</Text> ~{formatNumber(reachAtGoal)} people (Estimate, not guaranteed)
+              <Text style={{ fontFamily: fonts.sansBold, color: colors.ink }}>Estimated Reach at Goal:</Text> ~{formatNumber(reachAtGoal)} people (Estimate)
             </Text>
             <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 19, marginBottom: 8 }}>
               <Text style={{ fontFamily: fonts.sansBold, color: colors.ink }}>Target Locations:</Text>{' '}
