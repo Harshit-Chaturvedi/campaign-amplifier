@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -30,7 +30,11 @@ import { apiClient } from '../../api/client';
 
 export function FundCampaignScreen({ route, navigation }: any) {
   const { campaignId, initialAmount } = route.params;
-  const campaign = useCampaignStore((s) => s.getCampaign(campaignId));
+  const campaigns = useCampaignStore((s) => s.campaigns);
+  const campaign = useMemo(
+    () => campaigns.find((c) => c.id === campaignId || c.slug === campaignId),
+    [campaigns, campaignId]
+  );
   const addContribution = useCampaignStore((s) => s.addContribution);
   const user = useAuthStore((s) => s.user);
 
@@ -961,8 +965,16 @@ export function FundCampaignScreen({ route, navigation }: any) {
 
 export function ThankYouScreen({ route, navigation }: any) {
   const { campaignId, amount, receiptNo, estimatedReach, fee, total } = route.params;
-  const campaign = useCampaignStore((s) => s.getCampaign(campaignId));
-  const isFollowing = usePreferencesStore((s) => s.isFollowed(campaignId));
+  const campaigns = useCampaignStore((s) => s.campaigns);
+  const campaign = useMemo(
+    () => campaigns.find((c) => c.id === campaignId || c.slug === campaignId),
+    [campaigns, campaignId]
+  );
+  const followedCampaignIds = usePreferencesStore((s) => s.followedCampaignIds);
+  const isFollowing = useMemo(
+    () => followedCampaignIds.includes(campaignId),
+    [followedCampaignIds, campaignId]
+  );
   const toggleFollow = usePreferencesStore((s) => s.toggleFollowCampaign);
 
   const [followed, setFollowed] = useState(isFollowing);

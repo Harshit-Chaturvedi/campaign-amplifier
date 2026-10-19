@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -14,13 +14,21 @@ const { width: SCREEN_W } = Dimensions.get('window');
 
 export function CreatorAnalyticsScreen({ navigation }: any) {
   const user = useAuthStore((s) => s.user);
-  const getUserContributions = useCampaignStore((s) => s.getUserContributions);
-  const getCampaign = useCampaignStore((s) => s.getCampaign);
-  const _allCampaigns = useCampaignStore((s) => s.campaigns);
+  const allContributions = useCampaignStore((s) => s.contributions);
+  const campaigns = useCampaignStore((s) => s.campaigns);
 
   const uid = user?.uid || 'demo-user';
-  const contributions = getUserContributions(uid);
-  const impact = calculateImpact(contributions, (id) => getCampaign(id));
+  const contributions = useMemo(
+    () => allContributions.filter((c) => c.userId === uid),
+    [allContributions, uid]
+  );
+  const impact = useMemo(
+    () =>
+      calculateImpact(contributions, (id) =>
+        campaigns.find((c) => c.id === id || c.slug === id)
+      ),
+    [contributions, campaigns]
+  );
 
   const hasData = contributions.length > 0;
 
@@ -119,7 +127,7 @@ export function CreatorAnalyticsScreen({ navigation }: any) {
           <View>
             <Text style={{ fontSize: 18, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>Supported Campaigns</Text>
             {impact.campaignSummaries.map((cs) => {
-              const c = getCampaign(cs.id);
+              const c = campaigns.find((x) => x.id === cs.id || x.slug === cs.id);
               if (!c) return null;
               return (
                 <CampaignCard

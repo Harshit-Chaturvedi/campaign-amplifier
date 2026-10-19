@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -39,7 +39,12 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
   const [activeTab, setActiveTab] = useState<CreatorTab>(initialTab);
 
   const user = useAuthStore((s) => s.user);
-  const drafts = useDraftStore((s) => s.getAllDrafts());
+  const draftsMap = useDraftStore((s) => s.drafts);
+  const drafts = useMemo(() => {
+    return Object.values(draftsMap).sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  }, [draftsMap]);
   const deleteDraft = useDraftStore((s) => s.deleteDraft);
   const storeCampaigns = useCampaignStore((s) => s.campaigns);
   const transitionCampaign = useCampaignStore((s) => s.transitionCampaign);
@@ -78,7 +83,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
   const allCampaigns = remoteCampaigns.length > 0 ? remoteCampaigns : storeCampaigns;
 
   // Filter campaigns by active tab
-  const getFilteredCampaigns = () => {
+  const campaignsInTab = useMemo(() => {
     switch (activeTab) {
       case 'drafts':
         return []; // Rendered from drafts store below
@@ -103,9 +108,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
       default:
         return allCampaigns;
     }
-  };
-
-  const campaignsInTab = getFilteredCampaigns();
+  }, [activeTab, allCampaigns]);
 
   // Handle posting creator update
   const handlePostUpdate = async () => {

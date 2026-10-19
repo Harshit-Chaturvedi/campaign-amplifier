@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,12 @@ export function ProfileScreen({ navigation }: any) {
   const logout = useAuthStore((s) => s.logout);
   const storeCampaigns = useCampaignStore((s) => s.campaigns);
   const contributions = useCampaignStore((s) => s.contributions);
-  const drafts = useDraftStore((s) => s.getAllDrafts());
+  const draftsMap = useDraftStore((s) => s.drafts);
+  const drafts = useMemo(() => {
+    return Object.values(draftsMap).sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  }, [draftsMap]);
   const savedCampaignIds = usePreferencesStore((s) => s.savedCampaignIds);
   const preferences = usePreferencesStore((s) => s.notificationPrefs);
   const setPref = usePreferencesStore((s) => s.setNotificationPref);
@@ -37,12 +42,16 @@ export function ProfileScreen({ navigation }: any) {
   const [privacyDefaultOn, setPrivacyDefaultOn] = useState(true); // Default ON per platform policy
 
   // Contributions for this user/device
-  const myContributions = user
-    ? contributions.filter((c) => c.userId === user.uid || c.userId === 'demo-user')
-    : contributions.slice(0, 3); // Show local prototype contributions for guest
+  const myContributions = useMemo(() => {
+    return user
+      ? contributions.filter((c) => c.userId === user.uid || c.userId === 'demo-user')
+      : contributions.slice(0, 3); // Show local prototype contributions for guest
+  }, [contributions, user]);
 
   // Saved campaigns from preferences store
-  const savedCampaigns = storeCampaigns.filter((c) => savedCampaignIds.includes(c.id));
+  const savedCampaigns = useMemo(() => {
+    return storeCampaigns.filter((c) => savedCampaignIds.includes(c.id));
+  }, [storeCampaigns, savedCampaignIds]);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,12 @@ const STEP_LABELS: Record<number, string> = {
 export function CreateLandingScreen({ navigation }: any) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
-  const drafts = useDraftStore((s) => s.getAllDrafts());
+  const draftsMap = useDraftStore((s) => s.drafts);
+  const drafts = useMemo(() => {
+    return Object.values(draftsMap).sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+  }, [draftsMap]);
   const deleteDraft = useDraftStore((s) => s.deleteDraft);
   const setActiveDraft = useDraftStore((s) => s.setActiveDraft);
 

@@ -308,6 +308,28 @@ If time is short, **cut in this order:** comments → image generation → push 
     - `npx expo-doctor`: 20/20 checks passed (clean config schema).
     - `pytest -v backend/tests`: 20/20 tests passed.
 - **Status:** Brand identity, original icons, and splash assets fully delivered.
+
+- **Zustand v5 Selector Stability & Render Loop Remediation (Sun 19 Oct, 09:40 IST):**
+  - **Root Cause Analysis:** In Zustand v5, selectors returning newly instantiated arrays/objects on each invocation (e.g. `s.getAllDrafts()`, `.filter()`, or inline functions) fail reference equality (`Object.is`) checks across renders, causing an infinite re-render loop ("Maximum update depth exceeded") that crashed release builds when opening Create, Profile, and Creator Dashboard tabs.
+  - **Audit & Remediation Across `mobile/src`:**
+    1. `CreateLandingScreen.tsx`: Replaced `useDraftStore((s) => s.getAllDrafts())` with stable `draftsMap = useDraftStore((s) => s.drafts)` and derived sorted drafts via `useMemo`.
+    2. `ProfileScreen.tsx`: Replaced `s.getAllDrafts()` with `s.drafts` + `useMemo`, and memoized `myContributions` and `savedCampaigns`.
+    3. `CreatorDashboardScreen.tsx`: Replaced `s.getAllDrafts()` with `s.drafts` + `useMemo`, and memoized `campaignsInTab`.
+    4. `ReportScreen.tsx`: Replaced `s.getCampaign(id)` and `s.getCampaignContributions(id)` (which performed inline array filtering in selector) with stable `s.campaigns` and `s.contributions`, deriving data with `useMemo`.
+    5. `FundingScreens.tsx` (`FundCampaignScreen` & `ThankYouScreen`): Replaced `s.getCampaign(id)` and `s.isFollowed(id)` with stable array selectors (`s.campaigns`, `s.followedCampaignIds`) and `useMemo`.
+    6. `CampaignDetailScreen.tsx`: Replaced `s.isSaved(id)` and `s.isFollowed(id)` with stable selectors (`s.savedCampaignIds`, `s.followedCampaignIds`) and `useMemo`.
+    7. `CreatorAnalytics.tsx`: Replaced inline selector getters with stable `s.contributions` and `s.campaigns`, memoizing `contributions` and `impact` calculations.
+    8. `ActivityScreen.tsx`: Memoized `deduplicatedNotifications` and `filteredNotifications` with `useMemo`.
+  - **Component & Lifecycle Audit:** Scanned `CreateLandingScreen`, `ProfileScreen`, `CreatorDashboardScreen`, `ActivityScreen`, `HomeScreen`, and `ExploreScreen` for conditional hooks, state updates during render, and missing `useEffect` dependency arrays; confirmed all hooks are called unconditionally at top level with proper dependencies and unmount cleanup.
+  - **Regression Test Suite (`mobile/__tests__/screens_render.test.tsx`):**
+    - Configured `jest-expo` and `react-test-renderer` with AsyncStorage and `@expo/vector-icons` mocks.
+    - Verified `CreateLandingScreen`, `ProfileScreen`, and `CreatorDashboardScreen` render cleanly with 0 drafts and with 2 drafts, asserting no "Maximum update depth exceeded" errors. 6/6 tests passing.
+  - **Verifications:**
+    - `npm test`: 6 passed, 1 suite passed in 2.6s.
+    - `npx tsc --noEmit`: 0 TypeScript errors.
+    - `npx expo-doctor`: 20/20 checks passed.
+    - `pytest -v backend/tests`: 20/20 tests passed.
+- **Status:** Render stability resolved and verified.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

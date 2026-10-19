@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -56,38 +56,42 @@ export function ActivityScreen({ navigation }: any) {
   const rawNotifications = remoteNotifications.length > 0 ? remoteNotifications : storeNotifications;
 
   // De-duplicate notifications
-  const seenIds = new Set<string>();
-  const deduplicatedNotifications = rawNotifications.filter((n) => {
-    const key = n.id || `${n.campaign_id || n.campaignId}-${n.type}-${n.title}`;
-    if (seenIds.has(key)) return false;
-    seenIds.add(key);
-    return true;
-  });
+  const deduplicatedNotifications = useMemo(() => {
+    const seenIds = new Set<string>();
+    return rawNotifications.filter((n) => {
+      const key = n.id || `${n.campaign_id || n.campaignId}-${n.type}-${n.title}`;
+      if (seenIds.has(key)) return false;
+      seenIds.add(key);
+      return true;
+    });
+  }, [rawNotifications]);
 
-  const filteredNotifications = deduplicatedNotifications.filter((item) => {
-    const type = item.type || '';
-    if (filter === 'all') return true;
-    if (filter === 'funding') {
-      return (
-        type.includes('funding') ||
-        type.includes('milestone') ||
-        type.includes('contribution') ||
-        type === 'available_for_backing'
-      );
-    }
-    if (filter === 'updates') {
-      return type.includes('update') || type === 'review_decision' || type === 'changes_requested';
-    }
-    if (filter === 'following') {
-      return (
-        type.includes('promotion') ||
-        type.includes('report') ||
-        type.includes('delivery') ||
-        type === 'completed'
-      );
-    }
-    return true;
-  });
+  const filteredNotifications = useMemo(() => {
+    return deduplicatedNotifications.filter((item) => {
+      const type = item.type || '';
+      if (filter === 'all') return true;
+      if (filter === 'funding') {
+        return (
+          type.includes('funding') ||
+          type.includes('milestone') ||
+          type.includes('contribution') ||
+          type === 'available_for_backing'
+        );
+      }
+      if (filter === 'updates') {
+        return type.includes('update') || type === 'review_decision' || type === 'changes_requested';
+      }
+      if (filter === 'following') {
+        return (
+          type.includes('promotion') ||
+          type.includes('report') ||
+          type.includes('delivery') ||
+          type === 'completed'
+        );
+      }
+      return true;
+    });
+  }, [deduplicatedNotifications, filter]);
 
   const handleMarkAllRead = () => {
     deduplicatedNotifications.forEach((n) => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -53,8 +53,16 @@ export function CampaignDetailScreen({ route, navigation }: any) {
   const isServerWakingUp = useServerStatusStore((s) => s.isWakingUp);
 
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const isSaved = usePreferencesStore((s) => s.isSaved(campaignId));
-  const isFollowed = usePreferencesStore((s) => s.isFollowed(campaignId));
+  const savedCampaignIds = usePreferencesStore((s) => s.savedCampaignIds);
+  const followedCampaignIds = usePreferencesStore((s) => s.followedCampaignIds);
+  const isSaved = useMemo(
+    () => savedCampaignIds.includes(campaignId),
+    [savedCampaignIds, campaignId]
+  );
+  const isFollowed = useMemo(
+    () => followedCampaignIds.includes(campaignId),
+    [followedCampaignIds, campaignId]
+  );
   const toggleSave = usePreferencesStore((s) => s.toggleSaveCampaign);
   const toggleFollow = usePreferencesStore((s) => s.toggleFollowCampaign);
 

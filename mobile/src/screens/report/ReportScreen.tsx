@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,8 +19,16 @@ import { apiClient } from '../../api/client';
 
 export function ReportScreen({ route, navigation }: any) {
   const { campaignId } = route.params;
-  const storeCampaign = useCampaignStore((s) => s.getCampaign(campaignId));
-  const contributions = useCampaignStore((s) => s.getCampaignContributions(campaignId));
+  const campaigns = useCampaignStore((s) => s.campaigns);
+  const storeCampaign = useMemo(
+    () => campaigns.find((c) => c.id === campaignId || c.slug === campaignId),
+    [campaigns, campaignId]
+  );
+  const allContributions = useCampaignStore((s) => s.contributions);
+  const contributions = useMemo(
+    () => allContributions.filter((c) => c.campaignId === campaignId),
+    [allContributions, campaignId]
+  );
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
