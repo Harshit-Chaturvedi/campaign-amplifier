@@ -157,6 +157,27 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
           text: 'Edit & Send to Review',
           onPress: () => {
             transitionCampaign(camp.id, 'changes_requested', 'creator', 'Creator initiated revisions.');
+            useDraftStore.getState().saveDraft({
+              id: camp.id,
+              step: 1,
+              title: camp.title || '',
+              category: camp.category || 'environment',
+              creatorName: camp.creatorName || camp.creator_name || '',
+              summary: camp.summary || camp.tagline || '',
+              coverUrl: camp.coverUrl || camp.ad_image_url || '',
+              storyBlocks: camp.storyBlocks || [],
+              sources: camp.sources || [],
+              adImages: camp.adImages || (camp.ad_image_url ? [camp.ad_image_url] : []),
+              headline: camp.headline || camp.ad_headline || '',
+              adDescription: camp.adDescription || camp.ad_primary_text || '',
+              cta: camp.cta || 'Learn More',
+              locations: camp.locations || ['Cook County'],
+              interests: camp.interests || ['Civic Engagement'],
+              channels: camp.channels || ['Meta', 'Instagram'],
+              budgetAllocation: camp.budgetAllocation || { Meta: 60, Instagram: 40 },
+              durationDays: camp.durationDays || 30,
+              fundingGoal: camp.fundingGoal || camp.funding_goal || 5000,
+            });
             navigation.navigate('CreateFlow', { draftId: camp.id, step: 1 });
           },
         },

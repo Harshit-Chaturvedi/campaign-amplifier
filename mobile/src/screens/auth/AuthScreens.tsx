@@ -26,10 +26,20 @@ export function LoginScreen({ navigation, route }: any) {
   const login = useAuthStore((s) => s.login);
 
   const handleLogin = async (userEmail: string, pass: string) => {
+    const trimmedEmail = (userEmail || '').trim();
+    const trimmedPass = (pass || '').trim();
+    if (!trimmedEmail) {
+      setErrorMessage('Please enter your email address');
+      return;
+    }
+    if (!trimmedPass) {
+      setErrorMessage('Please enter your password');
+      return;
+    }
     setLoading(true);
     setErrorMessage(null);
     try {
-      const res = await apiClient.login(userEmail, pass || 'demo123');
+      const res = await apiClient.login(trimmedEmail, trimmedPass);
       login(res.user, res.token);
       if (navigation.canGoBack()) {
         navigation.goBack();
@@ -221,7 +231,7 @@ export function LoginScreen({ navigation, route }: any) {
         <View style={{ marginTop: 8 }}>
           <Button
             title="Sign In"
-            onPress={() => handleLogin(email || 'demo@example.com', password)}
+            onPress={() => handleLogin(email, password)}
             fullWidth
             size="lg"
             loading={loading && !wakingServer}

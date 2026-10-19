@@ -79,6 +79,7 @@ export type ProfileStackParamList = {
   MyContributions: undefined;
   MyCampaigns: undefined;
   CreatorDashboard: { initialTab?: string } | undefined;
+  CreateFlow: { draftId: string; step?: number };
   Report: { campaignId: string };
   InfoPage: { slug: string };
   CampaignDetail: { campaignId: string };

@@ -90,6 +90,7 @@ function ProfileNavigator() {
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <ProfileStack.Screen name="Profile" component={ProfileScreen} />
       <ProfileStack.Screen name="CreatorDashboard" component={CreatorDashboardScreen} />
+      <ProfileStack.Screen name="CreateFlow" component={CreateFlowScreen} />
       <ProfileStack.Screen name="Report" component={ReportScreen} />
       <ProfileStack.Screen name="InfoPage" component={InfoScreen} />
       <ProfileStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
