@@ -47,6 +47,11 @@ export function CreateFlowScreen({ route, navigation }: any) {
   const getDraft = useDraftStore((s) => s.getDraft);
   const saveDraft = useDraftStore((s) => s.saveDraft);
   const deleteDraft = useDraftStore((s) => s.deleteDraft);
+  const remapDraftId = useDraftStore((s) => s.remapDraftId);
+
+  const [activeDraftId, setActiveDraftId] = useState<string>(draftId);
+  const draftIdRef = useRef<string>(draftId);
+  draftIdRef.current = activeDraftId;
 
   // Initialize draft state from store or defaults
   const existingDraft = getDraft(draftId);
@@ -73,18 +78,52 @@ export function CreateFlowScreen({ route, navigation }: any) {
     }
   );
 
-  const [saveStatus, setSaveStatus] = useState<'saved_local' | 'synced' | 'saving'>('saved_local');
+  const [saveStatus, setSaveStatus] = useState<'saved_local' | 'synced' | 'saving' | 'error'>('saved_local');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const debounceTimerRef = useRef<any>(null);
 
+  const buildPatchPayload = (d: Partial<CampaignDraft>) => {
+    const patchPayload: any = {
+      title: d.title,
+      category: d.category,
+      creator_name: d.creatorName,
+      summary: d.summary,
+      cover_url: d.coverUrl,
+      headline: d.headline,
+      ad_description: d.adDescription,
+      cta: d.cta,
+      draft_step: d.step,
+      duration_days: d.durationDays || 30,
+      reach: {
+        locations: d.locations || ['Cook County'],
+        interests: d.interests || ['Public Health & Clean Water'],
+        channels: d.channels || ['Meta', 'Instagram'],
+        budget_alloc: d.budgetAllocation || { Meta: 60, Instagram: 40 },
+      },
+      story_blocks: d.storyBlocks?.map((b: any, idx: number) => ({
+        id: b.id || `blk-${idx}`,
+        position: idx,
+        type: b.type,
+        content: b,
+      })),
+      sources: d.sources,
+    };
+
+    if (d.fundingGoal && d.fundingGoal >= 500) {
+      patchPayload.funding_goal = d.fundingGoal;
+    }
+    return patchPayload;
+  };
+
   // Autosave handler (debounce 800ms)
   const triggerAutosave = (updated: Partial<CampaignDraft>, nextStep?: number) => {
+    const currentId = draftIdRef.current;
     const nextDraft: CampaignDraft = {
       ...(existingDraft || {}),
       ...draftState,
       ...updated,
-      id: draftId,
+      id: currentId,
       step: nextStep ?? currentStep,
       updatedAt: new Date().toISOString(),
     } as CampaignDraft;
@@ -97,45 +136,54 @@ export function CreateFlowScreen({ route, navigation }: any) {
     // 2. Debounce PATCH to backend if online
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     debounceTimerRef.current = setTimeout(async () => {
+      let targetId = draftIdRef.current;
+      const patchPayload = buildPatchPayload(nextDraft);
+
       try {
-        const patchPayload: any = {
-          title: nextDraft.title,
-          category: nextDraft.category,
-          creator_name: nextDraft.creatorName,
-          summary: nextDraft.summary,
-          cover_url: nextDraft.coverUrl,
-          headline: nextDraft.headline,
-          ad_description: nextDraft.adDescription,
-          cta: nextDraft.cta,
-          draft_step: nextDraft.step,
-          duration_days: nextDraft.durationDays || 30,
-          reach: {
-            locations: nextDraft.locations || ['Cook County'],
-            interests: nextDraft.interests || ['Public Health & Clean Water'],
-            channels: nextDraft.channels || ['Meta', 'Instagram'],
-            budget_alloc: nextDraft.budgetAllocation || { Meta: 60, Instagram: 40 },
-          },
-          story_blocks: nextDraft.storyBlocks?.map((b: any, idx: number) => ({
-            id: b.id || `blk-${idx}`,
-            position: idx,
-            type: b.type,
-            content: b,
-          })),
-          sources: nextDraft.sources,
-        };
-
-        if (nextDraft.fundingGoal && nextDraft.fundingGoal >= 500) {
-          patchPayload.funding_goal = nextDraft.fundingGoal;
-        }
-
-        const res = await apiClient.patchDraft(draftId, patchPayload);
+        const res = await apiClient.patchDraft(targetId, patchPayload);
         if (res.isOffline) {
           setSaveStatus('saved_local');
         } else {
           setSaveStatus('synced');
         }
-      } catch {
-        setSaveStatus('saved_local');
+      } catch (err: any) {
+        if (err.status === 404) {
+          // Draft not found on server -> auto-recover by creating draft and remapping
+          try {
+            const createRes = await apiClient.createDraft({
+              title: nextDraft.title,
+              category: nextDraft.category,
+              creator_name: nextDraft.creatorName,
+              summary: nextDraft.summary,
+              funding_goal: nextDraft.fundingGoal,
+            });
+
+            if (createRes.draft && createRes.draft.id && !createRes.isOffline) {
+              const newServerId = createRes.draft.id;
+              remapDraftId(targetId, newServerId);
+              draftIdRef.current = newServerId;
+              setActiveDraftId(newServerId);
+              navigation.setParams({ draftId: newServerId });
+
+              // Retry PATCH once
+              const retryRes = await apiClient.patchDraft(newServerId, patchPayload);
+              if (retryRes.isOffline) {
+                setSaveStatus('saved_local');
+              } else {
+                setSaveStatus('synced');
+              }
+              return;
+            }
+          } catch {
+            setSaveStatus('error');
+            return;
+          }
+        }
+        if (err.isHttpError || err.status) {
+          setSaveStatus('error');
+        } else {
+          setSaveStatus('saved_local');
+        }
       }
     }, 800);
   };
@@ -221,44 +269,47 @@ export function CreateFlowScreen({ route, navigation }: any) {
     }
 
     setIsSubmitting(true);
+    let targetId = draftIdRef.current;
+    const patchPayload = buildPatchPayload({ ...draftState, id: targetId, step: 5 });
+
     try {
       // 1. Immediately sync latest draft payload to backend
-      const patchPayload: any = {
-        title: draftState.title,
-        category: draftState.category,
-        creator_name: draftState.creatorName,
-        summary: draftState.summary,
-        cover_url: draftState.coverUrl,
-        headline: draftState.headline,
-        ad_description: draftState.adDescription,
-        cta: draftState.cta,
-        draft_step: 5,
-        funding_goal: draftState.fundingGoal,
-        duration_days: draftState.durationDays || 30,
-        reach: {
-          locations: draftState.locations || ['Cook County'],
-          interests: draftState.interests || ['Public Health & Clean Water'],
-          channels: draftState.channels || ['Meta', 'Instagram'],
-          budget_alloc: draftState.budgetAllocation || { Meta: 60, Instagram: 40 },
-        },
-        story_blocks: draftState.storyBlocks?.map((b: any, idx: number) => ({
-          id: b.id || `blk-${idx}`,
-          position: idx,
-          type: b.type,
-          content: b,
-        })),
-        sources: draftState.sources,
-      };
+      try {
+        await apiClient.patchDraft(targetId, patchPayload);
+      } catch (patchErr: any) {
+        if (patchErr.status === 404) {
+          // Draft not found on server -> auto-recover by creating draft and remapping
+          const createRes = await apiClient.createDraft({
+            title: draftState.title,
+            category: draftState.category,
+            creator_name: draftState.creatorName,
+            summary: draftState.summary,
+            funding_goal: draftState.fundingGoal,
+          });
 
-      await apiClient.patchDraft(draftId, patchPayload);
+          if (createRes.draft && createRes.draft.id && !createRes.isOffline) {
+            const newServerId = createRes.draft.id;
+            remapDraftId(targetId, newServerId);
+            draftIdRef.current = newServerId;
+            targetId = newServerId;
+            setActiveDraftId(newServerId);
+            navigation.setParams({ draftId: newServerId });
+            await apiClient.patchDraft(newServerId, patchPayload);
+          } else {
+            throw patchErr;
+          }
+        } else {
+          throw patchErr;
+        }
+      }
 
       // 2. Call backend transition endpoint
-      const submitRes = await apiClient.submitDraft(draftId);
+      const submitRes = await apiClient.submitDraft(targetId);
 
       // 3. Mark draft locally as submitted
       saveDraft({
         ...draftState,
-        id: draftId,
+        id: targetId,
         step: 5,
       });
 
@@ -341,6 +392,8 @@ export function CreateFlowScreen({ route, navigation }: any) {
                     ? 'cloud-done-outline'
                     : saveStatus === 'saving'
                     ? 'sync-outline'
+                    : saveStatus === 'error'
+                    ? 'alert-circle-outline'
                     : 'save-outline'
                 }
                 size={12}
@@ -349,6 +402,8 @@ export function CreateFlowScreen({ route, navigation }: any) {
                     ? colors.positive
                     : saveStatus === 'saving'
                     ? colors.accent
+                    : saveStatus === 'error'
+                    ? colors.warning
                     : colors.mutedInk
                 }
               />
@@ -361,6 +416,8 @@ export function CreateFlowScreen({ route, navigation }: any) {
                       ? colors.positive
                       : saveStatus === 'saving'
                       ? colors.accent
+                      : saveStatus === 'error'
+                      ? colors.warning
                       : colors.mutedInk,
                 }}
               >
@@ -368,6 +425,8 @@ export function CreateFlowScreen({ route, navigation }: any) {
                   ? 'All changes synced'
                   : saveStatus === 'saving'
                   ? 'Saving changes...'
+                  : saveStatus === 'error'
+                  ? "Couldn't sync, retrying"
                   : 'Saved on this device'}
               </Text>
             </View>

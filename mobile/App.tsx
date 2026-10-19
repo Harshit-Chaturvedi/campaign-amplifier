@@ -31,7 +31,7 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Newsreader_400Regular,
     Newsreader_500Medium,
     Newsreader_600SemiBold,
@@ -42,13 +42,25 @@ export default function App() {
     Inter_700Bold,
   });
 
+  const [timedOut, setTimedOut] = React.useState(false);
+
   useEffect(() => {
-    if (fontsLoaded && process.env.NODE_ENV !== 'test') {
+    // 3 second safety timeout so app always renders even if Google Fonts CDN is unreachable
+    const timer = setTimeout(() => {
+      setTimedOut(true);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const isReady = Boolean(fontsLoaded || fontError || timedOut);
+
+  useEffect(() => {
+    if (isReady && process.env.NODE_ENV !== 'test') {
       SplashScreen.hideAsync().catch(() => {});
     }
-  }, [fontsLoaded]);
+  }, [isReady]);
 
-  if (!fontsLoaded && process.env.NODE_ENV !== 'test') {
+  if (!isReady && process.env.NODE_ENV !== 'test') {
     return null;
   }
 

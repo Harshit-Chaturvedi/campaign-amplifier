@@ -40,11 +40,11 @@ const INTEREST_OPTIONS = [
 ];
 
 const ALL_CHANNELS = [
-  { id: 'Meta', name: 'Meta (Facebook)', icon: 'logo-facebook', color: '#1877f2' },
-  { id: 'Instagram', name: 'Instagram', icon: 'logo-instagram', color: '#e1306c' },
-  { id: 'Reddit', name: 'Reddit', icon: 'logo-reddit', color: '#ff4500' },
-  { id: 'YouTube', name: 'YouTube', icon: 'logo-youtube', color: '#ff0000' },
-  { id: 'X', name: 'X (Twitter)', icon: 'logo-twitter', color: '#0f172a' },
+  { id: 'Meta', name: 'Meta (Facebook)', icon: 'logo-facebook' },
+  { id: 'Instagram', name: 'Instagram', icon: 'logo-instagram' },
+  { id: 'Reddit', name: 'Reddit', icon: 'logo-reddit' },
+  { id: 'YouTube', name: 'YouTube', icon: 'logo-youtube' },
+  { id: 'X', name: 'X (Twitter)', icon: 'logo-twitter' },
 ];
 
 const DURATION_OPTIONS = [

@@ -363,6 +363,41 @@ If time is short, **cut in this order:** comments → image generation → push 
   - `npx expo-doctor`: 20/20 checks passed.
   - `npm test`: 8/8 tests passed.
   - `pytest -v backend/tests`: 20/20 passed.
+
+### Phase 8.4 — Release APK Bugfixes and Polish (Production Device Validation)
+- **Draft Creation & Server-ID Synchronization:**
+  - `CreateLandingScreen.tsx` (`handleStartManual`) now calls `apiClient.createDraft` before navigating and sets the server-returned `id` in `useDraftStore`. Shows clear connection error on failure instead of creating an unsynced draft.
+  - `VoiceDraftScreen.tsx` (`populateAndLandOnStep1` and `handleCreateManually`) creates the draft on the backend first and adopts the server-assigned ID.
+  - `CreateFlowScreen.tsx` (`triggerAutosave` and `handleSubmitForReview`) implements 404 auto-recover: if `patchDraft` returns 404, it calls `createDraft`, calls `remapDraftId(oldId, newId)` in `useDraftStore`, updates component state and navigation params, and retries the PATCH once.
+  - `useDraftStore.ts` equipped with `remapDraftId(oldId, newId)`.
+- **API Client Error & Offline Integrity (`mobile/src/api/client.ts`):**
+  - `createDraft`, `patchDraft`, and `submitDraft` accurately differentiate HTTP errors (404, 409, 422, 500) from true network/offline failures. HTTP errors attach `status` and `detail` and throw directly.
+  - Removed offline fake-success branch from `submitDraft`: if offline, submission fails truthfully with `"You are offline. Your draft is saved on this device. Reconnect to submit."` and the draft is not marked submitted.
+- **Truthful Autosave Status Pill:**
+  - "All changes synced" only after a successful PATCH (`colors.positive`).
+  - "Saved on this device" only when genuinely offline (`colors.mutedInk`).
+  - "Couldn't sync, retrying" on HTTP errors (`colors.warning`).
+  - "Saving changes..." while debouncing/transmitting (`colors.accent`).
+- **Cover Image Normalization & Helper (`mobile/src/utils/media.ts`):**
+  - Added single shared helper `getCoverUrl(campaign)` checking `adAssets.coverUrl || coverUrl || thumbnailUrl` and returning `string | null`.
+  - Replaced hardcoded Unsplash forest image (`photo-1577495508048-b635879837f1`) in `CreatorDashboardScreen.tsx` with `getCoverUrl` and `<GeneratedCover />` SVG geometric fallback.
+  - Adopted `getCoverUrl` across `CreatorDashboardScreen`, `CampaignCard`, and `CampaignDetailScreen`.
+- **Creator Dashboard Campaign Isolation:**
+  - `CreatorDashboardScreen.tsx` displays only campaigns owned by the signed-in user (`/me/campaigns` or user-filtered local store). Never falls back to global seed campaigns.
+  - Shows honest empty states ("No campaigns created yet") on each tab (Drafts, Review, Funding, Promoting, Completed, Action Needed) with matching count (0).
+- **Hardcoded Placeholder Cleanup:**
+  - Removed `'https://example.org/issue-evidence'` from `mobile/src/services/campaignAI.ts:33`.
+  - Removed remaining hardcoded hexes from `mobile/src/screens/create/Step4Reach.tsx` and `mobile/src/screens/funding/FundingScreens.tsx`.
+- **App.tsx Font Loading Fallback:**
+  - Updated `useFonts` in `mobile/App.tsx` to handle `fontError` and added a 3-second safety timeout so the app hides the splash screen and falls back to system fonts rather than hanging on a blank splash if Google Fonts CDN is unreachable.
+- **Automated Test Suites Added:**
+  - `mobile/__tests__/draft_sync_and_submit.test.tsx`: Jest test suite verifying createDraft, patchDraft, submitDraft success, 404 auto-recover remap + retry, and offline submit failure.
+  - `backend/tests/test_drafts_lifecycle.py`: pytest verifying `POST /api/v1/drafts` -> `PATCH` -> `submit`, plus 404 for non-existent draft IDs.
+- **Verifications:**
+  - `npx tsc --noEmit`: 0 errors.
+  - `npx expo-doctor`: 20/20 checks passed.
+  - `npm test`: 12/12 passed (2/2 test suites).
+  - `pytest -v backend/tests`: 21/21 passed.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

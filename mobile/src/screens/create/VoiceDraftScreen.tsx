@@ -320,7 +320,28 @@ export function VoiceDraftScreen({ navigation }: any) {
     suggested_channels: string[];
     demo_mode?: boolean;
   }) => {
-    const draftId = `cmp-${generateId()}`;
+    // 1. Create draft on server first to obtain server-assigned ID
+    let serverId: string | null = null;
+    try {
+      const createRes = await apiClient.createDraft({
+        title: aiResult.title.slice(0, 60),
+        category: (aiResult.category as any) || 'health',
+        creator_name: user?.name || 'Campaign Organizer',
+        summary: aiResult.summary,
+      });
+      if (createRes.draft && createRes.draft.id && !createRes.isOffline) {
+        serverId = createRes.draft.id;
+      }
+    } catch {
+      // Handled below
+    }
+
+    if (!serverId) {
+      Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+      return;
+    }
+
+    const draftId = serverId;
 
     const newDraft: CampaignDraft = {
       id: draftId,
@@ -390,19 +411,12 @@ export function VoiceDraftScreen({ navigation }: any) {
       isDemoSample: !!(aiResult as any).demo_mode || !!(aiResult as any).isDemoSample,
     };
 
-    // 1. Save locally in Zustand
+    // 2. Save locally in Zustand
     saveDraft(newDraft);
     setActiveDraft(draftId);
 
-    // 2. Try creating draft on server
+    // 3. Sync full draft fields to server
     try {
-      await apiClient.createDraft({
-        title: newDraft.title,
-        category: newDraft.category,
-        creator_name: newDraft.creatorName,
-        summary: newDraft.summary,
-      });
-
       await apiClient.patchDraft(draftId, {
         title: newDraft.title,
         category: newDraft.category,
@@ -422,10 +436,10 @@ export function VoiceDraftScreen({ navigation }: any) {
         sources: newDraft.sources,
       });
     } catch {
-      // Stored locally
+      // Stored locally, will sync on autosave
     }
 
-    // 3. ALWAYS land on editable Step 1! Never skip ahead to submission!
+    // 4. ALWAYS land on editable Step 1! Never skip ahead to submission!
     navigation.replace('CreateFlow', { draftId, step: 1 });
   };
 
@@ -487,30 +501,43 @@ export function VoiceDraftScreen({ navigation }: any) {
   };
 
   // Create manually fallback
-  const handleCreateManually = () => {
-    const draftId = `cmp-${generateId()}`;
-    saveDraft({
-      id: draftId,
-      step: 1,
-      title: '',
-      category: 'community',
-      creatorName: user?.name || '',
-      summary: '',
-      storyBlocks: [],
-      sources: [],
-      adImages: [],
-      headline: '',
-      adDescription: '',
-      cta: 'Learn More',
-      locations: ['Cook County'],
-      interests: ['Public Health & Clean Water'],
-      channels: ['Meta', 'Instagram'],
-      budgetAllocation: { Meta: 60, Instagram: 40 },
-      durationDays: 30,
-      fundingGoal: undefined,
-    });
-    setActiveDraft(draftId);
-    navigation.replace('CreateFlow', { draftId, step: 1 });
+  const handleCreateManually = async () => {
+    try {
+      const res = await apiClient.createDraft({
+        title: '',
+        category: 'community',
+        creator_name: user?.name || 'Campaign Organizer',
+      });
+      if (!res.draft || !res.draft.id || res.isOffline) {
+        Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+        return;
+      }
+      const draftId = res.draft.id;
+      saveDraft({
+        id: draftId,
+        step: 1,
+        title: '',
+        category: 'community',
+        creatorName: user?.name || '',
+        summary: '',
+        storyBlocks: [],
+        sources: [],
+        adImages: [],
+        headline: '',
+        adDescription: '',
+        cta: 'Learn More',
+        locations: ['Cook County'],
+        interests: ['Public Health & Clean Water'],
+        channels: ['Meta', 'Instagram'],
+        budgetAllocation: { Meta: 60, Instagram: 40 },
+        durationDays: 30,
+        fundingGoal: undefined,
+      });
+      setActiveDraft(draftId);
+      navigation.replace('CreateFlow', { draftId, step: 1 });
+    } catch {
+      Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+    }
   };
 
   const currentQ = GUIDED_QUESTIONS[currentQuestionIndex];

@@ -42,6 +42,7 @@ interface DraftState {
   getDraft: (id: string) => CampaignDraft | undefined;
   deleteDraft: (id: string) => void;
   setActiveDraft: (id: string | null) => void;
+  remapDraftId: (oldId: string, newId: string) => void;
   getAllDrafts: () => CampaignDraft[];
 }
 
@@ -104,6 +105,20 @@ export const useDraftStore = create<DraftState>()(
 
       setActiveDraft: (id: string | null) => {
         set({ activeDraftId: id });
+      },
+
+      remapDraftId: (oldId: string, newId: string) => {
+        set((state) => {
+          const existing = state.drafts[oldId];
+          if (!existing) return state;
+          const rest = { ...state.drafts };
+          delete rest[oldId];
+          rest[newId] = { ...existing, id: newId, updatedAt: new Date().toISOString() };
+          return {
+            drafts: rest,
+            activeDraftId: state.activeDraftId === oldId ? newId : state.activeDraftId,
+          };
+        });
       },
 
       getAllDrafts: () => {

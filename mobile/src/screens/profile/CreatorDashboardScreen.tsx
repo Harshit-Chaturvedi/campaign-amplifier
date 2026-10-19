@@ -19,11 +19,13 @@ import { Button } from '../../components/ui/Button';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
+import { GeneratedCover } from '../../components/ui/GeneratedCover';
 import { useCampaignStore } from '../../store/useCampaignStore';
 import { useDraftStore } from '../../store/useDraftStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
 import { apiClient } from '../../api/client';
+import { getCoverUrl } from '../../utils/media';
 import { colors, fonts, tokens } from '../../theme/tokens';
 
 export type CreatorTab =
@@ -50,7 +52,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
   const transitionCampaign = useCampaignStore((s) => s.transitionCampaign);
 
   const [loading, setLoading] = useState(false);
-  const [remoteCampaigns, setRemoteCampaigns] = useState<any[]>([]);
+  const [remoteCampaigns, setRemoteCampaigns] = useState<any[] | null>(null);
 
   // Post update modal state
   const [updateModalCampaignId, setUpdateModalCampaignId] = useState<string | null>(null);
@@ -64,11 +66,17 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
       try {
         setLoading(true);
         const res = await apiClient.getMyCampaigns();
-        if (isMounted && res.items && res.items.length > 0) {
-          setRemoteCampaigns(res.items);
+        if (isMounted) {
+          setRemoteCampaigns(res.items || []);
         }
       } catch {
-        // Fallback to store
+        if (isMounted) {
+          // If offline or error, filter store campaigns to user-owned only
+          const userCampaigns = storeCampaigns.filter(
+            (c) => user?.uid && (c.creatorId === user.uid || (c as any).created_by === user.uid)
+          );
+          setRemoteCampaigns(userCampaigns);
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -77,10 +85,15 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [user?.uid, storeCampaigns]);
 
-  // Merge store campaigns and remote campaigns
-  const allCampaigns = remoteCampaigns.length > 0 ? remoteCampaigns : storeCampaigns;
+  // Only user-owned campaigns! Never fall back to global seed campaigns
+  const allCampaigns = useMemo(() => {
+    if (remoteCampaigns !== null) return remoteCampaigns;
+    return storeCampaigns.filter(
+      (c) => user?.uid && (c.creatorId === user.uid || (c as any).created_by === user.uid)
+    );
+  }, [remoteCampaigns, storeCampaigns, user?.uid]);
 
   // Filter campaigns by active tab
   const campaignsInTab = useMemo(() => {
@@ -346,7 +359,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
                 <Ionicons name="document-text-outline" size={44} color={colors.inkMuted} />
                 <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink, marginTop: 12 }}>
-                  No Saved Drafts
+                  No campaigns created yet
                 </Text>
                 <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 4, marginBottom: 16 }}>
                   You don't have any in-progress campaign drafts.
@@ -369,11 +382,41 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                 <Card key={camp.id} style={{ marginBottom: 16 }}>
                   {/* Thumbnail / Header */}
                   <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
-                    <Image
-                      source={{ uri: camp.coverUrl || camp.thumbnailUrl || 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=400&q=80' }}
-                      style={{ width: 72, height: 72, borderRadius: tokens.radii.xs, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border }}
-                      resizeMode="cover"
-                    />
+                    {(() => {
+                      const cover = getCoverUrl(camp);
+                      return cover ? (
+                        <Image
+                          source={{ uri: cover }}
+                          style={{
+                            width: 72,
+                            height: 72,
+                            borderRadius: tokens.radii.xs,
+                            backgroundColor: colors.surfaceSecondary,
+                            borderWidth: 1,
+                            borderColor: colors.border,
+                          }}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View
+                          style={{
+                            width: 72,
+                            height: 72,
+                            borderRadius: tokens.radii.xs,
+                            overflow: 'hidden',
+                            borderWidth: 1,
+                            borderColor: colors.border,
+                          }}
+                        >
+                          <GeneratedCover
+                            category={camp.category}
+                            title={camp.title}
+                            height={72}
+                            iconSize={20}
+                          />
+                        </View>
+                      );
+                    })()}
                     <View style={{ flex: 1 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                         <StatusBadge status={camp.status} />
@@ -483,11 +526,16 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
                 <Ionicons name="folder-open-outline" size={44} color={colors.inkMuted} />
                 <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink, marginTop: 12 }}>
-                  No Campaigns in this Category
+                  No campaigns created yet
                 </Text>
-                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 4 }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 4, marginBottom: 16 }}>
                   No campaigns currently match the '{activeTab.replace(/_/g, ' ')}' status filter.
                 </Text>
+                <Button
+                  title="Start a New Campaign"
+                  onPress={() => navigation.navigate('CreateTab')}
+                  size="md"
+                />
               </View>
             )}
           </View>

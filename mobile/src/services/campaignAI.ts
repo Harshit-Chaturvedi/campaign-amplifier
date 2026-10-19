@@ -26,13 +26,7 @@ export function generateCampaignContent(issueText: string): GeneratedCampaignCon
         attribution: 'Community Briefing',
       },
     ],
-    sources: [
-      {
-        id: 's-gen-1',
-        title: 'Public Record & Community Issue Assessment',
-        url: 'https://example.org/issue-evidence',
-      },
-    ],
+    sources: [],
     targetAudience: `Residents and decision-makers in the affected area interested in ${keywords.slice(0, 2).join(' and ') || 'this issue'}.`,
     adHeadline: `${firstWord}. The evidence is public.`.slice(0, 60),
     adPrimaryText: `${summary} Back this campaign to fund ad reach that spreads the facts.`,

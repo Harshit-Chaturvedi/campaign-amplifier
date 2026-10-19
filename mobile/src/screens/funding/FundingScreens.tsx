@@ -362,7 +362,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                       style={{
                         fontSize: 16,
                         fontFamily: fonts.serifBold,
-                        color: selected ? '#FFFFFF' : colors.ink,
+                        color: selected ? colors.surface : colors.ink,
                       }}
                     >
                       ${preset}
@@ -714,19 +714,19 @@ export function FundCampaignScreen({ route, navigation }: any) {
                   </Text>
                   <Ionicons name="radio-outline" size={18} color={colors.inkMuted} />
                 </View>
-                <Text style={{ fontSize: 18, fontFamily: fonts.sansSemiBold, color: '#FFFFFF', letterSpacing: 2, marginBottom: 14 }}>
+                <Text style={{ fontSize: 18, fontFamily: fonts.sansSemiBold, color: colors.surface, letterSpacing: 2, marginBottom: 14 }}>
                   •••• •••• •••• 4242
                 </Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View>
                     <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase' }}>Cardholder</Text>
-                    <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: '#FFFFFF', marginTop: 2 }}>
+                    <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.surface, marginTop: 2 }}>
                       {showName && user ? user.name : 'COMMUNITY BACKER'}
                     </Text>
                   </View>
                   <View>
                     <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase' }}>Expires</Text>
-                    <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: '#FFFFFF', marginTop: 2 }}>12/28</Text>
+                    <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.surface, marginTop: 2 }}>12/28</Text>
                   </View>
                 </View>
               </View>
@@ -838,11 +838,11 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 }}
               >
                 {loading ? (
-                  <ActivityIndicator size="small" color="#fff" />
+                  <ActivityIndicator size="small" color={colors.surface} />
                 ) : (
                   <>
-                    <Ionicons name="checkmark-circle" size={18} color="#fff" />
-                    <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: '#fff' }}>
+                    <Ionicons name="checkmark-circle" size={18} color={colors.surface} />
+                    <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: colors.surface }}>
                       Simulate Success ({formatCurrency(total)})
                     </Text>
                   </>

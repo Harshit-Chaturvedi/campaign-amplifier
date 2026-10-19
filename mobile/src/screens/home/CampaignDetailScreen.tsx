@@ -23,6 +23,7 @@ import { Expandable } from '../../components/ui/Expandable';
 import { SourceItem } from '../../components/ui/SourceItem';
 import { CampaignDetailSkeleton } from '../../components/ui/Skeleton';
 import { GeneratedCover } from '../../components/ui/GeneratedCover';
+import { getCoverUrl } from '../../utils/media';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { StoryBlockRenderer } from '../../components/story/StoryBlockRenderer';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
@@ -144,7 +145,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
   const catColor = colors.category[campaign.category] || colors.accent;
   const pct = campaign.percentFunded ?? 0;
   const displayCategory = catLabels[campaign.category] || campaign.category;
-  const coverUrl = campaign.adAssets?.coverUrl;
+  const coverUrl = getCoverUrl(campaign);
   const currentReachEstimate = estimateReach(campaign.amountRaised).estimate;
   const isBackable = campaign.status === 'available_for_funding';
 

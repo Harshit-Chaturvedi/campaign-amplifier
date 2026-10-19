@@ -376,10 +376,21 @@ export const apiClient = {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        const detail = errJson.detail || `Server returned ${res.status}`;
+        const err: any = new Error(detail);
+        err.status = res.status;
+        err.detail = detail;
+        err.isHttpError = true;
+        throw err;
+      }
       const data = await res.json();
       return { draft: data, isOffline: false };
-    } catch {
+    } catch (err: any) {
+      if (err.isHttpError || err.status || (err.message && !err.message.includes('fetch') && !err.message.includes('Network') && !err.message.includes('Failed to fetch') && !err.message.includes('timed out') && !err.message.includes('abort'))) {
+        throw err;
+      }
       return { draft: null, isOffline: true };
     }
   },
@@ -391,10 +402,21 @@ export const apiClient = {
         method: 'PATCH',
         body: JSON.stringify(patch),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        const detail = errJson.detail || `Server returned ${res.status}`;
+        const err: any = new Error(detail);
+        err.status = res.status;
+        err.detail = detail;
+        err.isHttpError = true;
+        throw err;
+      }
       const data = await res.json();
       return { draft: data, isOffline: false };
-    } catch {
+    } catch (err: any) {
+      if (err.isHttpError || err.status || (err.message && !err.message.includes('fetch') && !err.message.includes('Network') && !err.message.includes('Failed to fetch') && !err.message.includes('timed out') && !err.message.includes('abort'))) {
+        throw err;
+      }
       return { draft: null, isOffline: true };
     }
   },
@@ -586,7 +608,11 @@ export const apiClient = {
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
         const detail = errJson.detail || `Server returned ${res.status}`;
-        throw new Error(detail);
+        const err: any = new Error(detail);
+        err.status = res.status;
+        err.detail = detail;
+        err.isHttpError = true;
+        throw err;
       }
       const data = await res.json();
       return {
@@ -595,15 +621,10 @@ export const apiClient = {
         campaignStatus: data.campaign_status || 'submitted',
       };
     } catch (err: any) {
-      if (err.message && !err.message.includes('fetch') && !err.message.includes('Network') && !err.message.includes('Failed to fetch')) {
+      if (err.isHttpError || err.status || (err.message && !err.message.includes('fetch') && !err.message.includes('Network') && !err.message.includes('Failed to fetch') && !err.message.includes('timed out') && !err.message.includes('abort'))) {
         throw err;
       }
-      // Offline fallback: mark local draft as submitted
-      return {
-        success: true,
-        isOffline: true,
-        campaignStatus: 'submitted',
-      };
+      throw new Error('You are offline. Your draft is saved on this device. Reconnect to submit.');
     }
   },
 

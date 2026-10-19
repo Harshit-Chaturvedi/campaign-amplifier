@@ -8,6 +8,7 @@ import { StatusBadge } from '../ui/StatusBadge';
 import { ProgressBar } from '../ui/ProgressBar';
 import { Button } from '../ui/Button';
 import { GeneratedCover } from '../ui/GeneratedCover';
+import { getCoverUrl } from '../../utils/media';
 import type { Campaign } from '../../types/campaign';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -41,7 +42,7 @@ export function CampaignCard({
   const catColor = colors.category[campaign.category] || colors.accent;
   const pct = campaign.percentFunded ?? 0;
   const displayCategory = catLabels[campaign.category] || campaign.category;
-  const coverUrl = campaign.adAssets?.coverUrl;
+  const coverUrl = getCoverUrl(campaign);
   const isBackable = campaign.status === 'available_for_funding';
   const [imageError, setImageError] = useState(false);
 

@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useDraftStore, CampaignDraft } from '../../store/useDraftStore';
+import { apiClient } from '../../api/client';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import {
@@ -40,10 +41,13 @@ export function CreateLandingScreen({ navigation }: any) {
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
   }, [draftsMap]);
+  const saveDraft = useDraftStore((s) => s.saveDraft);
   const deleteDraft = useDraftStore((s) => s.deleteDraft);
   const setActiveDraft = useDraftStore((s) => s.setActiveDraft);
 
-  const handleStartManual = () => {
+  const [isStartingManual, setIsStartingManual] = React.useState(false);
+
+  const handleStartManual = async () => {
     if (!isAuthenticated) {
       Alert.alert(
         'Sign in required',
@@ -56,10 +60,34 @@ export function CreateLandingScreen({ navigation }: any) {
       return;
     }
 
-    // Start fresh draft
-    const newId = `cmp-${Date.now().toString(36)}`;
-    setActiveDraft(newId);
-    navigation.navigate('CreateFlow', { draftId: newId, step: 1 });
+    setIsStartingManual(true);
+    try {
+      const res = await apiClient.createDraft({
+        title: '',
+        category: 'community',
+        creator_name: user?.name || 'Campaign Organizer',
+      });
+
+      if (!res.draft || !res.draft.id || res.isOffline) {
+        Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+        return;
+      }
+
+      const newId = res.draft.id;
+      saveDraft({
+        id: newId,
+        step: 1,
+        title: '',
+        category: 'community',
+        creatorName: user?.name || '',
+      });
+      setActiveDraft(newId);
+      navigation.navigate('CreateFlow', { draftId: newId, step: 1 });
+    } catch {
+      Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+    } finally {
+      setIsStartingManual(false);
+    }
   };
 
   const handleStartVoice = () => {
