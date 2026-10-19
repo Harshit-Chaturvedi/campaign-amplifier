@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   FlatList,
   TouchableOpacity,
+  Pressable,
+  Modal,
   StatusBar,
   RefreshControl,
   ActivityIndicator,
@@ -31,6 +33,7 @@ export function HomeScreen({ navigation }: any) {
   } = useCampaigns();
   const { data: featuredData } = useFeaturedCampaigns();
   const isServerWakingUp = useServerStatusStore((s) => s.isWakingUp);
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
 
   const isOffline = Boolean(campaignsData?.isOffline);
   const campaigns = campaignsData?.items || [];
@@ -45,6 +48,49 @@ export function HomeScreen({ navigation }: any) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar barStyle="dark-content" />
+
+      {/* Explainer Bottom Sheet Modal */}
+      <Modal
+        visible={showNoticeModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowNoticeModal(false)}
+      >
+        <Pressable
+          onPress={() => setShowNoticeModal(false)}
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.45)',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Pressable
+            onPress={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.surface,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              padding: 24,
+              paddingBottom: 36,
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ fontSize: 17, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
+                Message Amplification, Not a Donation
+              </Text>
+              <TouchableOpacity onPress={() => setShowNoticeModal(false)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close" size={20} color={colors.inkSecondary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 22 }}>
+              Your contribution pays for digital advertising that spreads documented messages to audiences and decision-makers. It is not a donation to the cause, person, or organisation.
+            </Text>
+            <View style={{ marginTop: 20 }}>
+              <Button title="Got it" onPress={() => setShowNoticeModal(false)} fullWidth />
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* Editorial Masthead / Header */}
       <View
@@ -62,7 +108,7 @@ export function HomeScreen({ navigation }: any) {
             <Text
               style={{
                 fontSize: 22,
-                fontFamily: fonts.serifBold,
+                fontFamily: fonts.sansBold,
                 color: colors.ink,
                 letterSpacing: -0.3,
               }}
@@ -72,9 +118,9 @@ export function HomeScreen({ navigation }: any) {
             <Text
               style={{
                 fontSize: 10,
-                fontFamily: fonts.sansBold,
+                fontFamily: fonts.sansSemiBold,
                 color: colors.inkMuted,
-                letterSpacing: 0.9,
+                letterSpacing: 0.8,
                 textTransform: 'uppercase',
                 marginTop: 2,
               }}
@@ -88,7 +134,7 @@ export function HomeScreen({ navigation }: any) {
             style={{
               width: 38,
               height: 38,
-              borderRadius: tokens.radii.xs,
+              borderRadius: 10,
               backgroundColor: colors.surfaceSecondary,
               borderWidth: 1,
               borderColor: colors.border,
@@ -112,7 +158,7 @@ export function HomeScreen({ navigation }: any) {
               backgroundColor: colors.surfaceSecondary,
               borderColor: colors.border,
               borderWidth: 1,
-              borderRadius: tokens.radii.xs,
+              borderRadius: 8,
               paddingVertical: 8,
               paddingHorizontal: 12,
             }}
@@ -134,7 +180,7 @@ export function HomeScreen({ navigation }: any) {
               backgroundColor: colors.warningFaint,
               borderColor: colors.warning,
               borderWidth: 1,
-              borderRadius: tokens.radii.xs,
+              borderRadius: 8,
               paddingVertical: 6,
               paddingHorizontal: 10,
             }}
@@ -153,16 +199,21 @@ export function HomeScreen({ navigation }: any) {
           <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); }} tintColor={colors.accent} />
         }
       >
-        {/* Core First Screen / Broadside Hero (Requirement 5) */}
+        {/* Core First Screen / Hero */}
         <View
           style={{
             marginHorizontal: 16,
             marginTop: 16,
             backgroundColor: colors.surface,
-            borderRadius: tokens.radii.md,
+            borderRadius: 16,
             borderWidth: 1,
             borderColor: colors.border,
             padding: 20,
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.04,
+            shadowRadius: 2,
+            elevation: 1,
           }}
         >
           {/* Dateline / Topic Tag */}
@@ -188,13 +239,13 @@ export function HomeScreen({ navigation }: any) {
             <DemoDataBadge size="sm" />
           </View>
 
-          {/* One Clear Serif Headline Stating the Idea */}
+          {/* Headline Stating the Idea */}
           <Text
             style={{
-              fontSize: 24,
-              fontFamily: fonts.serifBold,
+              fontSize: 22,
+              fontFamily: fonts.sansBold,
               color: colors.ink,
-              lineHeight: 30,
+              lineHeight: 28,
               letterSpacing: -0.2,
             }}
           >
@@ -207,26 +258,30 @@ export function HomeScreen({ navigation }: any) {
               fontSize: 14,
               fontFamily: fonts.sansRegular,
               color: colors.inkSecondary,
-              marginTop: 8,
-              lineHeight: 21,
+              marginTop: 6,
+              lineHeight: 20,
             }}
           >
             Contributions pool to pay for digital advertising that spreads documented messages to audiences and decision-makers.
           </Text>
 
-          {/* Newspaper Graphic Hero Numbers Box */}
+          {/* Reach Estimate Pill */}
           <View
             style={{
               backgroundColor: colors.surfaceSecondary,
               borderWidth: 1,
               borderColor: colors.border,
-              borderRadius: tokens.radii.xs,
-              padding: 14,
-              marginTop: 14,
+              borderRadius: 10,
+              paddingVertical: 10,
+              paddingHorizontal: 14,
+              marginTop: 12,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-              <Text style={{ fontSize: 28, fontFamily: fonts.serifBold, color: colors.ink }}>
+              <Text style={{ fontSize: 22, fontFamily: fonts.sansBold, color: colors.ink }}>
                 ~{reachPerDollar}
               </Text>
               <Text
@@ -234,33 +289,54 @@ export function HomeScreen({ navigation }: any) {
                   fontSize: 11,
                   fontFamily: fonts.sansBold,
                   color: colors.inkMuted,
-                  letterSpacing: 0.8,
+                  letterSpacing: 0.6,
                   textTransform: 'uppercase',
                   marginLeft: 8,
                 }}
               >
-                PEOPLE REACHED PER $1 (ESTIMATE)
+                PEOPLE PER $1 (ESTIMATE)
               </Text>
             </View>
+          </View>
+
+          {/* Collapsed 1-line explainer with info icon */}
+          <TouchableOpacity
+            onPress={() => setShowNoticeModal(true)}
+            activeOpacity={0.7}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: colors.surfaceSecondary,
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 10,
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+              marginTop: 10,
+            }}
+          >
+            <Ionicons
+              name="information-circle-outline"
+              size={17}
+              color={colors.accent}
+              style={{ marginRight: 8 }}
+            />
             <Text
               style={{
-                fontSize: 11,
-                fontFamily: fonts.sansRegular,
-                color: colors.inkSecondary,
-                marginTop: 4,
+                fontSize: 12,
+                fontFamily: fonts.sansMedium,
+                color: colors.ink,
+                flex: 1,
               }}
+              numberOfLines={1}
             >
-              Estimate based on demo assumptions, not a guarantee.
+              Message amplification, not a donation
             </Text>
-          </View>
-
-          {/* Amplification-Not-Donation Notice */}
-          <View style={{ marginTop: 14 }}>
-            <AmplificationNotice compact />
-          </View>
+            <Ionicons name="chevron-forward" size={15} color={colors.inkMuted} />
+          </TouchableOpacity>
 
           {/* One Primary CTA */}
-          <View style={{ marginTop: 16 }}>
+          <View style={{ marginTop: 14 }}>
             <Button
               title="Explore Active Campaigns"
               size="lg"

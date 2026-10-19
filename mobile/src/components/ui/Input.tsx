@@ -20,17 +20,18 @@ export function Input({ label, error, helper, ...props }: InputProps) {
       )}
       <TextInput
         accessibilityLabel={props.accessibilityLabel || label}
-        placeholderTextColor={colors.secondaryCaption}
+        placeholderTextColor={colors.inkMuted}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={[
           {
             backgroundColor: colors.surface,
             borderWidth: 1,
-            borderColor: error ? colors.danger : focused ? colors.accent : colors.hairline,
-            borderRadius: tokens.radius.sm,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
+            borderColor: error ? colors.danger : focused ? colors.accent : colors.border,
+            borderRadius: 12,
+            paddingHorizontal: 16,
+            paddingVertical: props.multiline ? 12 : 14,
+            minHeight: props.multiline ? undefined : 52,
             fontSize: 15,
             fontFamily: fonts.sansRegular,
             color: colors.ink,
@@ -41,7 +42,7 @@ export function Input({ label, error, helper, ...props }: InputProps) {
       />
       {error && <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.danger, marginTop: 4 }}>{error}</Text>}
       {helper && !error && (
-        <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.mutedInk, marginTop: 4 }}>{helper}</Text>
+        <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 4 }}>{helper}</Text>
       )}
     </View>
   );

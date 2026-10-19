@@ -422,12 +422,12 @@ export function CreateFlowScreen({ route, navigation }: any) {
                 }}
               >
                 {saveStatus === 'synced'
-                  ? 'All changes synced'
+                  ? 'Saved'
                   : saveStatus === 'saving'
-                  ? 'Saving changes...'
+                  ? 'Saving…'
                   : saveStatus === 'error'
                   ? "Couldn't sync, retrying"
-                  : 'Saved on this device'}
+                  : 'Saved'}
               </Text>
             </View>
           </View>

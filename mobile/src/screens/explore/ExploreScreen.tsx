@@ -133,16 +133,16 @@ export function ExploreScreen({ navigation }: any) {
         }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink }}>
+          <Text style={{ fontSize: 24, fontFamily: fonts.sansBold, color: colors.ink }}>
             Explore
           </Text>
           {isServerWakingUp ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceSecondary, paddingHorizontal: 8, paddingVertical: 4, borderRadius: tokens.radii.xs, borderWidth: 1, borderColor: colors.border }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceSecondary, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}>
               <ActivityIndicator size="small" color={colors.accent} style={{ marginRight: 6 }} />
               <Text style={{ fontSize: 11, fontFamily: fonts.sansMedium, color: colors.ink }}>Waking server...</Text>
             </View>
           ) : isOffline ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.warningFaint, paddingHorizontal: 8, paddingVertical: 4, borderRadius: tokens.radii.xs, borderWidth: 1, borderColor: colors.warning }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.warningFaint, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: colors.warning }}>
               <Ionicons name="cloud-offline-outline" size={13} color={colors.warning} style={{ marginRight: 4 }} />
               <Text style={{ fontSize: 11, fontFamily: fonts.sansMedium, color: colors.warning }}>Offline demo</Text>
             </View>
@@ -157,11 +157,11 @@ export function ExploreScreen({ navigation }: any) {
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: colors.surfaceSecondary,
-              borderRadius: tokens.radii.sm,
+              borderRadius: 12,
               borderWidth: 1,
               borderColor: colors.border,
-              paddingHorizontal: 12,
-              height: 42,
+              paddingHorizontal: 14,
+              height: 48,
             }}
           >
             <Ionicons name="search" size={18} color={colors.inkMuted} />
@@ -191,9 +191,9 @@ export function ExploreScreen({ navigation }: any) {
             accessibilityLabel={`Filter campaigns (${activeFiltersCount} active)`}
             onPress={() => setFilterSheetVisible(true)}
             style={{
-              height: 42,
-              width: 42,
-              borderRadius: tokens.radii.sm,
+              height: 48,
+              width: 48,
+              borderRadius: 12,
               backgroundColor: activeFiltersCount > 0 ? colors.accentFaint : colors.surfaceSecondary,
               borderColor: activeFiltersCount > 0 ? colors.accent : colors.border,
               borderWidth: 1,

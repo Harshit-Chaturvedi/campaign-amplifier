@@ -992,9 +992,22 @@ export function ThankYouScreen({ route, navigation }: any) {
   const [followed, setFollowed] = useState(isFollowing);
   const [displayReach, setDisplayReach] = useState(0);
   const animatedProgress = useSharedValue(0);
+  const checkScale = useSharedValue(0);
 
   const targetReach = estimatedReach || 0;
   const targetPercent = campaign?.percentFunded ?? 100;
+
+  useEffect(() => {
+    checkScale.value = withTiming(1, {
+      duration: 400,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, []);
+
+  const animatedCheckStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: checkScale.value }],
+    opacity: checkScale.value,
+  }));
 
   useEffect(() => {
     let isMounted = true;
@@ -1099,6 +1112,25 @@ export function ThankYouScreen({ route, navigation }: any) {
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
         {/* Editorial Confirmation Header */}
         <View style={{ alignItems: 'center', paddingVertical: 18 }}>
+          <Animated.View
+            style={[
+              {
+                width: 60,
+                height: 60,
+                borderRadius: 30,
+                backgroundColor: colors.positiveFaint,
+                borderWidth: 1,
+                borderColor: colors.positive,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 14,
+              },
+              animatedCheckStyle,
+            ]}
+          >
+            <Ionicons name="checkmark-circle" size={40} color={colors.positive} />
+          </Animated.View>
+
           <View
             style={{
               paddingHorizontal: 12,
@@ -1123,7 +1155,7 @@ export function ThankYouScreen({ route, navigation }: any) {
             </Text>
           </View>
 
-          <Text style={{ fontSize: 26, fontFamily: fonts.serifBold, color: colors.ink, textAlign: 'center', lineHeight: 32 }}>
+          <Text style={{ fontSize: 24, fontFamily: fonts.sansBold, color: colors.ink, textAlign: 'center', lineHeight: 30 }}>
             Thank You for Amplifying
           </Text>
 

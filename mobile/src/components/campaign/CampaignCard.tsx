@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, Pressable, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { formatCurrency, formatNumber } from '../../utils/formatting';
 import { colors, fonts, tokens } from '../../theme/tokens';
@@ -55,18 +55,23 @@ export function CampaignCard({
   // Compact variant
   if (variant === 'compact') {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
-        activeOpacity={0.7}
-        style={{
+        style={({ pressed }) => ({
           flexDirection: 'row',
           backgroundColor: colors.surface,
-          borderRadius: tokens.radii.sm,
+          borderRadius: 16,
           borderWidth: 1,
           borderColor: colors.border,
           padding: 12,
           marginBottom: 10,
-        }}
+          shadowColor: '#000000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 2,
+          elevation: 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+        })}
       >
         <View
           style={{
@@ -128,25 +133,30 @@ export function CampaignCard({
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
   // Featured variant
   if (variant === 'featured') {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
-        activeOpacity={0.88}
-        style={{
+        style={({ pressed }) => ({
           width: Math.min(SCREEN_W * 0.82, 330),
           backgroundColor: colors.surface,
-          borderRadius: tokens.radii.md,
+          borderRadius: 16,
           marginRight: 16,
           overflow: 'hidden',
           borderWidth: 1,
           borderColor: colors.border,
-        }}
+          shadowColor: '#000000',
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 2,
+          elevation: 1,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+        })}
       >
         <View style={{ width: '100%', aspectRatio: 16 / 9, backgroundColor: colors.surfaceSecondary, overflow: 'hidden' }}>
           {coverUrl && !imageError ? (
@@ -190,114 +200,45 @@ export function CampaignCard({
           </View>
         </View>
 
-        <View style={{ padding: 14 }}>
+        <View style={{ padding: 16 }}>
           <Text
             style={{
               fontSize: 16,
-              fontFamily: fonts.serifSemiBold,
+              fontFamily: fonts.sansSemiBold,
               color: colors.ink,
-              marginBottom: 4,
+              marginBottom: 8,
               lineHeight: 22,
             }}
             numberOfLines={2}
           >
             {campaign.title}
           </Text>
-          <Text
-            style={{
-              fontSize: 12,
-              fontFamily: fonts.sansRegular,
-              color: colors.inkSecondary,
-              marginBottom: 10,
-              lineHeight: 16,
-            }}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-          >
-            {campaign.summary || campaign.tagline}
+
+          <ProgressBar progress={pct} color={colors.accent} height={4} style={{ marginBottom: 8 }} />
+
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.ink, marginBottom: 4 }}>
+            {formatCurrency(campaign.amountRaised)} of {formatCurrency(campaign.fundingGoal)}{' '}
+            <Text style={{ color: colors.inkSecondary, fontFamily: fonts.sansRegular }}>
+              · {campaign.backerCount ?? 0} backers · {campaign.durationDays ?? 30}d left
+            </Text>
           </Text>
-
-          {/* Newspaper graphic stat heroes */}
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'flex-end',
-              paddingVertical: 8,
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-              borderBottomWidth: 1,
-              borderBottomColor: colors.border,
-              marginBottom: 8,
-            }}
-          >
-            <View>
-              <Text style={{ fontSize: 18, fontFamily: fonts.serifBold, color: colors.ink }}>
-                {formatCurrency(campaign.amountRaised)}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 9,
-                  fontFamily: fonts.sansBold,
-                  color: colors.inkMuted,
-                  letterSpacing: 0.8,
-                  textTransform: 'uppercase',
-                }}
-              >
-                RAISED
-              </Text>
-            </View>
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ fontSize: 18, fontFamily: fonts.serifBold, color: colors.accent }}>
-                {pct}%
-              </Text>
-              <Text
-                style={{
-                  fontSize: 9,
-                  fontFamily: fonts.sansBold,
-                  color: colors.inkMuted,
-                  letterSpacing: 0.8,
-                  textTransform: 'uppercase',
-                }}
-              >
-                FUNDED
-              </Text>
-            </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 18, fontFamily: fonts.serifBold, color: colors.ink }}>
-                {formatCurrency(campaign.fundingGoal)}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 9,
-                  fontFamily: fonts.sansBold,
-                  color: colors.inkMuted,
-                  letterSpacing: 0.8,
-                  textTransform: 'uppercase',
-                }}
-              >
-                GOAL
-              </Text>
-            </View>
-          </View>
-
-          <ProgressBar progress={pct} color={colors.accent} height={3} style={{ marginBottom: 8 }} />
 
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
+              marginTop: 4,
             }}
           >
-            <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
               Est. reach at goal: <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>~{formatNumber(reachAtGoal)}</Text>
             </Text>
             <DemoDataBadge size="sm" />
           </View>
 
           {isBackable && (
-            <View style={{ marginTop: 10 }}>
+            <View style={{ marginTop: 12 }}>
               <Button
                 title="Back This Campaign"
                 size="sm"
@@ -307,25 +248,30 @@ export function CampaignCard({
             </View>
           )}
         </View>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
   // Default variant (Main feed on Home & Explore)
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
-      activeOpacity={0.88}
-      style={{
+      style={({ pressed }) => ({
         backgroundColor: colors.surface,
-        borderRadius: tokens.radii.md,
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: colors.border,
         overflow: 'hidden',
         marginBottom: 16,
-      }}
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04,
+        shadowRadius: 2,
+        elevation: 1,
+        transform: [{ scale: pressed ? 0.98 : 1 }],
+      })}
     >
-      {/* 16:9 Real Photo - No Gradient Overlay */}
+      {/* 16:9 Real Photo */}
       <View style={{ width: '100%', aspectRatio: 16 / 9, backgroundColor: colors.surfaceSecondary, overflow: 'hidden' }}>
         {coverUrl && !imageError ? (
           <Image
@@ -373,114 +319,25 @@ export function CampaignCard({
       <View style={{ padding: 16 }}>
         <Text
           style={{
-            fontSize: 18,
-            fontFamily: fonts.serifSemiBold,
+            fontSize: 17,
+            fontFamily: fonts.sansSemiBold,
             color: colors.ink,
-            marginBottom: 4,
-            lineHeight: 24,
+            marginBottom: 8,
+            lineHeight: 23,
           }}
           numberOfLines={2}
         >
           {campaign.title}
         </Text>
 
-        <Text
-          style={{
-            fontSize: 12,
-            fontFamily: fonts.sansRegular,
-            color: colors.inkMuted,
-            marginBottom: 6,
-          }}
-        >
-          by {campaign.creatorName}
+        <ProgressBar progress={pct} color={colors.accent} height={4} style={{ marginBottom: 8 }} />
+
+        <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.ink, marginBottom: 4 }}>
+          {formatCurrency(campaign.amountRaised)} of {formatCurrency(campaign.fundingGoal)}{' '}
+          <Text style={{ color: colors.inkSecondary, fontFamily: fonts.sansRegular }}>
+            · {campaign.backerCount ?? 0} backers · {campaign.durationDays ?? 30}d left
+          </Text>
         </Text>
-
-        <Text
-          style={{
-            fontSize: 13,
-            fontFamily: fonts.sansRegular,
-            color: colors.inkSecondary,
-            lineHeight: 19,
-            marginBottom: 14,
-          }}
-          numberOfLines={2}
-          ellipsizeMode="tail"
-        >
-          {campaign.summary || campaign.tagline}
-        </Text>
-
-        {/* Hero Numbers Block - Newspaper Graphic Style */}
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            paddingVertical: 10,
-            borderTopWidth: 1,
-            borderTopColor: colors.border,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
-            marginBottom: 10,
-            backgroundColor: colors.surfaceSecondary,
-            paddingHorizontal: 12,
-            borderRadius: tokens.radii.xs,
-          }}
-        >
-          <View>
-            <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.ink }}>
-              {formatCurrency(campaign.amountRaised)}
-            </Text>
-            <Text
-              style={{
-                fontSize: 10,
-                fontFamily: fonts.sansBold,
-                color: colors.inkMuted,
-                letterSpacing: 0.8,
-                textTransform: 'uppercase',
-                marginTop: 2,
-              }}
-            >
-              RAISED
-            </Text>
-          </View>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.accent }}>
-              {pct}%
-            </Text>
-            <Text
-              style={{
-                fontSize: 10,
-                fontFamily: fonts.sansBold,
-                color: colors.inkMuted,
-                letterSpacing: 0.8,
-                textTransform: 'uppercase',
-                marginTop: 2,
-              }}
-            >
-              FUNDED
-            </Text>
-          </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.ink }}>
-              {formatCurrency(campaign.fundingGoal)}
-            </Text>
-            <Text
-              style={{
-                fontSize: 10,
-                fontFamily: fonts.sansBold,
-                color: colors.inkMuted,
-                letterSpacing: 0.8,
-                textTransform: 'uppercase',
-                marginTop: 2,
-              }}
-            >
-              GOAL
-            </Text>
-          </View>
-        </View>
-
-        {/* Thin Progress Bar */}
-        <ProgressBar progress={pct} color={colors.accent} height={3} style={{ marginBottom: 10 }} />
 
         {/* Reach metadata */}
         <View
@@ -488,7 +345,7 @@ export function CampaignCard({
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            paddingTop: 4,
+            marginTop: 4,
           }}
         >
           <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
@@ -509,6 +366,6 @@ export function CampaignCard({
           </View>
         )}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { Pressable, Text, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, fonts, tokens } from '../../theme/tokens';
 
@@ -51,33 +51,35 @@ export function Button({
   fullWidth = false,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
-  const py = size === 'sm' ? 8 : size === 'lg' ? 14 : 11;
-  const px = size === 'sm' ? 14 : size === 'lg' ? 24 : 18;
-  const fontSize = size === 'sm' ? 13 : size === 'lg' ? 16 : 14;
+  const isPrimary = variant === 'primary' || size === 'lg';
+
+  // Primary buttons: 52px height, 12px border radius, font-weight 600, 16px label
+  const minHeight = size === 'sm' ? 36 : isPrimary ? 52 : 44;
+  const borderRadius = isPrimary ? 12 : tokens.radii.sm;
+  const fontSize = isPrimary ? 16 : size === 'sm' ? 13 : 14;
   const iconSize = size === 'sm' ? 16 : 18;
   const bg = variantBg[variant];
   const textColor = variantText[variant];
   const borderColor = variantBorder[variant];
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       disabled={isDisabled}
-      activeOpacity={0.8}
-      style={{
+      style={({ pressed }) => ({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: bg,
-        paddingVertical: py,
-        paddingHorizontal: px,
-        minHeight: size === 'sm' ? 36 : size === 'lg' ? 48 : 42,
-        borderRadius: tokens.radii.md,
+        paddingHorizontal: size === 'sm' ? 14 : 20,
+        height: minHeight,
+        borderRadius,
         opacity: isDisabled ? 0.5 : 1,
         borderWidth: borderColor !== 'transparent' ? 1 : 0,
         borderColor: borderColor,
         width: fullWidth ? '100%' : undefined,
-      }}
+        transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
+      })}
       accessibilityRole="button"
       accessibilityLabel={title}
     >
@@ -88,7 +90,7 @@ export function Button({
           {icon && iconPosition === 'left' && (
             <Ionicons name={icon} size={iconSize} color={textColor} style={{ marginRight: 8 }} />
           )}
-          <Text style={{ color: textColor, fontSize, fontFamily: fonts.sansMedium }}>
+          <Text style={{ color: textColor, fontSize, fontFamily: fonts.sansSemiBold }}>
             {title}
           </Text>
           {icon && iconPosition === 'right' && (
@@ -96,6 +98,6 @@ export function Button({
           )}
         </>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }

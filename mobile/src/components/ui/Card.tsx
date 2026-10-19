@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, ViewStyle, StyleProp, StyleSheet } from 'react-native';
+import { View, Pressable, ViewStyle, StyleProp, StyleSheet } from 'react-native';
 import { tokens } from '../../theme/tokens';
 
 interface CardProps {
@@ -18,9 +18,15 @@ export function Card({ children, style, onPress, padding = 16 }: CardProps) {
 
   if (onPress) {
     return (
-      <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={baseStyle}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [
+          baseStyle,
+          { transform: [{ scale: pressed ? 0.98 : 1 }] },
+        ]}
+      >
         {children}
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 

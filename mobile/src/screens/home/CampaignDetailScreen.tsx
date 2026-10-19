@@ -477,13 +477,14 @@ export function CampaignDetailScreen({ route, navigation }: any) {
           </TouchableOpacity>
         </View>
 
-        {/* Editorial Story Section */}
-        <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-          <Card style={{ padding: 18 }}>
-            <Text style={{ fontSize: 19, fontFamily: fonts.serifSemiBold, color: colors.ink, marginBottom: 14 }}>
-              The Story
-            </Text>
-
+        {/* Accordions: Story, Evidence sources, Use of funds & fees, Reach estimate, Report */}
+        <View style={{ paddingHorizontal: 16, marginTop: 12 }}>
+          {/* 1. Story Accordion */}
+          <Expandable
+            title="Story"
+            icon="book-outline"
+            defaultExpanded={true}
+          >
             {campaign.storyBlocks && campaign.storyBlocks.length > 0 ? (
               campaign.storyBlocks.map((b, idx) => (
                 <StoryBlockRenderer key={idx} block={b} index={idx} />
@@ -493,19 +494,16 @@ export function CampaignDetailScreen({ route, navigation }: any) {
                 {campaign.summary}
               </Text>
             )}
-          </Card>
-        </View>
+          </Expandable>
 
-        {/* VISIBLE Sources List */}
-        <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-          <Card style={{ padding: 18 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-              <Ionicons name="link-outline" size={18} color={colors.accent} style={{ marginRight: 8 }} />
-              <Text style={{ fontSize: 17, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
-                Sources & Citations
-              </Text>
-            </View>
-            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 14 }}>
+          {/* 2. Evidence Sources Accordion */}
+          <Expandable
+            title="Evidence Sources"
+            icon="link-outline"
+            badgeText={`${campaign.sources?.length || 0} sources`}
+            defaultExpanded={true}
+          >
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 12 }}>
               Traceable evidence supporting this campaign. All sources are listed so you can review them directly.
             </Text>
 
@@ -518,12 +516,9 @@ export function CampaignDetailScreen({ route, navigation }: any) {
                 No external links provided for this campaign.
               </Text>
             )}
-          </Card>
-        </View>
+          </Expandable>
 
-        {/* Expandable Sections */}
-        <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-          {/* 1. Use of Funds */}
+          {/* 3. Use of Funds & Fees Accordion */}
           <Expandable
             title="Use of Funds & Fees"
             icon="pie-chart-outline"
@@ -546,11 +541,15 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             </Text>
           </Expandable>
 
-          {/* 2. Audience & Distribution */}
+          {/* 4. Reach Estimate & Audience Accordion */}
           <Expandable
-            title="Audience & Distribution"
+            title="Reach Estimate & Audience"
             icon="people-outline"
+            badgeText="Estimate"
           >
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 19, marginBottom: 8 }}>
+              <Text style={{ fontFamily: fonts.sansBold, color: colors.ink }}>Estimated Reach at Goal:</Text> ~{formatNumber(reachAtGoal)} people (Estimate, not guaranteed)
+            </Text>
             <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 19, marginBottom: 8 }}>
               <Text style={{ fontFamily: fonts.sansBold, color: colors.ink }}>Target Locations:</Text>{' '}
               {campaign.reachSettings?.locations.join(', ') || 'United States'}
@@ -571,7 +570,27 @@ export function CampaignDetailScreen({ route, navigation }: any) {
             </View>
           </Expandable>
 
-          {/* 3. Review & Trust */}
+          {/* 5. Distribution Report Accordion */}
+          <Expandable
+            title={['distribution_preparation', 'promoting', 'completed', 'goal_reached'].includes(effectiveStatus) ? 'Distribution Report' : 'Delivery & Analytics Report'}
+            icon="stats-chart"
+            badgeText="Report"
+          >
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 19, marginBottom: 10 }}>
+              {['distribution_preparation', 'promoting', 'completed', 'goal_reached'].includes(effectiveStatus)
+                ? 'View measured reach, itemised ad spend, and placement performance.'
+                : 'View budget breakdown and reach projections for this campaign.'}
+            </Text>
+            <Button
+              title="Open Full Distribution Report"
+              variant="outline"
+              size="sm"
+              onPress={() => navigation.navigate('Report', { campaignId: campaign.id })}
+              fullWidth
+            />
+          </Expandable>
+
+          {/* 6. Review & Trust */}
           <Expandable
             title="Review Process & Trust"
             icon="shield-checkmark-outline"

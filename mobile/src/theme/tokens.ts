@@ -1,63 +1,64 @@
 export const colors = {
-  // Editorial palette
-  background: '#FAF7F2', // Paper background
-  paper: '#FAF7F2',
-  surface: '#FFFFFF', // Card/sheet surface
-  surfaceSecondary: '#F4EFE6', // Warm parchment secondary
-  paperSecondary: '#F4EFE6',
-  surfaceMuted: '#EFEAE1', // Soft muted paper
+  // Fintech-meets-civic calm, high-trust palette
+  background: '#F7F8FA', // Off-white clean background
+  paper: '#F7F8FA',
+  surface: '#FFFFFF', // Pure white card surface
+  surfaceSecondary: '#F3F4F6', // Soft secondary surface
+  paperSecondary: '#F3F4F6',
+  surfaceMuted: '#E5E7EB', // Subtle neutral
 
-  ink: '#16130F', // Primary typography
-  inkSecondary: '#5C564D', // Muted ink
-  inkMuted: '#8C8275', // Secondary caption
-  mutedInk: '#5C564D',
-  text: '#16130F',
-  textSecondary: '#5C564D',
-  textMuted: '#8C8275',
+  ink: '#111827', // Primary typography
+  inkSecondary: '#6B7280', // Secondary typography
+  inkMuted: '#9CA3AF', // Muted text / tertiary
+  mutedInk: '#6B7280',
+  text: '#111827',
+  textSecondary: '#6B7280',
+  textMuted: '#9CA3AF',
   inkInverse: '#FFFFFF',
 
-  border: '#E4DDD0', // Hairline 1px border
-  borderHairline: '#E4DDD0',
-  hairline: '#E4DDD0',
-  borderDark: '#CCC2B0',
-  hairlineDark: '#CCC2B0',
-  secondaryCaption: '#8C8275',
+  border: '#E5E7EB', // 1px subtle card/divider border
+  borderHairline: '#E5E7EB',
+  hairline: '#E5E7EB',
+  borderDark: '#D1D5DB',
+  hairlineDark: '#D1D5DB',
+  secondaryCaption: '#9CA3AF',
 
-  accent: '#3B34C4', // Action only deep indigo
-  accentFaint: '#EEEDFA',
-  accentDark: '#2C269E',
-  primary: '#3B34C4',
+  accent: '#4338CA', // Deep indigo - strictly for primary actions, links, and progress
+  accentFaint: '#EEF2FF',
+  accentDark: '#3730A3',
+  primary: '#4338CA',
 
-  positive: '#1F7A4D', // Editorial positive green
-  positiveFaint: '#E9F5EF',
+  positive: '#059669', // Calm emerald
+  positiveFaint: '#ECFDF5',
 
-  warning: '#B45309', // Warm amber
-  warningFaint: '#FEF3C7',
+  warning: '#D97706', // Muted amber
+  warningFaint: '#FFFBEB',
 
-  danger: '#B42318', // Editorial crimson
-  dangerFaint: '#FDF2F2',
+  danger: '#DC2626', // Clean crimson
+  dangerFaint: '#FEF2F2',
 
-  // Category accents for editorial labels
+  // Category labels with disciplined accents
   category: {
-    environment: '#1F7A4D',
-    health: '#B42318',
-    science: '#1D4ED8',
+    environment: '#059669',
+    health: '#DC2626',
+    science: '#2563EB',
     education: '#2563EB',
-    public_policy: '#3B34C4',
-    economic_policy: '#0F766E',
-    community: '#7E22CE',
-    arts_culture: '#B45309',
+    public_policy: '#4338CA',
+    economic_policy: '#0D9488',
+    community: '#7C3AED',
+    arts_culture: '#D97706',
     business: '#4B5563',
-    other: '#5C564D',
+    other: '#6B7280',
   } as Record<string, string>,
 } as const;
 
+// Inter only across the entire application — strict hierarchy (700 bold, 600 semibold, 500 medium, 400 regular)
 export const fonts = {
-  serifRegular: 'Newsreader_400Regular',
-  serifMedium: 'Newsreader_500Medium',
-  serifSemiBold: 'Newsreader_600SemiBold',
-  serifBold: 'Newsreader_700Bold',
-  serifItalic: 'Newsreader_400Regular_Italic',
+  serifRegular: 'Inter_400Regular',
+  serifMedium: 'Inter_500Medium',
+  serifSemiBold: 'Inter_600SemiBold',
+  serifBold: 'Inter_700Bold',
+  serifItalic: 'Inter_400Regular',
 
   sansRegular: 'Inter_400Regular',
   sansMedium: 'Inter_500Medium',
@@ -81,20 +82,20 @@ export const tokens = {
   },
   radii: {
     none: 0,
-    xs: 2,
-    sm: 4,
-    md: 6,
-    lg: 8,
-    xl: 12,
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
     full: 9999,
   },
   radius: {
     none: 0,
-    xs: 2,
-    sm: 4,
-    md: 6,
-    lg: 8,
-    xl: 12,
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
     full: 9999,
   },
   borders: {
@@ -105,35 +106,40 @@ export const tokens = {
   card: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E4DDD0',
-    borderRadius: 8,
+    borderColor: '#E5E7EB',
+    borderRadius: 16,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
   },
   typeScale: {
-    hero: { fontSize: 32, lineHeight: 38, fontFamily: fonts.serifBold },
-    h1: { fontSize: 26, lineHeight: 32, fontFamily: fonts.serifSemiBold },
-    h2: { fontSize: 21, lineHeight: 28, fontFamily: fonts.serifSemiBold },
-    h3: { fontSize: 18, lineHeight: 24, fontFamily: fonts.serifMedium },
-    headline: { fontSize: 17, lineHeight: 22, fontFamily: fonts.serifMedium },
-    subhead: { fontSize: 15, lineHeight: 20, fontFamily: fonts.sansMedium },
-    bodyLarge: { fontSize: 16, lineHeight: 24, fontFamily: fonts.sansRegular },
-    body: { fontSize: 14, lineHeight: 21, fontFamily: fonts.sansRegular },
-    bodyBold: { fontSize: 14, lineHeight: 21, fontFamily: fonts.sansSemiBold },
+    hero: { fontSize: 28, lineHeight: 34, fontFamily: fonts.sansBold },
+    h1: { fontSize: 24, lineHeight: 30, fontFamily: fonts.sansBold },
+    h2: { fontSize: 20, lineHeight: 26, fontFamily: fonts.sansSemiBold },
+    h3: { fontSize: 17, lineHeight: 22, fontFamily: fonts.sansSemiBold },
+    headline: { fontSize: 16, lineHeight: 22, fontFamily: fonts.sansSemiBold },
+    subhead: { fontSize: 14, lineHeight: 20, fontFamily: fonts.sansMedium },
+    bodyLarge: { fontSize: 15, lineHeight: 22, fontFamily: fonts.sansRegular },
+    body: { fontSize: 14, lineHeight: 20, fontFamily: fonts.sansRegular },
+    bodyBold: { fontSize: 14, lineHeight: 20, fontFamily: fonts.sansSemiBold },
     caption: { fontSize: 12, lineHeight: 16, fontFamily: fonts.sansRegular },
     captionBold: { fontSize: 12, lineHeight: 16, fontFamily: fonts.sansSemiBold },
-    statLarge: { fontSize: 32, lineHeight: 36, fontFamily: fonts.serifBold },
-    statMedium: { fontSize: 24, lineHeight: 28, fontFamily: fonts.serifBold },
+    statLarge: { fontSize: 28, lineHeight: 32, fontFamily: fonts.sansBold },
+    statMedium: { fontSize: 22, lineHeight: 26, fontFamily: fonts.sansBold },
     smallCaps: {
       fontSize: 11,
       lineHeight: 14,
       fontFamily: fonts.sansSemiBold,
-      letterSpacing: 0.8,
+      letterSpacing: 0.6,
       textTransform: 'uppercase' as const,
     },
     metaLabel: {
       fontSize: 10,
       lineHeight: 12,
-      fontFamily: fonts.sansBold,
-      letterSpacing: 0.9,
+      fontFamily: fonts.sansSemiBold,
+      letterSpacing: 0.6,
       textTransform: 'uppercase' as const,
     },
   },
