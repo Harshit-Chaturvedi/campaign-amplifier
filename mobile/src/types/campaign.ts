@@ -178,6 +178,7 @@ export type NotificationType =
   | 'funding_milestone'
   | 'deadline_approaching'
   | 'contribution_status'
+  | 'contribution'
   | 'promotion_started'
   | 'distribution_progress'
   | 'campaign_completed'

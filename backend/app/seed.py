@@ -852,6 +852,26 @@ def seed():
         # 4. Seed Notifications
         seed_notifs = [
             Notification(
+                id="notif-contrib-1",
+                user_id="creator-demo",
+                type="contribution",
+                campaign_id="cmp-clean-water",
+                title="New contribution received",
+                body="Ava Mitchell contributed $120 to amplify Clean drinking water in every public school.",
+                read=False,
+                created_at=now - datetime.timedelta(hours=1)
+            ),
+            Notification(
+                id="notif-contrib-2",
+                user_id="creator-demo",
+                type="contribution",
+                campaign_id="cmp-transit-map",
+                title="New contribution received",
+                body="Mei Tanaka contributed $250 to amplify Redraw the bus network around where people actually work.",
+                read=False,
+                created_at=now - datetime.timedelta(hours=3)
+            ),
+            Notification(
                 id="notif-1",
                 user_id="backer-demo",
                 type="milestone",

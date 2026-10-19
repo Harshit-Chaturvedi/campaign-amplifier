@@ -129,27 +129,34 @@ export function normalizeCampaign(raw: any): Campaign {
       }
     : raw.report;
 
-  return {
-    id: raw.id,
-    slug: raw.slug || raw.id,
-    title: raw.title,
-    summary: raw.summary,
-    tagline: raw.tagline || '',
-    category: raw.category as CampaignCategory,
-    creatorType: (raw.creator_type || raw.creatorType || 'nonprofit') as CreatorType,
-    creatorName: raw.creator_name || raw.creatorName || 'Campaign Organizer',
-    creatorId: raw.owner_id || raw.creator_id || raw.creatorId || null,
-    status: raw.status as CampaignStatus,
-    currency: raw.currency || 'USD',
-    fundingGoal: raw.funding_goal ?? raw.fundingGoal ?? 5000,
-    amountRaised: raw.amount_raised ?? raw.amountRaised ?? 0,
-    percentFunded:
-      raw.percent_funded ??
-      raw.percentFunded ??
-      (raw.funding_goal ? Math.round(((raw.amount_raised ?? 0) / raw.funding_goal) * 100) : 0),
-    backerCount: raw.backer_count ?? raw.backerCount ?? 0,
-    estimatedReachAtGoal: raw.estimated_reach_at_goal ?? raw.estimatedReachAtGoal ?? 0,
-    durationDays: raw.duration_days ?? raw.durationDays ?? 30,
+    const fundingGoal = raw.funding_goal ?? raw.fundingGoal ?? 5000;
+    const amountRaised = raw.amount_raised ?? raw.amountRaised ?? 0;
+    let status = raw.status as CampaignStatus;
+    if (amountRaised >= fundingGoal && fundingGoal > 0 && (status === 'available_for_funding' || status === 'approved')) {
+      status = 'goal_reached';
+    }
+
+    return {
+      id: raw.id,
+      slug: raw.slug || raw.id,
+      title: raw.title,
+      summary: raw.summary,
+      tagline: raw.tagline || '',
+      category: raw.category as CampaignCategory,
+      creatorType: (raw.creator_type || raw.creatorType || 'nonprofit') as CreatorType,
+      creatorName: raw.creator_name || raw.creatorName || 'Campaign Organizer',
+      creatorId: raw.owner_id || raw.creator_id || raw.creatorId || null,
+      status,
+      currency: raw.currency || 'USD',
+      fundingGoal,
+      amountRaised,
+      percentFunded:
+        raw.percent_funded ??
+        raw.percentFunded ??
+        (fundingGoal ? Math.round((amountRaised / fundingGoal) * 100) : 0),
+      backerCount: raw.backer_count ?? raw.backerCount ?? 0,
+      estimatedReachAtGoal: raw.estimated_reach_at_goal ?? raw.estimatedReachAtGoal ?? 0,
+      durationDays: raw.duration_days ?? raw.durationDays ?? 30,
     createdAt: raw.created_at || raw.createdAt || new Date().toISOString(),
     publishedAt: raw.published_at || raw.publishedAt,
     submittedAt: raw.submitted_at || raw.submittedAt,

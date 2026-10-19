@@ -846,6 +846,28 @@ export const seedContributions: Contribution[] = [
 
 export const seedNotifications: AppNotification[] = [
   {
+    id: 'notif-contrib-1',
+    userId: 'creator-demo',
+    type: 'contribution',
+    campaignId: 'cmp-clean-water',
+    campaignTitle: 'Clean drinking water in every public school',
+    title: 'New contribution received',
+    body: 'Ava Mitchell contributed $120 to amplify Clean drinking water in every public school.',
+    read: false,
+    createdAt: iso(NOW - 1 * 60 * 60 * 1000),
+  },
+  {
+    id: 'notif-contrib-2',
+    userId: 'creator-demo',
+    type: 'contribution',
+    campaignId: 'cmp-transit-map',
+    campaignTitle: 'Redraw the bus network around where people actually work',
+    title: 'New contribution received',
+    body: 'Mei Tanaka contributed $250 to amplify Redraw the bus network around where people actually work.',
+    read: false,
+    createdAt: iso(NOW - 3 * 60 * 60 * 1000),
+  },
+  {
     id: 'notif-1',
     userId: 'backer-demo',
     type: 'funding_milestone',

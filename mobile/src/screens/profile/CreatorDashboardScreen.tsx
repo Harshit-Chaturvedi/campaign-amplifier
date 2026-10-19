@@ -361,7 +361,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
                 <Ionicons name="document-text-outline" size={44} color={colors.inkMuted} />
                 <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink, marginTop: 12 }}>
-                  No campaigns created yet
+                  No campaigns in Drafts yet
                 </Text>
                 <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 4, marginBottom: 16 }}>
                   You don't have any in-progress campaign drafts.
@@ -421,16 +421,16 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                     })()}
                     <View style={{ flex: 1 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                        <StatusBadge status={camp.status} />
+                        <StatusBadge status={camp.status} amountRaised={camp.amountRaised} fundingGoal={camp.fundingGoal} />
                         <Text style={{ fontSize: 10, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>
                           {camp.durationDays || 30}d window
                         </Text>
                       </View>
-                      <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink }} numberOfLines={2}>
+                      <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink }} numberOfLines={2} ellipsizeMode="tail">
                         {camp.title}
                       </Text>
                       <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
-                        Est. Reach: ~{formatNumber(camp.estimatedReachAtGoal || 150000)} (Estimate)
+                        Est. reach at goal: ~{formatNumber(camp.estimatedReachAtGoal || 150000)} (Estimate)
                       </Text>
                     </View>
                   </View>
@@ -515,7 +515,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
 
                     {['distribution_preparation', 'promoting', 'completed'].includes(camp.status) && (
                       <Button
-                        title="View Distribution Report"
+                        title="Distribution Report"
                         onPress={() => navigation.navigate('Report', { campaignId: camp.id })}
                         size="sm"
                         variant="primary"
@@ -528,10 +528,10 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
                 <Ionicons name="folder-open-outline" size={44} color={colors.inkMuted} />
                 <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink, marginTop: 12 }}>
-                  No campaigns created yet
+                  No campaigns in {tabOptions.find((t) => t.key === activeTab)?.label || activeTab} yet
                 </Text>
                 <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 4, marginBottom: 16 }}>
-                  No campaigns currently match the '{activeTab.replace(/_/g, ' ')}' status filter.
+                  No campaigns currently match the '{tabOptions.find((t) => t.key === activeTab)?.label || activeTab}' status filter.
                 </Text>
                 <Button
                   title="Start a New Campaign"

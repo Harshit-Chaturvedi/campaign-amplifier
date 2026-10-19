@@ -146,8 +146,12 @@ export function CampaignDetailScreen({ route, navigation }: any) {
   const pct = campaign.percentFunded ?? 0;
   const displayCategory = catLabels[campaign.category] || campaign.category;
   const coverUrl = getCoverUrl(campaign);
-  const currentReachEstimate = estimateReach(campaign.amountRaised).estimate;
-  const isBackable = campaign.status === 'available_for_funding';
+  const isGoalReached = (campaign.fundingGoal > 0) && (campaign.amountRaised >= campaign.fundingGoal);
+  const effectiveStatus = (isGoalReached && (campaign.status === 'available_for_funding' || campaign.status === 'approved'))
+    ? 'goal_reached'
+    : campaign.status;
+  const isBackable = effectiveStatus === 'available_for_funding';
+  const reachAtGoal = campaign.estimatedReachAtGoal || estimateReach(campaign.fundingGoal).estimate;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -332,7 +336,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
                 {displayCategory}
               </Text>
             </View>
-            <StatusBadge status={campaign.status} size="md" />
+            <StatusBadge status={effectiveStatus} amountRaised={campaign.amountRaised} fundingGoal={campaign.fundingGoal} size="md" />
           </View>
 
           <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink, lineHeight: 30, letterSpacing: -0.2 }}>
@@ -340,7 +344,11 @@ export function CampaignDetailScreen({ route, navigation }: any) {
           </Text>
 
           {campaign.tagline && (
-            <Text style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 6, lineHeight: 21 }}>
+            <Text
+              style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 6, lineHeight: 21 }}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
               {campaign.tagline}
             </Text>
           )}
@@ -413,7 +421,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <Text style={{ fontSize: 15, fontFamily: fonts.serifBold, color: colors.ink }}>
-                  ~{formatNumber(campaign.estimatedReachAtGoal)}
+                  ~{formatNumber(reachAtGoal)}
                 </Text>
                 <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.inkMuted, letterSpacing: 0.8, textTransform: 'uppercase' }}>
                   EST. REACH @ GOAL (ESTIMATE)
@@ -454,10 +462,12 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
-                  Delivery & Analytics Report
+                  {['distribution_preparation', 'promoting', 'completed', 'goal_reached'].includes(effectiveStatus)
+                    ? 'Distribution Report'
+                    : 'Delivery & Analytics Report'}
                 </Text>
                 <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
-                  {campaign.status === 'completed' || campaign.status === 'promoting'
+                  {['distribution_preparation', 'promoting', 'completed', 'goal_reached'].includes(effectiveStatus)
                     ? 'Measured reach and itemised ad spend'
                     : 'Budget breakdown and reach projections'}
                 </Text>
@@ -687,7 +697,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
               </Text>
             </Text>
             <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkMuted, marginTop: 1 }}>
-              {pct}% funded • Est. reach: {formatNumber(currentReachEstimate)}
+              {pct}% funded • Est. reach at goal: ~{formatNumber(reachAtGoal)}
             </Text>
           </View>
 

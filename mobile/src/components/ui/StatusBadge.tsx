@@ -7,16 +7,31 @@ import { fonts, tokens } from '../../theme/tokens';
 
 interface StatusBadgeProps {
   status: CampaignStatus;
+  amountRaised?: number;
+  fundingGoal?: number;
   size?: 'sm' | 'md' | 'lg';
   showIcon?: boolean;
 }
 
 export function StatusBadge({
   status,
+  amountRaised,
+  fundingGoal,
   size = 'sm',
   showIcon = true,
 }: StatusBadgeProps) {
-  const meta = getStatusMetadata(status);
+  let effectiveStatus = status;
+  if (
+    amountRaised !== undefined &&
+    fundingGoal !== undefined &&
+    fundingGoal > 0 &&
+    amountRaised >= fundingGoal &&
+    (status === 'available_for_funding' || status === 'approved')
+  ) {
+    effectiveStatus = 'goal_reached';
+  }
+
+  const meta = getStatusMetadata(effectiveStatus);
 
   const paddingClasses =
     size === 'sm'

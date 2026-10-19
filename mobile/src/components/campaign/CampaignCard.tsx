@@ -9,6 +9,7 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { Button } from '../ui/Button';
 import { GeneratedCover } from '../ui/GeneratedCover';
 import { getCoverUrl } from '../../utils/media';
+import { estimateReach } from '../../services/reach';
 import type { Campaign } from '../../types/campaign';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -43,7 +44,12 @@ export function CampaignCard({
   const pct = campaign.percentFunded ?? 0;
   const displayCategory = catLabels[campaign.category] || campaign.category;
   const coverUrl = getCoverUrl(campaign);
-  const isBackable = campaign.status === 'available_for_funding';
+  const isGoalReached = (campaign.fundingGoal > 0) && (campaign.amountRaised >= campaign.fundingGoal);
+  const effectiveStatus = (isGoalReached && (campaign.status === 'available_for_funding' || campaign.status === 'approved'))
+    ? 'goal_reached'
+    : campaign.status;
+  const isBackable = effectiveStatus === 'available_for_funding';
+  const reachAtGoal = campaign.estimatedReachAtGoal || estimateReach(campaign.fundingGoal).estimate;
   const [imageError, setImageError] = useState(false);
 
   // Compact variant
@@ -99,7 +105,7 @@ export function CampaignCard({
             >
               {campaign.title}
             </Text>
-            <StatusBadge status={campaign.status} size="sm" showIcon={false} />
+            <StatusBadge status={effectiveStatus} amountRaised={campaign.amountRaised} fundingGoal={campaign.fundingGoal} size="sm" showIcon={false} />
           </View>
           <Text
             style={{
@@ -180,7 +186,7 @@ export function CampaignCard({
             </Text>
           </View>
           <View style={{ position: 'absolute', top: 8, right: 8 }}>
-            <StatusBadge status={campaign.status} size="sm" />
+            <StatusBadge status={effectiveStatus} amountRaised={campaign.amountRaised} fundingGoal={campaign.fundingGoal} size="sm" />
           </View>
         </View>
 
@@ -205,7 +211,8 @@ export function CampaignCard({
               marginBottom: 10,
               lineHeight: 16,
             }}
-            numberOfLines={1}
+            numberOfLines={2}
+            ellipsizeMode="tail"
           >
             {campaign.summary || campaign.tagline}
           </Text>
@@ -284,7 +291,7 @@ export function CampaignCard({
             }}
           >
             <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
-              Est. reach: <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>{formatNumber(campaign.estimatedReachAtGoal)}</Text>
+              Est. reach at goal: <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>~{formatNumber(reachAtGoal)}</Text>
             </Text>
             <DemoDataBadge size="sm" />
           </View>
@@ -358,7 +365,7 @@ export function CampaignCard({
         </View>
 
         <View style={{ position: 'absolute', top: 10, right: 10 }}>
-          <StatusBadge status={campaign.status} size="sm" />
+          <StatusBadge status={effectiveStatus} amountRaised={campaign.amountRaised} fundingGoal={campaign.fundingGoal} size="sm" />
         </View>
       </View>
 
@@ -397,6 +404,7 @@ export function CampaignCard({
             marginBottom: 14,
           }}
           numberOfLines={2}
+          ellipsizeMode="tail"
         >
           {campaign.summary || campaign.tagline}
         </Text>
@@ -484,7 +492,7 @@ export function CampaignCard({
           }}
         >
           <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
-            Est. reach: <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>{formatNumber(campaign.estimatedReachAtGoal)} people</Text>
+            Est. reach at goal: <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>~{formatNumber(reachAtGoal)}</Text>
           </Text>
           <DemoDataBadge size="sm" />
         </View>
