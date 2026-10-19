@@ -205,7 +205,7 @@ async function fetchWithTimeout(
           signal: controller.signal,
         });
         clearTimeout(id);
-        if (response.status === 401) {
+        if (response.status === 401 && token) {
           useAuthStore.getState().logout();
           navigateToLogin('Please sign in again');
         }

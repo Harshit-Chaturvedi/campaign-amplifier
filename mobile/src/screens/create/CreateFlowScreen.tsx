@@ -408,6 +408,7 @@ export function CreateFlowScreen({ route, navigation }: any) {
                 }
               />
               <Text
+                accessibilityLabel="autosave-status"
                 style={{
                   fontSize: 11,
                   fontFamily: fonts.sansMedium,
@@ -422,12 +423,12 @@ export function CreateFlowScreen({ route, navigation }: any) {
                 }}
               >
                 {saveStatus === 'synced'
-                  ? 'Saved'
+                  ? 'All changes synced'
                   : saveStatus === 'saving'
                   ? 'Saving…'
                   : saveStatus === 'error'
                   ? "Couldn't sync, retrying"
-                  : 'Saved'}
+                  : 'Saved on this device'}
               </Text>
             </View>
           </View>
