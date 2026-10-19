@@ -30,10 +30,22 @@ TRANSITION_RULES = {
         "roles": ["reviewer", "admin"],
         "desc": "Reject submission that fails community guidelines or ad policies",
     },
-    # 3. Creator resubmits after requested changes
+    # 3. Creator revisions and re-reviews
     ("changes_requested", "submitted"): {
         "roles": ["creator", "admin"],
         "desc": "Resubmit revised campaign for review",
+    },
+    ("available_for_funding", "draft"): {
+        "roles": ["creator", "admin"],
+        "desc": "Creator paused campaign to draft revisions for re-review",
+    },
+    ("approved", "draft"): {
+        "roles": ["creator", "admin"],
+        "desc": "Creator paused approved campaign to draft revisions",
+    },
+    ("available_for_funding", "changes_requested"): {
+        "roles": ["creator", "reviewer", "admin"],
+        "desc": "Revisions initiated on active campaign for editorial re-review",
     },
     # 4. Publishing approved campaign for funding
     ("approved", "available_for_funding"): {

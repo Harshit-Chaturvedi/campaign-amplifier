@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Campaign, Report, User
+from app.models import Campaign, Report, User, Contribution, Notification, Follow, Save
 from app.schemas import (
     CampaignPublic, ModerationNoteRequest, SimulateDeliveryRequest, ReportResponse
 )
@@ -229,3 +229,25 @@ def complete_campaign(
         db.commit()
 
     return {"status": "ok", "campaign_status": campaign.status}
+ 
+@router.delete("/campaigns/{id}")
+def delete_campaign(
+    id: str,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    campaign = db.query(Campaign).filter(Campaign.id == id).first()
+    if not campaign:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found")
+
+    # Delete contributions associated with this campaign
+    db.query(Contribution).filter(Contribution.campaign_id == id).delete()
+    # Delete notifications referencing this campaign
+    db.query(Notification).filter(Notification.campaign_id == id).delete()
+    # Delete follows and saves
+    db.query(Follow).filter(Follow.campaign_id == id).delete()
+    db.query(Save).filter(Save.campaign_id == id).delete()
+
+    db.delete(campaign)
+    db.commit()
+    return {"status": "ok", "deleted_id": id}
