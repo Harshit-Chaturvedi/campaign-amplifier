@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, ViewStyle, StyleProp, StyleSheet } from 'react-native';
+import { tokens } from '../../theme/tokens';
 
 interface CardProps {
   children: React.ReactNode;
@@ -10,16 +11,8 @@ interface CardProps {
 
 export function Card({ children, style, onPress, padding = 16 }: CardProps) {
   const baseStyle: ViewStyle = {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
+    ...tokens.card,
     padding,
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
     ...StyleSheet.flatten(style),
   };
 

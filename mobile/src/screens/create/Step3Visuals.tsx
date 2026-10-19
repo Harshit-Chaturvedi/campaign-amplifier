@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -13,10 +12,19 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
+import {
   FeedPlacementPreview,
   VerticalStoryPlacementPreview,
   TextOnlyPlacementPreview,
 } from '../../components/campaign/PlacementPreviews';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface Step3VisualsProps {
   draft: any;
@@ -70,35 +78,35 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
   const hasDescription = Boolean(adDescription.trim());
 
   return (
-    <View style={{ gap: 20 }}>
+    <View style={{ gap: tokens.spacing.lg }}>
       {/* 1. Missing Assets Warnings */}
       {(!hasCoverOrAdImage || !hasHeadline || !hasDescription) && (
         <Card
           style={{
-            padding: 14,
-            backgroundColor: '#fffbeb',
+            padding: tokens.spacing.md,
+            backgroundColor: colors.warningFaint,
             borderWidth: 1,
-            borderColor: '#fef3c7',
+            borderColor: colors.border,
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-            <Ionicons name="warning-outline" size={18} color="#b45309" style={{ marginRight: 6 }} />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#92400e' }}>
+            <Ionicons name="warning-outline" size={16} color={colors.warning} style={{ marginRight: 6 }} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.warning }}>
               Missing Creative Assets
             </Text>
           </View>
-          <Text style={{ fontSize: 12, color: '#78350f', lineHeight: 17 }}>
+          <BodyText style={{ fontSize: 12, color: colors.warning, lineHeight: 17 }}>
             For optimal ad performance across social feeds, ensure you provide:
-          </Text>
+          </BodyText>
           <View style={{ marginTop: 4, gap: 2 }}>
             {!hasCoverOrAdImage && (
-              <Text style={{ fontSize: 12, color: '#b45309' }}>• At least one ad or cover image</Text>
+              <MetaLabel style={{ color: colors.warning }}>• At least one ad or cover image</MetaLabel>
             )}
             {!hasHeadline && (
-              <Text style={{ fontSize: 12, color: '#b45309' }}>• An ad headline</Text>
+              <MetaLabel style={{ color: colors.warning }}>• An ad headline</MetaLabel>
             )}
             {!hasDescription && (
-              <Text style={{ fontSize: 12, color: '#b45309' }}>• A short ad primary description</Text>
+              <MetaLabel style={{ color: colors.warning }}>• A short ad primary description</MetaLabel>
             )}
           </View>
         </Card>
@@ -106,7 +114,7 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
 
       {/* 2. Ad Headline & Copy */}
       <View>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 6 }}>
           Ad Headline
         </Text>
         <Input
@@ -119,7 +127,7 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
       </View>
 
       <View>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 6 }}>
           Ad Primary Text / Description
         </Text>
         <Input
@@ -135,7 +143,7 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
       </View>
 
       <View>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 6 }}>
           Call To Action (CTA) Button
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -147,16 +155,18 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
                 onPress={() => onChange({ cta: txt })}
                 style={{
                   paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 8,
-                  backgroundColor: isSelected ? '#4f46e5' : '#f1f5f9',
+                  paddingVertical: 7,
+                  borderRadius: tokens.radius.xs,
+                  borderWidth: 1,
+                  borderColor: isSelected ? colors.accent : colors.hairline,
+                  backgroundColor: isSelected ? colors.surface : colors.paperSecondary,
                 }}
               >
                 <Text
                   style={{
                     fontSize: 13,
-                    fontWeight: isSelected ? '700' : '500',
-                    color: isSelected ? '#fff' : '#334155',
+                    fontFamily: isSelected ? fonts.sansSemiBold : fonts.sansRegular,
+                    color: isSelected ? colors.accent : colors.ink,
                   }}
                 >
                   {txt}
@@ -170,37 +180,39 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
       {/* 3. Ad Images (Multiple) */}
       <View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
             Ad Creative Images ({adImages.length})
           </Text>
           <TouchableOpacity
             onPress={handlePickAdImage}
             style={{ flexDirection: 'row', alignItems: 'center' }}
           >
-            <Ionicons name="add-circle" size={16} color="#4f46e5" style={{ marginRight: 4 }} />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#4f46e5' }}>Add Image</Text>
+            <Ionicons name="add-circle-outline" size={15} color={colors.accent} style={{ marginRight: 4 }} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.accent }}>Add Image</Text>
           </TouchableOpacity>
         </View>
-        <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 10 }}>
+        <MetaLabel style={{ marginBottom: 10 }}>
           Upload high-contrast documentary photos. Multiple images rotate automatically in split testing.
-        </Text>
+        </MetaLabel>
 
         {adImages.length === 0 ? (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Add Ad Creatives from Photo Library"
             onPress={handlePickAdImage}
             style={{
               height: 100,
-              borderRadius: 14,
-              borderWidth: 1.5,
+              borderRadius: tokens.radius.md,
+              borderWidth: 1,
               borderStyle: 'dashed',
-              borderColor: '#cbd5e1',
-              backgroundColor: '#f8fafc',
+              borderColor: colors.hairlineDark,
+              backgroundColor: colors.paperSecondary,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="images-outline" size={28} color="#64748b" />
-            <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginTop: 4 }}>
+            <Ionicons name="images-outline" size={26} color={colors.mutedInk} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink, marginTop: 4 }}>
               Add Ad Creatives from Photo Library
             </Text>
           </TouchableOpacity>
@@ -212,11 +224,11 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
                 style={{
                   width: 100,
                   height: 100,
-                  borderRadius: 12,
+                  borderRadius: tokens.radius.sm,
                   overflow: 'hidden',
                   position: 'relative',
                   borderWidth: 1,
-                  borderColor: '#e2e8f0',
+                  borderColor: colors.hairline,
                 }}
               >
                 <Image source={{ uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
@@ -228,7 +240,7 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
                     position: 'absolute',
                     top: 4,
                     right: 4,
-                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    backgroundColor: 'rgba(22, 19, 15, 0.7)',
                     width: 22,
                     height: 22,
                     borderRadius: 11,
@@ -247,11 +259,11 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
       {/* 4. Video Row (Clear label, not a dead button) */}
       <View
         style={{
-          backgroundColor: '#f8fafc',
-          borderRadius: 14,
-          padding: 14,
+          backgroundColor: colors.paperSecondary,
+          borderRadius: tokens.radius.sm,
+          padding: tokens.spacing.md,
           borderWidth: 1,
-          borderColor: '#e2e8f0',
+          borderColor: colors.hairline,
           flexDirection: 'row',
           alignItems: 'center',
         }}
@@ -260,42 +272,46 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
           style={{
             width: 36,
             height: 36,
-            borderRadius: 10,
-            backgroundColor: '#e2e8f0',
+            borderRadius: tokens.radius.xs,
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             alignItems: 'center',
             justifyContent: 'center',
             marginRight: 12,
           }}
         >
-          <Ionicons name="videocam-off-outline" size={20} color="#64748b" />
+          <Ionicons name="videocam-off-outline" size={18} color={colors.mutedInk} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 13, fontWeight: '700', color: '#475569' }}>
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
             Video Creatives
           </Text>
-          <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+          <MetaLabel style={{ marginTop: 2 }}>
             Video creatives are not supported in this prototype. High-resolution photos are used for all placements.
-          </Text>
+          </MetaLabel>
         </View>
       </View>
 
       {/* 5. Placement Previews Tabs */}
       <View style={{ marginTop: 6 }}>
-        <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a', marginBottom: 6 }}>
+        <Headline style={{ fontSize: 18, color: colors.ink, marginBottom: 4 }}>
           Audience Placement Previews
-        </Text>
-        <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+        </Headline>
+        <MetaLabel style={{ marginBottom: 12 }}>
           Preview how your message will appear to targeted residents across different digital channels.
-        </Text>
+        </MetaLabel>
 
         {/* Tab Selector */}
         <View
           style={{
             flexDirection: 'row',
-            backgroundColor: '#f1f5f9',
-            borderRadius: 10,
-            padding: 4,
-            marginBottom: 14,
+            backgroundColor: colors.paperSecondary,
+            borderRadius: tokens.radius.sm,
+            borderWidth: 1,
+            borderColor: colors.hairline,
+            padding: 3,
+            marginBottom: tokens.spacing.md,
           }}
         >
           {[
@@ -310,17 +326,19 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
                 onPress={() => setActivePlacementTab(tab.key as any)}
                 style={{
                   flex: 1,
-                  paddingVertical: 8,
-                  borderRadius: 8,
-                  backgroundColor: isSelected ? '#fff' : 'transparent',
+                  paddingVertical: 7,
+                  borderRadius: tokens.radius.xs,
+                  backgroundColor: isSelected ? colors.surface : 'transparent',
+                  borderWidth: isSelected ? 1 : 0,
+                  borderColor: colors.hairline,
                   alignItems: 'center',
                 }}
               >
                 <Text
                   style={{
                     fontSize: 12,
-                    fontWeight: isSelected ? '700' : '500',
-                    color: isSelected ? '#0f172a' : '#64748b',
+                    fontFamily: isSelected ? fonts.sansSemiBold : fonts.sansRegular,
+                    color: isSelected ? colors.ink : colors.mutedInk,
                   }}
                 >
                   {tab.label}
@@ -361,34 +379,34 @@ export function Step3Visuals({ draft, onChange }: Step3VisualsProps) {
       </View>
 
       {/* 6. Creative Quality Feedback Prompt */}
-      <Card style={{ padding: 14, backgroundColor: '#f0fdf4', borderWidth: 1, borderColor: '#bbf7d0' }}>
+      <Card style={{ padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Ionicons name="sparkles-outline" size={16} color="#16a34a" />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#166534' }}>
+            <Ionicons name="sparkles-outline" size={16} color={colors.positive} />
+            <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
               Creative Quality Checklist
-            </Text>
+            </SmallCapsLabel>
           </View>
           <TouchableOpacity onPress={() => setFeedbackPromptVisible(!feedbackPromptVisible)}>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#16a34a' }}>
-              {feedbackPromptVisible ? 'Hide' : 'Inspect'}
-            </Text>
+            <SmallCapsLabel style={{ color: colors.accent }}>
+              {feedbackPromptVisible ? 'HIDE' : 'INSPECT'}
+            </SmallCapsLabel>
           </TouchableOpacity>
         </View>
 
         {feedbackPromptVisible && (
-          <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#dcfce7', gap: 6 }}>
+          <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.hairline, gap: 6 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name={hasHeadline ? 'checkmark-circle' : 'close-circle'} size={16} color={hasHeadline ? '#22c55e' : '#ef4444'} />
-              <Text style={{ fontSize: 12, color: '#166534' }}>Headline is under 60 characters and evidence-grounded</Text>
+              <Ionicons name={hasHeadline ? 'checkmark-circle-outline' : 'close-circle-outline'} size={15} color={hasHeadline ? colors.positive : colors.danger} />
+              <BodyText style={{ fontSize: 12, color: colors.mutedInk }}>Headline is under 60 characters and evidence-grounded</BodyText>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name={hasCoverOrAdImage ? 'checkmark-circle' : 'close-circle'} size={16} color={hasCoverOrAdImage ? '#22c55e' : '#ef4444'} />
-              <Text style={{ fontSize: 12, color: '#166534' }}>Documentary photo is attached without artificial text burn-ins</Text>
+              <Ionicons name={hasCoverOrAdImage ? 'checkmark-circle-outline' : 'close-circle-outline'} size={15} color={hasCoverOrAdImage ? colors.positive : colors.danger} />
+              <BodyText style={{ fontSize: 12, color: colors.mutedInk }}>Documentary photo is attached without artificial text burn-ins</BodyText>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name={hasDescription ? 'checkmark-circle' : 'close-circle'} size={16} color={hasDescription ? '#22c55e' : '#ef4444'} />
-              <Text style={{ fontSize: 12, color: '#166534' }}>Ad description invites the reader to inspect the citations</Text>
+              <Ionicons name={hasDescription ? 'checkmark-circle-outline' : 'close-circle-outline'} size={15} color={hasDescription ? colors.positive : colors.danger} />
+              <BodyText style={{ fontSize: 12, color: colors.mutedInk }}>Ad description invites the reader to inspect the citations</BodyText>
             </View>
           </View>
         )}

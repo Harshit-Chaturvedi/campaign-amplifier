@@ -13,11 +13,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCampaigns, useFeaturedCampaigns } from '../../api/hooks';
 import { useServerStatusStore } from '../../api/client';
 import { CampaignCard } from '../../components/campaign/CampaignCard';
+import { AmplificationNotice } from '../../components/campaign/AmplificationNotice';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { estimateReachPerDollar } from '../../services/reach';
 import { CampaignCardSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { Button } from '../../components/ui/Button';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 export function HomeScreen({ navigation }: any) {
   const {
@@ -41,42 +43,62 @@ export function HomeScreen({ navigation }: any) {
     navigation.navigate('FundCampaign', { campaignId: id });
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Top Header */}
+      {/* Editorial Masthead / Header */}
       <View
         style={{
           paddingTop: 52,
-          paddingBottom: 14,
+          paddingBottom: 12,
           paddingHorizontal: 20,
-          backgroundColor: '#fff',
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.border,
         }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View>
-            <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>
+            <Text
+              style={{
+                fontSize: 22,
+                fontFamily: fonts.serifBold,
+                color: colors.ink,
+                letterSpacing: -0.3,
+              }}
+            >
               Campaign Amplifier
             </Text>
-            <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>
-              Community-funded advertising for important messages
+            <Text
+              style={{
+                fontSize: 10,
+                fontFamily: fonts.sansBold,
+                color: colors.inkMuted,
+                letterSpacing: 0.9,
+                textTransform: 'uppercase',
+                marginTop: 2,
+              }}
+            >
+              Community-Funded Message Distribution
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => navigation.navigate('ActivityTab')}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: '#f1f5f9',
+              width: 38,
+              height: 38,
+              borderRadius: tokens.radii.xs,
+              backgroundColor: colors.surfaceSecondary,
+              borderWidth: 1,
+              borderColor: colors.border,
               alignItems: 'center',
               justifyContent: 'center',
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Notifications"
           >
-            <Ionicons name="notifications-outline" size={20} color="#64748b" />
+            <Ionicons name="notifications-outline" size={19} color={colors.ink} />
           </TouchableOpacity>
         </View>
 
@@ -87,17 +109,17 @@ export function HomeScreen({ navigation }: any) {
               marginTop: 10,
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: '#eef2ff',
-              borderColor: '#c7d2fe',
+              backgroundColor: colors.surfaceSecondary,
+              borderColor: colors.border,
               borderWidth: 1,
-              borderRadius: 10,
+              borderRadius: tokens.radii.xs,
               paddingVertical: 8,
               paddingHorizontal: 12,
             }}
           >
-            <ActivityIndicator size="small" color="#4f46e5" style={{ marginRight: 8 }} />
-            <Text style={{ fontSize: 12, color: '#3730a3', fontWeight: '600', flex: 1 }}>
-              Waking up the server... (Free-tier cold start may take up to 50s)
+            <ActivityIndicator size="small" color={colors.accent} style={{ marginRight: 8 }} />
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.ink, flex: 1 }}>
+              Connecting to server... (Free-tier cold start may take a moment)
             </Text>
           </View>
         )}
@@ -109,16 +131,16 @@ export function HomeScreen({ navigation }: any) {
               marginTop: 10,
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: '#fffbeb',
-              borderColor: '#fef3c7',
+              backgroundColor: colors.warningFaint,
+              borderColor: colors.warning,
               borderWidth: 1,
-              borderRadius: 10,
+              borderRadius: tokens.radii.xs,
               paddingVertical: 6,
               paddingHorizontal: 10,
             }}
           >
-            <Ionicons name="cloud-offline-outline" size={15} color="#b45309" style={{ marginRight: 6 }} />
-            <Text style={{ fontSize: 12, color: '#92400e', fontWeight: '500', flex: 1 }}>
+            <Ionicons name="cloud-offline-outline" size={15} color={colors.warning} style={{ marginRight: 6 }} />
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.warning, flex: 1 }}>
               Offline demo data active — bundled prototype campaigns
             </Text>
           </View>
@@ -128,106 +150,124 @@ export function HomeScreen({ navigation }: any) {
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); }} tintColor="#4f46e5" />
+          <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); }} tintColor={colors.accent} />
         }
       >
-        {/* Core Hero Section */}
+        {/* Core First Screen / Broadside Hero (Requirement 5) */}
         <View
           style={{
             marginHorizontal: 16,
             marginTop: 16,
-            backgroundColor: '#1e1b4b',
-            borderRadius: 22,
-            padding: 22,
-            shadowColor: '#1e1b4b',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 10,
-            elevation: 5,
+            backgroundColor: colors.surface,
+            borderRadius: tokens.radii.md,
+            borderWidth: 1,
+            borderColor: colors.border,
+            padding: 20,
           }}
         >
+          {/* Dateline / Topic Tag */}
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 12,
+              marginBottom: 10,
             }}
           >
-            <View
+            <Text
               style={{
-                backgroundColor: 'rgba(255,255,255,0.15)',
-                borderRadius: 20,
-                paddingHorizontal: 10,
-                paddingVertical: 4,
+                fontSize: 10,
+                fontFamily: fonts.sansBold,
+                color: colors.accent,
+                letterSpacing: 0.9,
+                textTransform: 'uppercase',
               }}
             >
-              <Text style={{ fontSize: 11, fontWeight: '700', color: '#c7d2fe', letterSpacing: 0.3 }}>
-                COMMUNITY-FUNDED REACH
-              </Text>
-            </View>
+              COMMUNITY-FUNDED REACH
+            </Text>
             <DemoDataBadge size="sm" />
           </View>
 
-          <Text style={{ fontSize: 22, fontWeight: '800', color: '#ffffff', lineHeight: 28 }}>
-            Help important messages travel beyond their networks
-          </Text>
-          <Text style={{ fontSize: 13, color: '#c7d2fe', marginTop: 8, lineHeight: 19 }}>
-            Contributions pool to pay for digital advertising that spreads the message to audiences beyond the creator's network. It is not a donation to causes.
+          {/* One Clear Serif Headline Stating the Idea */}
+          <Text
+            style={{
+              fontSize: 24,
+              fontFamily: fonts.serifBold,
+              color: colors.ink,
+              lineHeight: 30,
+              letterSpacing: -0.2,
+            }}
+          >
+            Help Important Messages Travel Beyond Their Network
           </Text>
 
-          {/* Illustrative Reach per Dollar */}
+          {/* One Sentence Explanation */}
+          <Text
+            style={{
+              fontSize: 14,
+              fontFamily: fonts.sansRegular,
+              color: colors.inkSecondary,
+              marginTop: 8,
+              lineHeight: 21,
+            }}
+          >
+            Contributions pool to pay for digital advertising that spreads checkable messages to audiences and decision-makers.
+          </Text>
+
+          {/* Newspaper Graphic Hero Numbers Box */}
           <View
             style={{
-              backgroundColor: 'rgba(255,255,255,0.08)',
-              borderRadius: 12,
-              padding: 12,
+              backgroundColor: colors.surfaceSecondary,
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: tokens.radii.xs,
+              padding: 14,
               marginTop: 14,
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="flash-outline" size={16} color="#818cf8" style={{ marginRight: 6 }} />
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#e0e7ff', flex: 1 }}>
-                Estimated reach: about {reachPerDollar} people per $1
+            <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
+              <Text style={{ fontSize: 28, fontFamily: fonts.serifBold, color: colors.ink }}>
+                ~{reachPerDollar}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontFamily: fonts.sansBold,
+                  color: colors.inkMuted,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                  marginLeft: 8,
+                }}
+              >
+                PEOPLE REACHED PER $1 (ESTIMATE)
               </Text>
             </View>
-            <Text style={{ fontSize: 11, color: '#a5b4fc', marginTop: 4 }}>
+            <Text
+              style={{
+                fontSize: 11,
+                fontFamily: fonts.sansRegular,
+                color: colors.inkSecondary,
+                marginTop: 4,
+              }}
+            >
               Estimate based on demo assumptions, not a guarantee.
             </Text>
           </View>
 
-          {/* Dual CTAs - Stacked to guarantee no text wrapping on 360px widths */}
-          <View style={{ marginTop: 18, gap: 10 }}>
+          {/* Amplification-Not-Donation Notice */}
+          <View style={{ marginTop: 14 }}>
+            <AmplificationNotice compact />
+          </View>
+
+          {/* One Primary CTA */}
+          <View style={{ marginTop: 16 }}>
             <Button
-              title="Explore Campaigns"
-              size="md"
+              title="Explore Active Campaigns"
+              size="lg"
               variant="primary"
-              icon="compass-outline"
               onPress={() => navigation.navigate('ExploreTab')}
               fullWidth
             />
-            <TouchableOpacity
-              onPress={() => navigation.navigate('CreateTab')}
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.14)',
-                borderWidth: 1,
-                borderColor: 'rgba(255,255,255,0.25)',
-                minHeight: 48,
-                paddingHorizontal: 16,
-                borderRadius: 14,
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'row',
-                width: '100%',
-              }}
-              accessibilityRole="button"
-              accessibilityLabel="Start a Campaign"
-            >
-              <Ionicons name="add-circle-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>
-                Start a Campaign
-              </Text>
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -238,21 +278,21 @@ export function HomeScreen({ navigation }: any) {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-                alignItems: 'center',
+                alignItems: 'baseline',
                 paddingHorizontal: 20,
                 marginBottom: 12,
               }}
             >
               <View>
-                <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
+                <Text style={{ fontSize: 19, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                   Featured Campaigns
                 </Text>
-                <Text style={{ fontSize: 12, color: '#64748b', marginTop: 1 }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 1 }}>
                   Curated messages ready for community reach
                 </Text>
               </View>
               <TouchableOpacity onPress={() => navigation.navigate('ExploreTab')}>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#4f46e5' }}>See All</Text>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.accent }}>See All</Text>
               </TouchableOpacity>
             </View>
 
@@ -274,77 +314,74 @@ export function HomeScreen({ navigation }: any) {
           </View>
         )}
 
-        {/* How It Works: Create -> Review -> Amplify */}
+        {/* How It Works: Create -> Review -> Amplify (Editorial Cards) */}
         <View style={{ marginTop: 26, paddingHorizontal: 20 }}>
-          <View style={{ marginBottom: 14 }}>
-            <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
+          <View style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 19, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
               How It Works
             </Text>
-            <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>
-              A clear sequence from message to reach
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 1 }}>
+              A clear sequence from message to public reach
             </Text>
           </View>
 
           <View style={{ flexDirection: 'row', gap: 10 }}>
             {[
               {
-                step: '1',
-                title: 'Create',
-                desc: 'Write the message, link sources, and define the audience.',
-                icon: 'create-outline',
-                color: '#4f46e5',
-                bg: '#eef2ff',
+                num: '01',
+                title: 'Draft',
+                desc: 'Write the message, link checkable sources, and set an audience.',
               },
               {
-                step: '2',
+                num: '02',
                 title: 'Review',
-                desc: 'Our team reviews content and creative before funding.',
-                icon: 'shield-checkmark-outline',
-                color: '#0284c7',
-                bg: '#e0f2fe',
+                desc: 'Claims and creative are checked before funding opens.',
               },
               {
-                step: '3',
+                num: '03',
                 title: 'Amplify',
-                desc: 'Backers pool funds to pay for ad distribution.',
-                icon: 'megaphone-outline',
-                color: '#16a34a',
-                bg: '#dcfce7',
+                desc: 'Backers pool funds to pay for verified digital ads.',
               },
             ].map((card) => (
               <View
-                key={card.step}
+                key={card.num}
                 style={{
                   flex: 1,
-                  backgroundColor: '#fff',
-                  borderRadius: 16,
-                  padding: 14,
+                  backgroundColor: colors.surface,
+                  borderRadius: tokens.radii.sm,
+                  padding: 12,
                   borderWidth: 1,
-                  borderColor: '#f1f5f9',
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.03,
-                  shadowRadius: 3,
-                  elevation: 1,
+                  borderColor: colors.border,
                 }}
               >
-                <View
+                <Text
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    backgroundColor: card.bg,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 10,
+                    fontSize: 16,
+                    fontFamily: fonts.serifBold,
+                    color: colors.inkMuted,
+                    marginBottom: 4,
                   }}
                 >
-                  <Ionicons name={card.icon as any} size={20} color={card.color} />
-                </View>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 4 }}>
+                  {card.num}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontFamily: fonts.sansSemiBold,
+                    color: colors.ink,
+                    marginBottom: 4,
+                  }}
+                >
                   {card.title}
                 </Text>
-                <Text style={{ fontSize: 11, color: '#64748b', lineHeight: 15 }}>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    fontFamily: fonts.sansRegular,
+                    color: colors.inkSecondary,
+                    lineHeight: 15,
+                  }}
+                >
                   {card.desc}
                 </Text>
               </View>
@@ -352,26 +389,26 @@ export function HomeScreen({ navigation }: any) {
           </View>
         </View>
 
-        {/* Campaign Feed */}
+        {/* Active Campaigns Feed */}
         <View style={{ marginTop: 28, paddingHorizontal: 20, paddingBottom: 40 }}>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              alignItems: 'center',
+              alignItems: 'baseline',
               marginBottom: 14,
             }}
           >
             <View>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
+              <Text style={{ fontSize: 19, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                 Active Campaigns
               </Text>
-              <Text style={{ fontSize: 12, color: '#64748b', marginTop: 1 }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 1 }}>
                 Community-funded amplification in progress
               </Text>
             </View>
             <TouchableOpacity onPress={() => navigation.navigate('ExploreTab')}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#4f46e5' }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.accent }}>
                 Filter & Search
               </Text>
             </TouchableOpacity>
@@ -412,17 +449,23 @@ export function HomeScreen({ navigation }: any) {
               marginTop: 30,
               paddingTop: 24,
               borderTopWidth: 1,
-              borderTopColor: '#e2e8f0',
+              borderTopColor: colors.border,
               alignItems: 'center',
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-              <Ionicons name="megaphone" size={16} color="#4f46e5" style={{ marginRight: 6 }} />
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#0f172a' }}>
-                Campaign Amplifier
-              </Text>
-            </View>
-            <Text style={{ fontSize: 11, color: '#64748b', textAlign: 'center', marginBottom: 14, paddingHorizontal: 20 }}>
+            <Text style={{ fontSize: 13, fontFamily: fonts.serifBold, color: colors.ink, marginBottom: 4 }}>
+              Campaign Amplifier
+            </Text>
+            <Text
+              style={{
+                fontSize: 11,
+                fontFamily: fonts.sansRegular,
+                color: colors.inkSecondary,
+                textAlign: 'center',
+                marginBottom: 14,
+                paddingHorizontal: 20,
+              }}
+            >
               Civic message distribution infrastructure. Micro-contributions pool to fund digital ads for checkable messages.
             </Text>
 
@@ -448,14 +491,14 @@ export function HomeScreen({ navigation }: any) {
                   onPress={() => navigation.navigate('InfoPage', { slug: item.slug })}
                   style={{ paddingVertical: 4, paddingHorizontal: 6 }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#4f46e5' }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.accent }}>
                     {item.title}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text style={{ fontSize: 11, color: '#94a3b8' }}>
+            <Text style={{ fontSize: 10, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>
               © 2026 Campaign Amplifier • Demo Environment
             </Text>
           </View>

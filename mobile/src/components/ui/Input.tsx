@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TextInputProps } from 'react-native';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -11,32 +12,36 @@ export function Input({ label, error, helper, ...props }: InputProps) {
   const [focused, setFocused] = useState(false);
 
   return (
-    <View style={{ marginBottom: 16 }}>
+    <View style={{ marginBottom: tokens.spacing.md }}>
       {label && (
-        <Text style={{ fontSize: 14, fontWeight: '500', color: '#334155', marginBottom: 6 }}>
+        <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 5 }}>
           {label}
         </Text>
       )}
       <TextInput
         accessibilityLabel={props.accessibilityLabel || label}
-        placeholderTextColor="#94a3b8"
+        placeholderTextColor={colors.secondaryCaption}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        style={{
-          backgroundColor: '#fff',
-          borderWidth: 1.5,
-          borderColor: error ? '#ef4444' : focused ? '#4f46e5' : '#e2e8f0',
-          borderRadius: 12,
-          paddingHorizontal: 16,
-          paddingVertical: 14,
-          fontSize: 15,
-          color: '#0f172a',
-        }}
+        style={[
+          {
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: error ? colors.danger : focused ? colors.accent : colors.hairline,
+            borderRadius: tokens.radius.sm,
+            paddingHorizontal: 14,
+            paddingVertical: 12,
+            fontSize: 15,
+            fontFamily: fonts.sansRegular,
+            color: colors.ink,
+          },
+          props.style,
+        ]}
         {...props}
       />
-      {error && <Text style={{ fontSize: 13, color: '#ef4444', marginTop: 4 }}>{error}</Text>}
+      {error && <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.danger, marginTop: 4 }}>{error}</Text>}
       {helper && !error && (
-        <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>{helper}</Text>
+        <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.mutedInk, marginTop: 4 }}>{helper}</Text>
       )}
     </View>
   );

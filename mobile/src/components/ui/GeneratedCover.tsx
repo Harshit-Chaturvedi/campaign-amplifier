@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { getCategoryColor } from '../../theme/colors';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface GeneratedCoverProps {
   category: string;
@@ -27,9 +28,8 @@ export function GeneratedCover({
   category,
   title,
   height = '100%',
-  iconSize = 44,
+  iconSize = 32,
 }: GeneratedCoverProps) {
-  const baseColor = getCategoryColor(category);
   const iconName = CATEGORY_ICONS[category] || 'megaphone-outline';
 
   return (
@@ -38,32 +38,27 @@ export function GeneratedCover({
         styles.container,
         {
           height: height as any,
-          backgroundColor: '#0f172a', // Deep dark slate container
+          backgroundColor: colors.paperSecondary,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.hairline,
         },
       ]}
     >
-      {/* Decorative gradient-like accent block */}
-      <View
-        style={[
-          styles.accentGlow,
-          {
-            backgroundColor: baseColor,
-            opacity: 0.22,
-          },
-        ]}
-      />
-
       <View style={styles.content}>
         <View
-          style={[
-            styles.iconCircle,
-            {
-              backgroundColor: baseColor + '25',
-              borderColor: baseColor + '50',
-            },
-          ]}
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: tokens.radius.xs,
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: colors.hairline,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 8,
+          }}
         >
-          <Ionicons name={iconName} size={iconSize} color={baseColor} />
+          <Ionicons name={iconName} size={iconSize} color={colors.accent} />
         </View>
 
         {title ? (
@@ -75,8 +70,8 @@ export function GeneratedCover({
           </Text>
         ) : null}
 
-        <View style={[styles.categoryPill, { backgroundColor: baseColor + '20' }]}>
-          <Text style={[styles.categoryText, { color: baseColor }]}>
+        <View style={styles.categoryPill}>
+          <Text style={styles.categoryText}>
             {category.replace('_', ' ').toUpperCase()}
           </Text>
         </View>
@@ -93,45 +88,32 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
   },
-  accentGlow: {
-    position: 'absolute',
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    top: -50,
-    right: -50,
-  },
   content: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
     zIndex: 2,
   },
-  iconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    marginBottom: 10,
-  },
   title: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#f8fafc',
+    fontFamily: fonts.serifBold,
+    color: colors.ink,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
     maxWidth: 280,
   },
   categoryPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: tokens.radius.xs,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.hairline,
   },
   categoryText: {
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontSize: 9,
+    fontFamily: fonts.sansBold,
+    letterSpacing: 0.8,
+    color: colors.mutedInk,
   },
 });

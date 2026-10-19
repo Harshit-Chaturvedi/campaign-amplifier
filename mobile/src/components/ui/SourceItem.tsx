@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Linking, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Source } from '../../types/campaign';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface SourceItemProps {
   source: Source;
@@ -27,17 +28,19 @@ export function SourceItem({ source, index, style }: SourceItemProps) {
 
   return (
     <TouchableOpacity
+      accessibilityRole="link"
+      accessibilityLabel={`Open source: ${source.title || domain || source.url}`}
       onPress={handleOpen}
       activeOpacity={0.7}
       style={[
         {
           flexDirection: 'row',
           alignItems: 'center',
-          backgroundColor: '#f8fafc',
+          backgroundColor: colors.paperSecondary,
           borderWidth: 1,
-          borderColor: '#e2e8f0',
-          borderRadius: 12,
-          padding: 12,
+          borderColor: colors.hairline,
+          borderRadius: tokens.radius.xs,
+          padding: 10,
           marginBottom: 8,
         },
         style,
@@ -45,23 +48,25 @@ export function SourceItem({ source, index, style }: SourceItemProps) {
     >
       <View
         style={{
-          width: 32,
-          height: 32,
-          borderRadius: 8,
-          backgroundColor: '#eef2ff',
+          width: 30,
+          height: 30,
+          borderRadius: tokens.radius.xs,
+          backgroundColor: colors.surface,
+          borderWidth: 1,
+          borderColor: colors.hairline,
           alignItems: 'center',
           justifyContent: 'center',
           marginRight: 10,
         }}
       >
-        <Ionicons name="document-text-outline" size={18} color="#4f46e5" />
+        <Ionicons name="document-text-outline" size={15} color={colors.accent} />
       </View>
       <View style={{ flex: 1, marginRight: 8 }}>
         <Text
           style={{
-            fontSize: 14,
-            fontWeight: '600',
-            color: '#0f172a',
+            fontSize: 13,
+            fontFamily: fonts.sansSemiBold,
+            color: colors.ink,
             lineHeight: 18,
           }}
           numberOfLines={2}
@@ -70,8 +75,9 @@ export function SourceItem({ source, index, style }: SourceItemProps) {
         </Text>
         <Text
           style={{
-            fontSize: 12,
-            color: '#64748b',
+            fontSize: 11,
+            fontFamily: fonts.sansRegular,
+            color: colors.mutedInk,
             marginTop: 2,
           }}
           numberOfLines={1}
@@ -79,7 +85,7 @@ export function SourceItem({ source, index, style }: SourceItemProps) {
           {domain || source.url}
         </Text>
       </View>
-      <Ionicons name="open-outline" size={16} color="#64748b" />
+      <Ionicons name="open-outline" size={14} color={colors.mutedInk} />
     </TouchableOpacity>
   );
 }

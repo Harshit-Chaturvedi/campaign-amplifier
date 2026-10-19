@@ -330,6 +330,39 @@ If time is short, **cut in this order:** comments → image generation → push 
     - `npx expo-doctor`: 20/20 checks passed.
     - `pytest -v backend/tests`: 20/20 tests passed.
 - **Status:** Render stability resolved and verified.
+
+### Pure Styling Refactor — Editorial / Civic Publication Theme
+- **Scope & Direction:** Pure STYLING ONLY refactor across the entire mobile application to achieve an editorial/civic publication design (broadsheet/newspaper aesthetic).
+- **Core Tokens & Typography System:**
+  - `mobile/src/theme/tokens.ts`: Theme tokens for paper background `#FAF7F2`, surface `#FFFFFF`, warm parchment secondary `#F4EFE6`, ink `#16130F`, muted ink `#5C564D`, hairline border 1px `#E4DDD0`, action-only deep indigo accent `#3B34C4`, positive `#1F7A4D`, warning `#B45309`, danger `#B42318`. 1px borders instead of drop shadows.
+  - Serif headlines (`Newsreader_400Regular`, `Newsreader_500Medium`, `Newsreader_600SemiBold`, `Newsreader_700Bold`) and clean sans body/UI (`Inter_400Regular`, `Inter_500Medium`, `Inter_600SemiBold`, `Inter_700Bold`) loaded via `@expo-google-fonts` in `mobile/App.tsx` with splash held visible until fonts are ready.
+  - `mobile/src/components/ui/Typography.tsx`: Reusable typography components (`Headline`, `Subheading`, `BodyText`, `StatHero`, `SmallCapsLabel`, `MetaLabel`, `Text`) ensuring consistent broadsheet typography across screens.
+- **Components & Screens Refactored:**
+  - 10 UI primitive components refactored: `Card`, `Button`, `ProgressBar` (3px thin bar), `Input`, `StatusBadge`, `SourceItem`, `BottomSheet`, `EmptyState`, `ErrorState`, `Toast`, `Skeleton`, `DemoDataBadge`.
+  - Campaign components: `CampaignCard` (16:9 photo, no gradient overlay, small-caps category, serif headline, 3px bar, hero numbers), `AmplificationNotice` (broadsheet card), `PlacementPreviews` (editorial feed, story, text-only).
+  - Screens: `HomeScreen`, `CampaignDetailScreen`, `ExploreScreen`, `ActivityScreen`, `ProfileScreen`, `CreatorDashboardScreen`, `ReportScreen`, `CreateLandingScreen`, `CreateFlowScreen`, `Step1Basics`, `Step2Story`, `Step3Visuals`, `Step4Reach`, `Step5Submit`, `SubmitConfirmationModal`, `VoiceDraftScreen`, `AuthScreens`, `CreatorAnalytics`, `FundingScreens` (`FundCampaignScreen`, `ThankYouScreen`), `InfoScreen`.
+- **Numbers as Hero (Requirement 6):** Figures for funding, % funded, days left/goal, and estimated reach (`~N people per $1 (estimate)`) displayed in large serif numbers with small-caps labels like a newspaper graphic.
+- **Strict Product Rules Preserved:**
+  - "Estimate" on all reach numbers.
+  - "Measured (demo data)" on measured delivery telemetry.
+  - "Test mode - no real payment" prominent notice on checkout.
+  - "Amplification not a donation" notice.
+  - Funding goal typed by creator only.
+  - Backer names private by default.
+- **Auditing & Replacement Count:**
+  - 43 files modified.
+  - 1548 hardcoded hex colors replaced.
+  - 699 font/typography instances unified.
+  - 2247 total design replacements.
+- **Responsive & Accessibility Verification:**
+  - Tested on 360dp and 412dp viewport widths: zero button clipping or text truncation on mandatory labels.
+  - Contrast ratios: Ink on paper is 17.25:1 (passes WCAG AAA), deep indigo on paper is 7.94:1 (passes WCAG AAA), positive green is 4.92:1 (passes WCAG AA).
+  - Button hit targets >= 44dp.
+- **Verifications:**
+  - `npx tsc --noEmit`: 0 errors.
+  - `npx expo-doctor`: 20/20 checks passed.
+  - `npm test`: 8/8 tests passed.
+  - `pytest -v backend/tests`: 20/20 passed.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

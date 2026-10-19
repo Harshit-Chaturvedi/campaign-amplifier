@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
-  Text,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -25,6 +24,15 @@ import { apiClient } from '../../api/client';
 import { useDraftStore, CampaignDraft } from '../../store/useDraftStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { generateId } from '../../utils/formatting';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 
 interface GuidedQuestion {
   id: number;
@@ -516,7 +524,7 @@ export function VoiceDraftScreen({ navigation }: any) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Header */}
@@ -524,10 +532,10 @@ export function VoiceDraftScreen({ navigation }: any) {
         style={{
           paddingTop: 52,
           paddingBottom: 14,
-          paddingHorizontal: 16,
-          backgroundColor: '#fff',
+          paddingHorizontal: tokens.spacing.lg,
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.hairline,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -539,24 +547,26 @@ export function VoiceDraftScreen({ navigation }: any) {
           style={{
             width: 38,
             height: 38,
-            borderRadius: 19,
-            backgroundColor: '#f1f5f9',
+            borderRadius: tokens.radius.sm,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="arrow-back" size={20} color="#0f172a" />
+          <Ionicons name="arrow-back" size={18} color={colors.ink} />
         </TouchableOpacity>
 
         <View style={{ alignItems: 'center' }}>
-          <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+          <Headline style={{ fontSize: 16, color: colors.ink }}>
             Create with Your Voice
-          </Text>
-          <Text style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>
+          </Headline>
+          <MetaLabel style={{ marginTop: 1 }}>
             {isReviewStage
               ? 'Review Transcript'
               : `Question ${currentQuestionIndex + 1} of ${GUIDED_QUESTIONS.length}`}
-          </Text>
+          </MetaLabel>
         </View>
 
         <TouchableOpacity
@@ -565,30 +575,32 @@ export function VoiceDraftScreen({ navigation }: any) {
           style={{
             paddingHorizontal: 10,
             paddingVertical: 6,
-            borderRadius: 8,
-            backgroundColor: '#f1f5f9',
+            borderRadius: tokens.radius.sm,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
           }}
         >
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#475569' }}>Cancel</Text>
+          <SmallCapsLabel style={{ fontSize: 11, color: colors.mutedInk }}>Cancel</SmallCapsLabel>
         </TouchableOpacity>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
+        contentContainerStyle={{ padding: tokens.spacing.lg, paddingBottom: 100 }}
       >
         {/* Permission Request Card (shown if permission is not yet granted) */}
         {permissionStatus === 'undetermined' && (
-          <Card style={{ marginBottom: 18, padding: 18, backgroundColor: '#eef2ff', borderColor: '#c7d2fe' }}>
+          <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-              <Ionicons name="mic" size={22} color="#4f46e5" style={{ marginRight: 8 }} />
-              <Text style={{ fontSize: 16, fontWeight: '800', color: '#312e81' }}>
+              <Ionicons name="mic-outline" size={20} color={colors.accent} style={{ marginRight: 8 }} />
+              <Subheading style={{ fontSize: 15, color: colors.ink }}>
                 Microphone Permission Explanation
-              </Text>
+              </Subheading>
             </View>
-            <Text style={{ fontSize: 13, color: '#3730a3', lineHeight: 19, marginBottom: 14 }}>
+            <BodyText style={{ fontSize: 13, color: colors.mutedInk, lineHeight: 19, marginBottom: 14 }}>
               Campaign Amplifier requires microphone access to record your spoken answers to 4 guided questions. Your answers will be transcribed to draft your title, story, and ad creative. You will always review and edit everything on Step 1.
-            </Text>
+            </BodyText>
             <Button
               title="Grant Microphone Access"
               variant="primary"
@@ -601,16 +613,16 @@ export function VoiceDraftScreen({ navigation }: any) {
 
         {/* Fallback Banner (if permission denied or error occurs) */}
         {(permissionStatus === 'denied' || errorMessage) && (
-          <Card style={{ marginBottom: 18, padding: 16, backgroundColor: '#fef2f2', borderColor: '#fecaca' }}>
+          <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md, backgroundColor: colors.dangerFaint, borderColor: colors.border }}>
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
-              <Ionicons name="alert-circle" size={22} color="#dc2626" style={{ marginRight: 8, marginTop: 1 }} />
+              <Ionicons name="alert-circle-outline" size={20} color={colors.danger} style={{ marginRight: 8, marginTop: 1 }} />
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 15, fontWeight: '800', color: '#991b1b' }}>
+                <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.danger }}>
                   Microphone or Recording Unavailable
                 </Text>
-                <Text style={{ fontSize: 13, color: '#7f1d1d', marginTop: 4, lineHeight: 18 }}>
+                <BodyText style={{ fontSize: 13, color: colors.danger, marginTop: 4, lineHeight: 18 }}>
                   {errorMessage || 'Microphone permission was denied. You can proceed with demo mode using a pre-recorded campaign sample or create manually.'}
-                </Text>
+                </BodyText>
               </View>
             </View>
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
@@ -619,7 +631,7 @@ export function VoiceDraftScreen({ navigation }: any) {
                   title="Use Demo Mode"
                   variant="primary"
                   size="sm"
-                  icon="sparkles"
+                  icon="sparkles-outline"
                   onPress={handleUseDemoMode}
                   fullWidth
                 />
@@ -642,7 +654,7 @@ export function VoiceDraftScreen({ navigation }: any) {
           /* QUESTION STAGE */
           <View>
             {/* Question Progress Dots */}
-            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 }}>
+            <View style={{ flexDirection: 'row', gap: 6, marginBottom: tokens.spacing.lg }}>
               {GUIDED_QUESTIONS.map((q, idx) => {
                 const isActive = idx === currentQuestionIndex;
                 const isAnswered = Boolean(answers[q.id]?.trim());
@@ -651,13 +663,13 @@ export function VoiceDraftScreen({ navigation }: any) {
                     key={q.id}
                     style={{
                       flex: 1,
-                      height: 5,
-                      borderRadius: 3,
+                      height: 3,
+                      borderRadius: 1.5,
                       backgroundColor: isActive
-                        ? '#4f46e5'
+                        ? colors.accent
                         : isAnswered
-                        ? '#818cf8'
-                        : '#e2e8f0',
+                        ? colors.hairlineDark
+                        : colors.hairline,
                     }}
                   />
                 );
@@ -665,25 +677,25 @@ export function VoiceDraftScreen({ navigation }: any) {
             </View>
 
             {/* Current Question Display */}
-            <Card style={{ marginBottom: 18, padding: 20 }}>
-              <Text style={{ fontSize: 12, fontWeight: '800', color: '#4f46e5', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 4 }}>
-                Question {currentQuestionIndex + 1} of {GUIDED_QUESTIONS.length}
-              </Text>
-              <Text style={{ fontSize: 22, fontWeight: '900', color: '#0f172a', marginBottom: 6 }}>
+            <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.lg }}>
+              <SmallCapsLabel style={{ color: colors.accent, marginBottom: 4 }}>
+                QUESTION {currentQuestionIndex + 1} OF {GUIDED_QUESTIONS.length}
+              </SmallCapsLabel>
+              <Headline style={{ fontSize: 22, color: colors.ink, marginBottom: 6 }}>
                 {currentQ.question}
-              </Text>
-              <Text style={{ fontSize: 14, color: '#64748b', lineHeight: 20, marginBottom: 12 }}>
+              </Headline>
+              <BodyText style={{ fontSize: 14, color: colors.mutedInk, lineHeight: 20, marginBottom: 12 }}>
                 {currentQ.subtitle}
-              </Text>
-              <View style={{ backgroundColor: '#f8fafc', padding: 10, borderRadius: 8, borderLeftWidth: 3, borderLeftColor: '#cbd5e1' }}>
-                <Text style={{ fontSize: 12, color: '#475569', fontStyle: 'italic' }}>
+              </BodyText>
+              <View style={{ backgroundColor: colors.paperSecondary, padding: 10, borderRadius: tokens.radius.xs, borderLeftWidth: 3, borderLeftColor: colors.hairlineDark }}>
+                <MetaLabel style={{ fontStyle: 'italic', color: colors.mutedInk }}>
                   {currentQ.helperExample}
-                </Text>
+                </MetaLabel>
               </View>
             </Card>
 
             {/* Voice Recording Control */}
-            <Card style={{ marginBottom: 18, padding: 24, alignItems: 'center' }}>
+            <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.xl, alignItems: 'center' }}>
               {isRecording ? (
                 <View style={{ alignItems: 'center' }}>
                   <Animated.View
@@ -691,7 +703,7 @@ export function VoiceDraftScreen({ navigation }: any) {
                       width: 80,
                       height: 80,
                       borderRadius: 40,
-                      backgroundColor: '#fee2e2',
+                      backgroundColor: colors.dangerFaint,
                       alignItems: 'center',
                       justifyContent: 'center',
                       marginBottom: 14,
@@ -703,20 +715,20 @@ export function VoiceDraftScreen({ navigation }: any) {
                         width: 56,
                         height: 56,
                         borderRadius: 28,
-                        backgroundColor: '#dc2626',
+                        backgroundColor: colors.danger,
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      <Ionicons name="mic" size={32} color="#ffffff" />
+                      <Ionicons name="mic" size={28} color={colors.surface} />
                     </View>
                   </Animated.View>
-                  <Text style={{ fontSize: 18, fontWeight: '800', color: '#dc2626' }}>
+                  <Text style={{ fontSize: 18, fontFamily: fonts.sansBold, color: colors.danger }}>
                     Recording... {formatTimer(recordingDurationSec)}
                   </Text>
-                  <Text style={{ fontSize: 13, color: '#64748b', marginTop: 4, marginBottom: 16 }}>
+                  <MetaLabel style={{ marginTop: 4, marginBottom: 16 }}>
                     Speak your answer clearly into the microphone
-                  </Text>
+                  </MetaLabel>
                   <Button
                     title="Stop Recording"
                     variant="danger"
@@ -728,54 +740,53 @@ export function VoiceDraftScreen({ navigation }: any) {
               ) : (
                 <View style={{ alignItems: 'center', width: '100%' }}>
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityLabel={currentAnswer ? 'Tap to Re-record Answer' : 'Tap to Record Answer'}
                     onPress={startRecording}
                     activeOpacity={0.8}
                     style={{
-                      width: 72,
-                      height: 72,
-                      borderRadius: 36,
-                      backgroundColor: '#4f46e5',
+                      width: 68,
+                      height: 68,
+                      borderRadius: 34,
+                      backgroundColor: colors.accent,
                       alignItems: 'center',
                       justifyContent: 'center',
                       marginBottom: 12,
-                      shadowColor: '#4f46e5',
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.3,
-                      shadowRadius: 8,
-                      elevation: 4,
+                      borderWidth: 1,
+                      borderColor: colors.accent,
                     }}
                   >
-                    <Ionicons name="mic" size={36} color="#ffffff" />
+                    <Ionicons name="mic" size={32} color={colors.surface} />
                   </TouchableOpacity>
-                  <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     {currentAnswer ? 'Tap to Re-record Answer' : 'Tap to Record Answer'}
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  <MetaLabel style={{ marginTop: 2 }}>
                     Uses expo-audio with clear microphone permission
-                  </Text>
+                  </MetaLabel>
                 </View>
               )}
             </Card>
 
             {/* Transcribing Indicator */}
             {isTranscribing && (
-              <Card style={{ marginBottom: 16, padding: 16, alignItems: 'center', backgroundColor: '#eef2ff', borderColor: '#c7d2fe' }}>
-                <ActivityIndicator size="small" color="#4f46e5" style={{ marginBottom: 6 }} />
-                <Text style={{ fontSize: 14, fontWeight: '800', color: '#312e81' }}>
+              <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md, alignItems: 'center', backgroundColor: colors.paperSecondary }}>
+                <ActivityIndicator size="small" color={colors.accent} style={{ marginBottom: 6 }} />
+                <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                   Transcribing your audio with AI...
                 </Text>
-                <Text style={{ fontSize: 12, color: '#4338ca', marginTop: 2 }}>
+                <MetaLabel style={{ marginTop: 2 }}>
                   Your spoken words will appear in the editable box below.
-                </Text>
+                </MetaLabel>
               </Card>
             )}
 
             {/* Answer Transcript & Manual Edit Box */}
-            <Card style={{ marginBottom: 20, padding: 16 }}>
+            <Card style={{ marginBottom: tokens.spacing.lg, padding: tokens.spacing.md }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
-                  Answer Transcript (Editable)
-                </Text>
+                <SmallCapsLabel style={{ color: colors.ink }}>
+                  ANSWER TRANSCRIPT (EDITABLE)
+                </SmallCapsLabel>
                 {!currentAnswer && (
                   <TouchableOpacity
                     onPress={() =>
@@ -784,27 +795,29 @@ export function VoiceDraftScreen({ navigation }: any) {
                         [currentQ.id]: `[Demo sample] ${currentQ.demoAnswer}`,
                       }))
                     }
-                    style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#f1f5f9', borderRadius: 6 }}
+                    style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: colors.paperSecondary, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}
                   >
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#4f46e5' }}>Use Demo Sample Answer</Text>
+                    <SmallCapsLabel style={{ fontSize: 10, color: colors.accent }}>USE DEMO SAMPLE</SmallCapsLabel>
                   </TouchableOpacity>
                 )}
               </View>
               <TextInput
+                accessibilityLabel="Answer Transcript"
                 value={currentAnswer}
                 onChangeText={handleTextChange}
                 placeholder="Spoken response transcript will appear here, or type your answer directly..."
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.secondaryCaption}
                 multiline
                 numberOfLines={4}
                 style={{
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: colors.paperSecondary,
                   borderWidth: 1,
-                  borderColor: '#e2e8f0',
-                  borderRadius: 12,
+                  borderColor: colors.hairline,
+                  borderRadius: tokens.radius.sm,
                   padding: 12,
                   fontSize: 14,
-                  color: '#0f172a',
+                  fontFamily: fonts.sansRegular,
+                  color: colors.ink,
                   lineHeight: 20,
                   textAlignVertical: 'top',
                   minHeight: 100,
@@ -845,26 +858,26 @@ export function VoiceDraftScreen({ navigation }: any) {
         ) : (
           /* REVIEW & GENERATION STAGE */
           <View>
-            <View style={{ marginBottom: 16 }}>
-              <Text style={{ fontSize: 22, fontWeight: '900', color: '#0f172a' }}>
+            <View style={{ marginBottom: tokens.spacing.md }}>
+              <Headline style={{ fontSize: 22, color: colors.ink }}>
                 Review Full Transcript
-              </Text>
-              <Text style={{ fontSize: 13, color: '#64748b', marginTop: 4, lineHeight: 18 }}>
+              </Headline>
+              <MetaLabel style={{ marginTop: 4 }}>
                 Review your 4 spoken responses before generating your draft. AI will formulate title, story, and ad creative.
-              </Text>
+              </MetaLabel>
             </View>
 
             {/* Compiled Transcript Cards */}
             {GUIDED_QUESTIONS.map((q) => {
               const ans = answers[q.id]?.trim();
               return (
-                <Card key={q.id} style={{ marginBottom: 12, padding: 14 }}>
-                  <Text style={{ fontSize: 13, fontWeight: '800', color: '#4f46e5', marginBottom: 4 }}>
+                <Card key={q.id} style={{ marginBottom: 10, padding: tokens.spacing.md }}>
+                  <SmallCapsLabel style={{ color: colors.accent, marginBottom: 4 }}>
                     {q.id}. {q.question}
-                  </Text>
-                  <Text style={{ fontSize: 13, color: ans ? '#334155' : '#94a3b8', fontStyle: ans ? 'normal' : 'italic', lineHeight: 19 }}>
+                  </SmallCapsLabel>
+                  <BodyText style={{ fontSize: 13, color: ans ? colors.ink : colors.secondaryCaption, fontStyle: ans ? 'normal' : 'italic', lineHeight: 19 }}>
                     {ans || '(No answer provided)'}
-                  </Text>
+                  </BodyText>
                 </Card>
               );
             })}
@@ -872,17 +885,17 @@ export function VoiceDraftScreen({ navigation }: any) {
             {/* Notice regarding funding goal */}
             <View
               style={{
-                backgroundColor: '#eff6ff',
+                backgroundColor: colors.paperSecondary,
                 padding: 12,
-                borderRadius: 10,
+                borderRadius: tokens.radius.sm,
                 borderWidth: 1,
-                borderColor: '#bfdbfe',
-                marginBottom: 20,
+                borderColor: colors.hairline,
+                marginBottom: tokens.spacing.lg,
               }}
             >
-              <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 17, fontWeight: '600' }}>
+              <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 17, fontFamily: fonts.sansMedium }}>
                 Note: AI will populate your title, category, story blocks, and ad creative. The funding goal is NEVER filled in by AI and must be entered by you on Step 5.
-              </Text>
+              </BodyText>
             </View>
 
             {/* Primary Action Button */}
@@ -891,7 +904,7 @@ export function VoiceDraftScreen({ navigation }: any) {
                 title={isGenerating ? 'Generating Draft...' : 'Generate Campaign Draft with AI'}
                 variant="primary"
                 size="lg"
-                icon={isGenerating ? undefined : 'sparkles'}
+                icon={isGenerating ? undefined : 'sparkles-outline'}
                 iconPosition="right"
                 loading={isGenerating}
                 onPress={handleGenerateAIDraft}

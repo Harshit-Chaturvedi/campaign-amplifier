@@ -8,7 +8,6 @@ import {
   Alert,
   Modal,
   Switch,
-  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -18,8 +17,8 @@ import { usePreferencesStore } from '../../store/usePreferencesStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
-import { formatCurrency, formatNumber, formatDate, timeAgo } from '../../utils/formatting';
-import { INFO_PAGES } from '../info/InfoScreen';
+import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 export function ProfileScreen({ navigation }: any) {
   const user = useAuthStore((s) => s.user);
@@ -54,7 +53,7 @@ export function ProfileScreen({ navigation }: any) {
   }, [storeCampaigns, savedCampaignIds]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Top Header */}
@@ -63,15 +62,15 @@ export function ProfileScreen({ navigation }: any) {
           paddingTop: 52,
           paddingBottom: 14,
           paddingHorizontal: 20,
-          backgroundColor: '#fff',
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.border,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
       >
-        <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>
+        <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink }}>
           Profile & Account
         </Text>
         <TouchableOpacity
@@ -79,15 +78,17 @@ export function ProfileScreen({ navigation }: any) {
           accessibilityLabel="Open settings modal"
           onPress={() => setShowSettingsModal(true)}
           style={{
-            width: 38,
-            height: 38,
-            borderRadius: 19,
-            backgroundColor: '#f1f5f9',
+            width: 36,
+            height: 36,
+            borderRadius: tokens.radii.xs,
+            backgroundColor: colors.surfaceSecondary,
+            borderWidth: 1,
+            borderColor: colors.border,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="settings-outline" size={20} color="#475569" />
+          <Ionicons name="settings-outline" size={18} color={colors.inkSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -98,42 +99,43 @@ export function ProfileScreen({ navigation }: any) {
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <View
                 style={{
-                  width: 54,
-                  height: 54,
-                  borderRadius: 27,
-                  backgroundColor: '#eef2ff',
+                  width: 48,
+                  height: 48,
+                  borderRadius: tokens.radii.xs,
+                  backgroundColor: colors.surfaceSecondary,
+                  borderWidth: 1,
+                  borderColor: colors.border,
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginRight: 14,
                 }}
               >
-                <Ionicons name="person" size={28} color="#4f46e5" />
+                <Ionicons name="person-outline" size={24} color={colors.accent} />
               </View>
               <View style={{ flex: 1 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={{ fontSize: 17, fontWeight: '800', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                     {user.name}
                   </Text>
-                  <View style={{ backgroundColor: '#dcfce7', paddingHorizontal: 6, paddingVertical: 1, borderRadius: 6 }}>
-                    <Text style={{ fontSize: 10, fontWeight: '700', color: '#16a34a', textTransform: 'uppercase' }}>
+                  <View style={{ backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 6, paddingVertical: 1, borderRadius: tokens.radii.xs }}>
+                    <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.positive, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                       Active
                     </Text>
                   </View>
                 </View>
-                <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                   {user.email}
                 </Text>
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border }}>
               <View style={{ flex: 1 }}>
                 <Button
                   title="Creator Dashboard"
                   onPress={() => navigation.navigate('CreatorDashboard')}
                   size="sm"
                   variant="primary"
-                  icon="speedometer-outline"
                   fullWidth
                 />
               </View>
@@ -148,21 +150,20 @@ export function ProfileScreen({ navigation }: any) {
                   }}
                   size="sm"
                   variant="outline"
-                  icon="log-out-outline"
                   fullWidth
                 />
               </View>
             </View>
           </Card>
         ) : (
-          <Card style={{ marginBottom: 16, backgroundColor: '#eff6ff', borderColor: '#bfdbfe' }}>
+          <Card style={{ marginBottom: 16, backgroundColor: colors.surfaceSecondary }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-              <Ionicons name="globe-outline" size={20} color="#2563eb" />
-              <Text style={{ fontSize: 15, fontWeight: '800', color: '#1d4ed8' }}>
+              <Ionicons name="globe-outline" size={18} color={colors.accent} />
+              <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                 Browsing as a Guest
               </Text>
             </View>
-            <Text style={{ fontSize: 13, color: '#1e40af', lineHeight: 18, marginBottom: 12 }}>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 18, marginBottom: 12 }}>
               You can browse campaigns and back messages without an account. Sign in to synchronize your drafts and track campaign creation across devices.
             </Text>
             <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -191,36 +192,34 @@ export function ProfileScreen({ navigation }: any) {
         {/* 2. Created Campaigns & Creator Dashboard Shortcut */}
         <Card style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Ionicons name="create-outline" size={20} color="#4f46e5" />
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
-                Created Campaigns & Drafts
-              </Text>
-            </View>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+              Created Campaigns & Drafts
+            </Text>
             <TouchableOpacity onPress={() => navigation.navigate('CreatorDashboard')}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#4f46e5' }}>Dashboard →</Text>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.accent }}>Dashboard →</Text>
             </TouchableOpacity>
           </View>
-          <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 12 }}>
             Manage in-progress drafts, monitor moderation review feedback, and view delivery reports.
           </Text>
 
+          {/* Newspaper Stat Heroes */}
           <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1, backgroundColor: '#f8fafc', padding: 12, borderRadius: 10 }}>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>{drafts.length}</Text>
-              <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Local Drafts</Text>
+            <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+              <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.ink }}>{drafts.length}</Text>
+              <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Local Drafts</Text>
             </View>
-            <View style={{ flex: 1, backgroundColor: '#f8fafc', padding: 12, borderRadius: 10 }}>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#4f46e5' }}>
+            <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+              <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.accent }}>
                 {storeCampaigns.filter((c) => c.status === 'submitted').length}
               </Text>
-              <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>In Review</Text>
+              <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>In Review</Text>
             </View>
-            <View style={{ flex: 1, backgroundColor: '#f8fafc', padding: 12, borderRadius: 10 }}>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#16a34a' }}>
+            <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+              <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.positive }}>
                 {storeCampaigns.filter((c) => ['available_for_funding', 'goal_reached'].includes(c.status)).length}
               </Text>
-              <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Published</Text>
+              <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Published</Text>
             </View>
           </View>
         </Card>
@@ -228,12 +227,9 @@ export function ProfileScreen({ navigation }: any) {
         {/* 3. Backed Campaigns */}
         <Card style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Ionicons name="heart-outline" size={20} color="#e11d48" />
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
-                Backed Campaigns
-              </Text>
-            </View>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+              Backed Campaigns
+            </Text>
             <DemoDataBadge size="sm" />
           </View>
 
@@ -246,28 +242,30 @@ export function ProfileScreen({ navigation }: any) {
                   style={{
                     paddingVertical: 10,
                     borderBottomWidth: idx < myContributions.length - 1 ? 1 : 0,
-                    borderBottomColor: '#f1f5f9',
+                    borderBottomColor: colors.border,
                   }}
                 >
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{ flex: 1, paddingRight: 10 }}>
-                      <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
+                      <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink }} numberOfLines={1}>
                         {camp?.title || 'Community Campaign'}
                       </Text>
-                      <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                      <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                         Backed {formatCurrency(con.amount)} • {con.showName ? 'Public backer' : 'Private (Name hidden)'}
                       </Text>
                     </View>
                     <TouchableOpacity
                       onPress={() => setActiveReceipt(con)}
                       style={{
-                        backgroundColor: '#f1f5f9',
+                        backgroundColor: colors.surfaceSecondary,
+                        borderWidth: 1,
+                        borderColor: colors.border,
                         paddingHorizontal: 8,
                         paddingVertical: 4,
-                        borderRadius: 6,
+                        borderRadius: tokens.radii.xs,
                       }}
                     >
-                      <Text style={{ fontSize: 11, fontWeight: '600', color: '#475569' }}>Receipt</Text>
+                      <Text style={{ fontSize: 11, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>Receipt</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -275,7 +273,7 @@ export function ProfileScreen({ navigation }: any) {
             })
           ) : (
             <View style={{ paddingVertical: 14, alignItems: 'center' }}>
-              <Text style={{ fontSize: 13, color: '#94a3b8' }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>
                 You haven't backed any campaigns yet.
               </Text>
             </View>
@@ -285,12 +283,9 @@ export function ProfileScreen({ navigation }: any) {
         {/* 4. Saved Campaigns */}
         <Card style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Ionicons name="bookmark-outline" size={20} color="#4f46e5" />
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
-                Saved Campaigns ({savedCampaigns.length})
-              </Text>
-            </View>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+              Saved Campaigns ({savedCampaigns.length})
+            </Text>
           </View>
 
           {savedCampaigns.length > 0 ? (
@@ -304,17 +299,17 @@ export function ProfileScreen({ navigation }: any) {
                   alignItems: 'center',
                   paddingVertical: 8,
                   borderBottomWidth: idx < savedCampaigns.length - 1 ? 1 : 0,
-                  borderBottomColor: '#f1f5f9',
+                  borderBottomColor: colors.border,
                 }}
               >
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a', flex: 1, marginRight: 10 }} numberOfLines={1}>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.ink, flex: 1, marginRight: 10 }} numberOfLines={1}>
                   {camp.title}
                 </Text>
-                <Ionicons name="chevron-forward" size={16} color="#94a3b8" />
+                <Ionicons name="chevron-forward" size={15} color={colors.inkMuted} />
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic' }}>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkMuted, fontStyle: 'italic' }}>
               Tap the bookmark icon on any campaign to save it here for quick access.
             </Text>
           )}
@@ -323,14 +318,11 @@ export function ProfileScreen({ navigation }: any) {
         {/* 5. Payment History & Receipts */}
         <Card style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Ionicons name="receipt-outline" size={20} color="#059669" />
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
-                Payment History (Own Transactions)
-              </Text>
-            </View>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+              Payment History (Own Transactions)
+            </Text>
           </View>
-          <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 10 }}>
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 10 }}>
             Receipts for payments originating from this account or session.
           </Text>
 
@@ -344,23 +336,23 @@ export function ProfileScreen({ navigation }: any) {
                 alignItems: 'center',
                 paddingVertical: 10,
                 borderBottomWidth: i < myContributions.length - 1 ? 1 : 0,
-                borderBottomColor: '#f1f5f9',
+                borderBottomColor: colors.border,
               }}
             >
               <View>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>
+                <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                   {formatCurrency(c.total || c.amount + 1.75)}
                 </Text>
-                <Text style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>
+                <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 1 }}>
                   {c.receiptNo || `REC-2026-${1000 + i}`} • {formatDate(c.createdAt)}
                 </Text>
               </View>
 
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ backgroundColor: '#dcfce7', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#16a34a' }}>Succeeded</Text>
+                <View style={{ backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 6, paddingVertical: 2, borderRadius: tokens.radii.xs }}>
+                  <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.positive }}>Succeeded</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={14} color="#94a3b8" />
+                <Ionicons name="chevron-forward" size={14} color={colors.inkMuted} />
               </View>
             </TouchableOpacity>
           ))}
@@ -368,11 +360,11 @@ export function ProfileScreen({ navigation }: any) {
 
         {/* 6. Help & About Directory (Info Pages) */}
         <Card style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink, marginBottom: 12 }}>
             Help, Policies & Information
           </Text>
 
-          <View style={{ gap: 6 }}>
+          <View style={{ gap: 2 }}>
             {[
               { slug: 'about', title: 'About Campaign Amplifier', icon: 'information-circle-outline' },
               { slug: 'how-it-works', title: 'How It Works (Sequence & Rules)', icon: 'git-network-outline' },
@@ -393,16 +385,16 @@ export function ProfileScreen({ navigation }: any) {
                   justifyContent: 'space-between',
                   paddingVertical: 10,
                   borderBottomWidth: 1,
-                  borderBottomColor: '#f8fafc',
+                  borderBottomColor: colors.border,
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <Ionicons name={item.icon as any} size={18} color="#64748b" />
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#334155' }}>
+                  <Ionicons name={item.icon as any} size={16} color={colors.inkSecondary} />
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.ink }}>
                     {item.title}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={16} color="#cbd5e1" />
+                <Ionicons name="chevron-forward" size={15} color={colors.inkMuted} />
               </TouchableOpacity>
             ))}
           </View>
@@ -416,64 +408,61 @@ export function ProfileScreen({ navigation }: any) {
         transparent
         onRequestClose={() => setActiveReceipt(null)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-          <View style={{ backgroundColor: '#ffffff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: tokens.radii.lg, borderTopRightRadius: tokens.radii.lg, padding: 20, borderWidth: 1, borderColor: colors.border }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Ionicons name="receipt-outline" size={20} color="#4f46e5" />
-                <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>Digital Receipt</Text>
-              </View>
+              <Text style={{ fontSize: 17, fontFamily: fonts.serifSemiBold, color: colors.ink }}>Digital Receipt</Text>
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="Close receipt modal"
                 onPress={() => setActiveReceipt(null)}
               >
-                <Ionicons name="close" size={22} color="#64748b" />
+                <Ionicons name="close" size={20} color={colors.inkSecondary} />
               </TouchableOpacity>
             </View>
 
             {activeReceipt && (
               <View style={{ gap: 10, marginBottom: 20 }}>
-                <View style={{ backgroundColor: '#f1f5f9', padding: 12, borderRadius: 10 }}>
-                  <Text style={{ fontSize: 11, color: '#64748b' }}>Receipt Reference</Text>
-                  <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a', marginTop: 2 }}>
+                <View style={{ backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Receipt Reference</Text>
+                  <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: colors.ink, marginTop: 2 }}>
                     #{activeReceipt.receiptNo || 'REC-2026-DEMO'}
                   </Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 13, color: '#64748b' }}>Date & Time</Text>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Date & Time</Text>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     {formatDate(activeReceipt.createdAt)}
                   </Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 13, color: '#64748b' }}>Contribution</Text>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Contribution</Text>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     {formatCurrency(activeReceipt.amount)}
                   </Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 13, color: '#64748b' }}>Payment Processing Fee</Text>
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Payment Processing Fee</Text>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     {formatCurrency(activeReceipt.fee || 1.75)}
                   </Text>
                 </View>
 
-                <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 4 }} />
+                <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 4 }} />
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a' }}>Total Paid</Text>
-                  <Text style={{ fontSize: 18, fontWeight: '800', color: '#4f46e5' }}>
+                  <Text style={{ fontSize: 14, fontFamily: fonts.serifBold, color: colors.ink }}>Total Paid</Text>
+                  <Text style={{ fontSize: 17, fontFamily: fonts.serifBold, color: colors.accent }}>
                     {formatCurrency(activeReceipt.total || activeReceipt.amount + 1.75)}
                   </Text>
                 </View>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 13, color: '#64748b' }}>Privacy Status</Text>
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#059669' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Privacy Status</Text>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansBold, color: colors.positive }}>
                     {activeReceipt.showName ? 'Public' : 'Private by default (Name hidden)'}
                   </Text>
                 </View>
@@ -497,10 +486,10 @@ export function ProfileScreen({ navigation }: any) {
         transparent
         onRequestClose={() => setShowSettingsModal(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-          <View style={{ backgroundColor: '#ffffff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: tokens.radii.lg, borderTopRightRadius: tokens.radii.lg, padding: 20, borderWidth: 1, borderColor: colors.border }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
+              <Text style={{ fontSize: 17, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                 Account Settings
               </Text>
               <TouchableOpacity
@@ -508,56 +497,56 @@ export function ProfileScreen({ navigation }: any) {
                 accessibilityLabel="Close settings modal"
                 onPress={() => setShowSettingsModal(false)}
               >
-                <Ionicons name="close" size={22} color="#64748b" />
+                <Ionicons name="close" size={20} color={colors.inkSecondary} />
               </TouchableOpacity>
             </View>
 
             <View style={{ gap: 16, marginBottom: 20 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flex: 1, marginRight: 12 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     Keep Backer Name Private by Default
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                     Ensure new contributions hide your name automatically.
                   </Text>
                 </View>
                 <Switch
                   value={privacyDefaultOn}
                   onValueChange={setPrivacyDefaultOn}
-                  trackColor={{ false: '#cbd5e1', true: '#4f46e5' }}
+                  trackColor={{ false: colors.border, true: colors.accent }}
                 />
               </View>
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flex: 1, marginRight: 12 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     Funding Milestone Notifications
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                     Alerts at 25%, 50%, 75%, and 100% funding.
                   </Text>
                 </View>
                 <Switch
                   value={preferences.fundingMilestones}
                   onValueChange={(val) => setPref('fundingMilestones', val)}
-                  trackColor={{ false: '#cbd5e1', true: '#4f46e5' }}
+                  trackColor={{ false: colors.border, true: colors.accent }}
                 />
               </View>
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flex: 1, marginRight: 12 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     Delivery Report Notifications
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                     Notifies you when measured ad telemetry is published.
                   </Text>
                 </View>
                 <Switch
                   value={preferences.deliveryReports}
                   onValueChange={(val) => setPref('deliveryReports', val)}
-                  trackColor={{ false: '#cbd5e1', true: '#4f46e5' }}
+                  trackColor={{ false: colors.border, true: colors.accent }}
                 />
               </View>
             </View>

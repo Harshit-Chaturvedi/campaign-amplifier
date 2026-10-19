@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, Linking, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { StoryBlock } from '../../types/campaign';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { StatHero, SmallCapsLabel, MetaLabel } from '../ui/Typography';
 
 interface StoryBlockRendererProps {
   block: StoryBlock;
@@ -20,8 +22,8 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
           style={[
             {
               fontSize,
-              fontWeight: '800',
-              color: '#0f172a',
+              fontFamily: fonts.serifBold,
+              color: colors.ink,
               marginTop: index === 0 ? 0 : 20,
               marginBottom: 10,
               lineHeight: fontSize + 6,
@@ -40,7 +42,8 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
           style={[
             {
               fontSize: 15,
-              color: '#334155',
+              fontFamily: fonts.sansRegular,
+              color: colors.ink,
               lineHeight: 24,
               marginBottom: 14,
             },
@@ -57,11 +60,11 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
           style={[
             {
               marginVertical: 14,
-              borderRadius: 16,
+              borderRadius: tokens.radius.sm,
               overflow: 'hidden',
-              backgroundColor: '#f1f5f9',
+              backgroundColor: colors.paperSecondary,
               borderWidth: 1,
-              borderColor: '#e2e8f0',
+              borderColor: colors.hairline,
             },
             style,
           ]}
@@ -74,19 +77,19 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
             />
           ) : (
             <View style={{ width: '100%', height: 160, alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="image-outline" size={40} color="#94a3b8" />
-              <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 6 }}>No image URL</Text>
+              <Ionicons name="image-outline" size={36} color={colors.secondaryCaption} />
+              <MetaLabel style={{ marginTop: 6 }}>No image URL</MetaLabel>
             </View>
           )}
           {(block.caption || block.credit) && (
-            <View style={{ padding: 10, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+            <View style={{ padding: 10, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.hairline }}>
               {block.caption && (
-                <Text style={{ fontSize: 13, color: '#475569', fontStyle: 'italic' }}>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.mutedInk, fontStyle: 'italic' }}>
                   {block.caption}
                 </Text>
               )}
               {block.credit && (
-                <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.secondaryCaption, marginTop: 2 }}>
                   Credit: {block.credit}
                 </Text>
               )}
@@ -101,21 +104,23 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
           style={[
             {
               marginVertical: 14,
-              backgroundColor: '#eef2ff',
-              borderRadius: 16,
-              padding: 16,
-              borderLeftWidth: 4,
-              borderLeftColor: '#4f46e5',
+              backgroundColor: colors.paperSecondary,
+              borderRadius: tokens.radius.sm,
+              padding: tokens.spacing.md,
+              borderLeftWidth: 3,
+              borderLeftColor: colors.accent,
+              borderWidth: 1,
+              borderColor: colors.hairline,
             },
             style,
           ]}
         >
-          <Text style={{ fontSize: 28, fontWeight: '900', color: '#1e1b4b' }}>
+          <StatHero style={{ fontSize: 26, color: colors.ink }}>
             {block.value}
-          </Text>
-          <Text style={{ fontSize: 13, fontWeight: '600', color: '#4338ca', marginTop: 4 }}>
+          </StatHero>
+          <SmallCapsLabel style={{ color: colors.accent, marginTop: 4 }}>
             {block.label}
-          </Text>
+          </SmallCapsLabel>
         </View>
       );
     case 'quote':
@@ -125,20 +130,22 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
           style={[
             {
               marginVertical: 14,
-              backgroundColor: '#f8fafc',
-              borderRadius: 16,
-              padding: 18,
-              borderLeftWidth: 4,
-              borderLeftColor: '#0284c7',
+              backgroundColor: colors.paperSecondary,
+              borderRadius: tokens.radius.sm,
+              padding: tokens.spacing.md,
+              borderLeftWidth: 3,
+              borderLeftColor: colors.ink,
+              borderWidth: 1,
+              borderColor: colors.hairline,
             },
             style,
           ]}
         >
-          <Text style={{ fontSize: 16, fontStyle: 'italic', color: '#1e293b', lineHeight: 24 }}>
+          <Text style={{ fontSize: 16, fontFamily: fonts.serifRegular, fontStyle: 'italic', color: colors.ink, lineHeight: 24 }}>
             "{block.quote}"
           </Text>
           {block.attribution && (
-            <Text style={{ fontSize: 13, color: '#64748b', fontWeight: '600', marginTop: 8 }}>
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.mutedInk, marginTop: 8 }}>
               — {block.attribution}
             </Text>
           )}
@@ -151,22 +158,22 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
           style={[
             {
               marginVertical: 14,
-              backgroundColor: '#f0fdf4',
-              borderRadius: 16,
-              padding: 16,
+              backgroundColor: colors.paperSecondary,
+              borderRadius: tokens.radius.sm,
+              padding: tokens.spacing.md,
               borderWidth: 1,
-              borderColor: '#bbf7d0',
+              borderColor: colors.hairline,
             },
             style,
           ]}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-            <Ionicons name="checkbox-outline" size={18} color="#16a34a" style={{ marginRight: 6 }} />
-            <Text style={{ fontSize: 15, fontWeight: '700', color: '#14532d' }}>
+            <Ionicons name="checkbox-outline" size={16} color={colors.positive} style={{ marginRight: 6 }} />
+            <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
               {block.title}
             </Text>
           </View>
-          <Text style={{ fontSize: 13, color: '#166534', lineHeight: 19 }}>
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.mutedInk, lineHeight: 19 }}>
             {block.description}
           </Text>
           {block.url && (
@@ -174,10 +181,10 @@ export function StoryBlockRenderer({ block, index, style }: StoryBlockRendererPr
               onPress={() => Linking.openURL(block.url!).catch(() => {})}
               style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}
             >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#16a34a', marginRight: 4 }}>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.positive, marginRight: 4 }}>
                 Take action
               </Text>
-              <Ionicons name="open-outline" size={14} color="#16a34a" />
+              <Ionicons name="open-outline" size={14} color={colors.positive} />
             </TouchableOpacity>
           )}
         </View>

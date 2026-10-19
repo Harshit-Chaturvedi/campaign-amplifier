@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface ButtonProps {
   title: string;
@@ -15,19 +16,27 @@ interface ButtonProps {
 }
 
 const variantBg: Record<string, string> = {
-  primary: '#4f46e5',
-  secondary: '#f1f5f9',
+  primary: colors.accent,
+  secondary: colors.surfaceSecondary,
   outline: 'transparent',
   ghost: 'transparent',
-  danger: '#ef4444',
+  danger: colors.danger,
 };
 
 const variantText: Record<string, string> = {
-  primary: '#ffffff',
-  secondary: '#0f172a',
-  outline: '#4f46e5',
-  ghost: '#334155',
-  danger: '#ffffff',
+  primary: colors.inkInverse,
+  secondary: colors.ink,
+  outline: colors.accent,
+  ghost: colors.inkSecondary,
+  danger: colors.inkInverse,
+};
+
+const variantBorder: Record<string, string> = {
+  primary: 'transparent',
+  secondary: colors.border,
+  outline: colors.border,
+  ghost: 'transparent',
+  danger: 'transparent',
 };
 
 export function Button({
@@ -42,12 +51,13 @@ export function Button({
   fullWidth = false,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
-  const py = size === 'sm' ? 8 : size === 'lg' ? 18 : 14;
-  const px = size === 'sm' ? 14 : size === 'lg' ? 28 : 22;
-  const fontSize = size === 'sm' ? 13 : size === 'lg' ? 17 : 15;
-  const iconSize = size === 'sm' ? 16 : 20;
+  const py = size === 'sm' ? 8 : size === 'lg' ? 14 : 11;
+  const px = size === 'sm' ? 14 : size === 'lg' ? 24 : 18;
+  const fontSize = size === 'sm' ? 13 : size === 'lg' ? 16 : 14;
+  const iconSize = size === 'sm' ? 16 : 18;
   const bg = variantBg[variant];
   const textColor = variantText[variant];
+  const borderColor = variantBorder[variant];
 
   return (
     <TouchableOpacity
@@ -61,11 +71,11 @@ export function Button({
         backgroundColor: bg,
         paddingVertical: py,
         paddingHorizontal: px,
-        minHeight: size === 'sm' ? 40 : 48,
-        borderRadius: 14,
+        minHeight: size === 'sm' ? 36 : size === 'lg' ? 48 : 42,
+        borderRadius: tokens.radii.md,
         opacity: isDisabled ? 0.5 : 1,
-        borderWidth: variant === 'outline' ? 1.5 : 0,
-        borderColor: variant === 'outline' ? '#4f46e5' : 'transparent',
+        borderWidth: borderColor !== 'transparent' ? 1 : 0,
+        borderColor: borderColor,
         width: fullWidth ? '100%' : undefined,
       }}
       accessibilityRole="button"
@@ -78,7 +88,9 @@ export function Button({
           {icon && iconPosition === 'left' && (
             <Ionicons name={icon} size={iconSize} color={textColor} style={{ marginRight: 8 }} />
           )}
-          <Text style={{ color: textColor, fontSize, fontWeight: '600' }}>{title}</Text>
+          <Text style={{ color: textColor, fontSize, fontFamily: fonts.sansMedium }}>
+            {title}
+          </Text>
           {icon && iconPosition === 'right' && (
             <Ionicons name={icon} size={iconSize} color={textColor} style={{ marginLeft: 8 }} />
           )}

@@ -10,7 +10,6 @@ import {
   Alert,
   Modal,
   TextInput,
-  Share,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -25,6 +24,7 @@ import { useDraftStore } from '../../store/useDraftStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
 import { apiClient } from '../../api/client';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 export type CreatorTab =
   | 'drafts'
@@ -133,7 +133,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
     }
   };
 
-  // Handle editing published campaign (sends material changes back to review!)
+  // Handle editing published campaign
   const handleEditPublishedCampaign = (camp: any) => {
     Alert.alert(
       'Material Changes Require Re-review',
@@ -173,7 +173,7 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Top Header */}
@@ -182,9 +182,9 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
           paddingTop: 52,
           paddingBottom: 14,
           paddingHorizontal: 16,
-          backgroundColor: '#fff',
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.border,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -195,17 +195,19 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
           accessibilityLabel="Go back"
           onPress={() => navigation.goBack()}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#f1f5f9',
+            width: 36,
+            height: 36,
+            borderRadius: tokens.radii.xs,
+            backgroundColor: colors.surfaceSecondary,
+            borderWidth: 1,
+            borderColor: colors.border,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="arrow-back" size={20} color="#0f172a" />
+          <Ionicons name="arrow-back" size={19} color={colors.ink} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+        <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
           Creator Dashboard
         </Text>
         <TouchableOpacity
@@ -213,20 +215,22 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
           accessibilityLabel="Create new campaign"
           onPress={() => navigation.navigate('CreateTab')}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#eef2ff',
+            width: 36,
+            height: 36,
+            borderRadius: tokens.radii.xs,
+            backgroundColor: colors.surfaceSecondary,
+            borderWidth: 1,
+            borderColor: colors.border,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="add" size={24} color="#4f46e5" />
+          <Ionicons name="add" size={20} color={colors.accent} />
         </TouchableOpacity>
       </View>
 
       {/* Horizontal Filter Tabs */}
-      <View style={{ backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
+      <View style={{ backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -239,10 +243,12 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                 key={t.key}
                 onPress={() => setActiveTab(t.key)}
                 style={{
-                  paddingHorizontal: 14,
-                  paddingVertical: 8,
-                  borderRadius: 12,
-                  backgroundColor: active ? '#4f46e5' : '#f1f5f9',
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: tokens.radii.xs,
+                  backgroundColor: active ? colors.accent : colors.surfaceSecondary,
+                  borderWidth: 1,
+                  borderColor: active ? colors.accent : colors.border,
                   flexDirection: 'row',
                   alignItems: 'center',
                   gap: 6,
@@ -250,9 +256,9 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               >
                 <Text
                   style={{
-                    fontSize: 13,
-                    fontWeight: active ? '700' : '600',
-                    color: active ? '#ffffff' : '#475569',
+                    fontSize: 12,
+                    fontFamily: active ? fonts.sansSemiBold : fonts.sansMedium,
+                    color: active ? colors.inkInverse : colors.ink,
                   }}
                 >
                   {t.label}
@@ -260,17 +266,17 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                 {t.count !== undefined && t.count > 0 && (
                   <View
                     style={{
-                      backgroundColor: active ? '#6366f1' : '#e2e8f0',
-                      paddingHorizontal: 6,
+                      backgroundColor: active ? colors.surface : colors.surfaceSecondary,
+                      paddingHorizontal: 5,
                       paddingVertical: 1,
-                      borderRadius: 10,
+                      borderRadius: tokens.radii.xs,
                     }}
                   >
                     <Text
                       style={{
-                        fontSize: 11,
-                        fontWeight: '700',
-                        color: active ? '#ffffff' : '#475569',
+                        fontSize: 10,
+                        fontFamily: fonts.sansBold,
+                        color: active ? colors.accent : colors.inkSecondary,
                       }}
                     >
                       {t.count}
@@ -287,28 +293,26 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
         {/* Loading Indicator */}
         {loading && (
           <View style={{ paddingVertical: 20, alignItems: 'center' }}>
-            <ActivityIndicator size="small" color="#4f46e5" />
+            <ActivityIndicator size="small" color={colors.accent} />
           </View>
         )}
 
-        {/* ========================================================================= */}
-        {/* DRAFTS TAB                                                                */}
-        {/* ========================================================================= */}
+        {/* DRAFTS TAB */}
         {activeTab === 'drafts' && (
           <View>
             {drafts.length > 0 ? (
               drafts.map((d) => (
                 <Card key={d.id} style={{ marginBottom: 14 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#6366f1', textTransform: 'uppercase' }}>
+                    <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.accent, textTransform: 'uppercase', letterSpacing: 0.8 }}>
                       Step {d.step} of 5 • {d.category}
                     </Text>
                     {d.isDemoSample && <DemoDataBadge size="sm" />}
                   </View>
-                  <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
+                  <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink, marginBottom: 4 }}>
                     {d.title || 'Untitled Draft'}
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 14 }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkMuted, marginBottom: 14 }}>
                     Last saved: {formatDate(d.updatedAt)}
                   </Text>
 
@@ -318,7 +322,6 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                         title="Resume Editing"
                         onPress={() => navigation.navigate('CreateFlow', { draftId: d.id, step: d.step })}
                         size="sm"
-                        icon="create-outline"
                         fullWidth
                       />
                     </View>
@@ -341,26 +344,24 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               ))
             ) : (
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-                <Ionicons name="document-text-outline" size={44} color="#94a3b8" />
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#475569', marginTop: 12 }}>
+                <Ionicons name="document-text-outline" size={44} color={colors.inkMuted} />
+                <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink, marginTop: 12 }}>
                   No Saved Drafts
                 </Text>
-                <Text style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', marginTop: 4, marginBottom: 16 }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 4, marginBottom: 16 }}>
                   You don't have any in-progress campaign drafts.
                 </Text>
                 <Button
                   title="Start a New Campaign"
                   onPress={() => navigation.navigate('CreateTab')}
-                  icon="add-circle-outline"
+                  size="md"
                 />
               </View>
             )}
           </View>
         )}
 
-        {/* ========================================================================= */}
-        {/* OTHER LIFECYCLE TABS                                                      */}
-        {/* ========================================================================= */}
+        {/* OTHER LIFECYCLE TABS */}
         {activeTab !== 'drafts' && (
           <View>
             {campaignsInTab.length > 0 ? (
@@ -370,33 +371,33 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                   <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
                     <Image
                       source={{ uri: camp.coverUrl || camp.thumbnailUrl || 'https://images.unsplash.com/photo-1577495508048-b635879837f1?w=400&q=80' }}
-                      style={{ width: 80, height: 80, borderRadius: 10, backgroundColor: '#f1f5f9' }}
+                      style={{ width: 72, height: 72, borderRadius: tokens.radii.xs, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border }}
                       resizeMode="cover"
                     />
                     <View style={{ flex: 1 }}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                         <StatusBadge status={camp.status} />
-                        <Text style={{ fontSize: 11, color: '#94a3b8' }}>
+                        <Text style={{ fontSize: 10, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>
                           {camp.durationDays || 30}d window
                         </Text>
                       </View>
-                      <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }} numberOfLines={2}>
+                      <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink }} numberOfLines={2}>
                         {camp.title}
                       </Text>
-                      <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                      <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                         Est. Reach: ~{formatNumber(camp.estimatedReachAtGoal || 150000)} (Estimate)
                       </Text>
                     </View>
                   </View>
 
-                  {/* Progress info */}
+                  {/* Progress info with thin bar */}
                   <View style={{ marginBottom: 12 }}>
-                    <ProgressBar progress={camp.percentFunded || 0} color="#4f46e5" height={6} />
+                    <ProgressBar progress={camp.percentFunded || 0} color={colors.accent} height={3} />
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                      <Text style={{ fontSize: 12, fontWeight: '700', color: '#4f46e5' }}>
+                      <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.accent }}>
                         {formatCurrency(camp.amountRaised || 0)} raised ({camp.percentFunded || 0}%)
                       </Text>
-                      <Text style={{ fontSize: 12, color: '#64748b' }}>
+                      <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
                         Goal: {formatCurrency(camp.fundingGoal || 5000)}
                       </Text>
                     </View>
@@ -406,52 +407,44 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                   {camp.status === 'changes_requested' && (
                     <View
                       style={{
-                        backgroundColor: '#fffbeb',
-                        borderColor: '#fde68a',
+                        backgroundColor: colors.warningFaint,
+                        borderColor: colors.warning,
                         borderWidth: 1,
-                        borderRadius: 10,
+                        borderRadius: tokens.radii.xs,
                         padding: 10,
                         marginBottom: 12,
                       }}
                     >
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                        <Ionicons name="chatbubble-ellipses-outline" size={16} color="#b45309" />
-                        <Text style={{ fontSize: 12, fontWeight: '700', color: '#92400e' }}>
-                          Editorial Review Feedback:
-                        </Text>
-                      </View>
-                      <Text style={{ fontSize: 12, color: '#92400e', lineHeight: 16 }}>
+                      <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: colors.warning, letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 2 }}>
+                        Editorial Review Feedback
+                      </Text>
+                      <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.ink, lineHeight: 16 }}>
                         {camp.moderationFeedback ||
-                          'Please provide an official government or municipal source citation for the claims made in paragraphs 2 and 3.'}
+                          'Please provide an official source citation for claims in the story blocks.'}
                       </Text>
                     </View>
                   )}
 
                   {/* Contextual Action Buttons */}
                   <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                    {/* Requires action: Edit & Resubmit */}
                     {camp.status === 'changes_requested' && (
                       <Button
                         title="Edit & Resubmit"
                         onPress={() => handleResubmitChanges(camp)}
                         size="sm"
                         variant="primary"
-                        icon="arrow-up-circle-outline"
                       />
                     )}
 
-                    {/* Under review: Preview */}
                     {['submitted', 'in_review'].includes(camp.status) && (
                       <Button
                         title="Preview Campaign"
                         onPress={() => navigation.navigate('CampaignDetail', { campaignId: camp.id })}
                         size="sm"
                         variant="outline"
-                        icon="eye-outline"
                       />
                     )}
 
-                    {/* Published / Funding: Share, Post Update, Edit */}
                     {['approved', 'available_for_funding', 'goal_reached'].includes(camp.status) && (
                       <>
                         <Button
@@ -459,33 +452,28 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                           onPress={() => setUpdateModalCampaignId(camp.id)}
                           size="sm"
                           variant="primary"
-                          icon="megaphone-outline"
                         />
                         <Button
                           title="Public Page"
                           onPress={() => navigation.navigate('CampaignDetail', { campaignId: camp.id })}
                           size="sm"
                           variant="outline"
-                          icon="open-outline"
                         />
                         <Button
                           title="Edit"
                           onPress={() => handleEditPublishedCampaign(camp)}
                           size="sm"
                           variant="ghost"
-                          icon="create-outline"
                         />
                       </>
                     )}
 
-                    {/* Promoting or Completed: View Distribution Report */}
                     {['distribution_preparation', 'promoting', 'completed'].includes(camp.status) && (
                       <Button
                         title="View Distribution Report"
                         onPress={() => navigation.navigate('Report', { campaignId: camp.id })}
                         size="sm"
                         variant="primary"
-                        icon="document-text-outline"
                       />
                     )}
                   </View>
@@ -493,11 +481,11 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               ))
             ) : (
               <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-                <Ionicons name="folder-open-outline" size={44} color="#94a3b8" />
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#475569', marginTop: 12 }}>
+                <Ionicons name="folder-open-outline" size={44} color={colors.inkMuted} />
+                <Text style={{ fontSize: 15, fontFamily: fonts.serifSemiBold, color: colors.ink, marginTop: 12 }}>
                   No Campaigns in this Category
                 </Text>
-                <Text style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', marginTop: 4 }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 4 }}>
                   No campaigns currently match the '{activeTab.replace(/_/g, ' ')}' status filter.
                 </Text>
               </View>
@@ -514,12 +502,12 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
         onRequestClose={() => setUpdateModalCampaignId(null)}
       >
         <KeyboardAvoidingView
-          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-          <View style={{ backgroundColor: '#ffffff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+          <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: tokens.radii.lg, borderTopRightRadius: tokens.radii.lg, padding: 20, borderWidth: 1, borderColor: colors.border }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
+              <Text style={{ fontSize: 17, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                 Post Campaign Update
               </Text>
               <TouchableOpacity
@@ -527,11 +515,11 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
                 accessibilityLabel="Close update modal"
                 onPress={() => setUpdateModalCampaignId(null)}
               >
-                <Ionicons name="close" size={22} color="#64748b" />
+                <Ionicons name="close" size={20} color={colors.inkSecondary} />
               </TouchableOpacity>
             </View>
 
-            <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 14 }}>
               Broadcast milestone progress, press coverage, or municipal reactions to all supporters.
             </Text>
 
@@ -540,15 +528,16 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               value={updateTitle}
               onChangeText={setUpdateTitle}
               placeholder="Update Title (e.g. City Council schedules committee review)"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inkMuted}
               style={{
-                backgroundColor: '#f8fafc',
-                borderWidth: 1.5,
-                borderColor: '#e2e8f0',
-                borderRadius: 12,
+                backgroundColor: colors.surfaceSecondary,
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: tokens.radii.xs,
                 padding: 12,
-                fontSize: 14,
-                color: '#0f172a',
+                fontSize: 13,
+                fontFamily: fonts.sansRegular,
+                color: colors.ink,
                 marginBottom: 12,
               }}
             />
@@ -558,17 +547,18 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
               value={updateBody}
               onChangeText={setUpdateBody}
               placeholder="Write your update message..."
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inkMuted}
               multiline
               numberOfLines={4}
               style={{
-                backgroundColor: '#f8fafc',
-                borderWidth: 1.5,
-                borderColor: '#e2e8f0',
-                borderRadius: 12,
+                backgroundColor: colors.surfaceSecondary,
+                borderWidth: 1,
+                borderColor: colors.border,
+                borderRadius: tokens.radii.xs,
                 padding: 12,
-                fontSize: 14,
-                color: '#0f172a',
+                fontSize: 13,
+                fontFamily: fonts.sansRegular,
+                color: colors.ink,
                 height: 100,
                 textAlignVertical: 'top',
                 marginBottom: 20,

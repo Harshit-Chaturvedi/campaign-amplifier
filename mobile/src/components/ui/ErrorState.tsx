@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { Headline, BodyText } from './Typography';
 
 interface ErrorStateProps {
   title?: string;
@@ -31,40 +33,41 @@ export function ErrorState({
     >
       <View
         style={{
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          backgroundColor: '#fee2e2',
+          width: 44,
+          height: 44,
+          borderRadius: tokens.radius.xs,
+          backgroundColor: colors.dangerFaint,
+          borderWidth: 1,
+          borderColor: colors.border,
           alignItems: 'center',
           justifyContent: 'center',
           marginBottom: 14,
         }}
       >
-        <Ionicons name="alert-circle-outline" size={30} color="#ef4444" />
+        <Ionicons name="alert-circle-outline" size={24} color={colors.danger} />
       </View>
-      <Text
+      <Headline
         style={{
           fontSize: 17,
-          fontWeight: '700',
-          color: '#0f172a',
+          color: colors.ink,
           textAlign: 'center',
           marginBottom: 6,
         }}
       >
         {title}
-      </Text>
-      <Text
+      </Headline>
+      <BodyText
         style={{
-          fontSize: 14,
-          color: '#64748b',
+          fontSize: 13,
+          color: colors.mutedInk,
           textAlign: 'center',
-          lineHeight: 20,
+          lineHeight: 18,
           maxWidth: 300,
           marginBottom: onRetry ? 16 : 0,
         }}
       >
         {message}
-      </Text>
+      </BodyText>
       {onRetry && (
         <TouchableOpacity
           onPress={onRetry}
@@ -72,15 +75,15 @@ export function ErrorState({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: '#4f46e5',
+            backgroundColor: colors.accent,
             paddingHorizontal: 16,
-            paddingVertical: 10,
-            borderRadius: 12,
+            paddingVertical: 9,
+            borderRadius: tokens.radius.xs,
             marginTop: 8,
           }}
         >
-          <Ionicons name="refresh" size={16} color="#fff" style={{ marginRight: 6 }} />
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>
+          <Ionicons name="refresh" size={15} color={colors.surface} style={{ marginRight: 6 }} />
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.surface }}>
             {retryLabel}
           </Text>
         </TouchableOpacity>

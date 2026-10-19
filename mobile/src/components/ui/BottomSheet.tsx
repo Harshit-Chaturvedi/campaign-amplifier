@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { Headline, MetaLabel } from './Typography';
 
 interface BottomSheetProps {
   visible: boolean;
@@ -31,7 +33,7 @@ export function BottomSheet({
       <View
         style={{
           flex: 1,
-          backgroundColor: 'rgba(15, 23, 42, 0.45)',
+          backgroundColor: 'rgba(22, 19, 15, 0.5)',
           justifyContent: 'flex-end',
         }}
       >
@@ -42,29 +44,28 @@ export function BottomSheet({
         />
         <View
           style={{
-            backgroundColor: '#fff',
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
+            backgroundColor: colors.surface,
+            borderTopLeftRadius: tokens.radius.md,
+            borderTopRightRadius: tokens.radius.md,
+            borderTopWidth: 1,
+            borderLeftWidth: 1,
+            borderRightWidth: 1,
+            borderColor: colors.hairline,
             paddingTop: 12,
-            paddingHorizontal: 20,
+            paddingHorizontal: tokens.spacing.lg,
             paddingBottom: 32,
             maxHeight,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -3 },
-            shadowOpacity: 0.1,
-            shadowRadius: 10,
-            elevation: 10,
           }}
         >
           {/* Grab handle */}
           <View
             style={{
               width: 36,
-              height: 4,
-              borderRadius: 2,
-              backgroundColor: '#cbd5e1',
+              height: 3,
+              borderRadius: 1.5,
+              backgroundColor: colors.hairline,
               alignSelf: 'center',
-              marginBottom: 12,
+              marginBottom: 14,
             }}
           />
 
@@ -74,32 +75,34 @@ export function BottomSheet({
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: subtitle ? 4 : 16,
+              marginBottom: subtitle ? 4 : 14,
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a' }}>
+            <Headline style={{ fontSize: 18, color: colors.ink }}>
               {title}
-            </Text>
+            </Headline>
             <TouchableOpacity
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
-                backgroundColor: '#f1f5f9',
+                width: 30,
+                height: 30,
+                borderRadius: tokens.radius.xs,
+                backgroundColor: colors.paperSecondary,
+                borderWidth: 1,
+                borderColor: colors.hairline,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Ionicons name="close" size={18} color="#64748b" />
+              <Ionicons name="close" size={16} color={colors.ink} />
             </TouchableOpacity>
           </View>
 
           {subtitle && (
-            <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>
+            <MetaLabel style={{ marginBottom: 14 }}>
               {subtitle}
-            </Text>
+            </MetaLabel>
           )}
 
           <ScrollView showsVerticalScrollIndicator={false} bounces={false}>

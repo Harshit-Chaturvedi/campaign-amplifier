@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { Headline, BodyText, SmallCapsLabel } from './Typography';
 
 interface InfoTooltipProps {
   title: string;
@@ -13,7 +15,7 @@ export function InfoTooltip({
   title,
   description,
   size = 18,
-  color = '#64748b',
+  color = colors.mutedInk,
 }: InfoTooltipProps) {
   const [visible, setVisible] = useState(false);
 
@@ -36,7 +38,7 @@ export function InfoTooltip({
         <TouchableOpacity
           style={{
             flex: 1,
-            backgroundColor: 'rgba(15, 23, 42, 0.45)',
+            backgroundColor: 'rgba(22, 19, 15, 0.5)',
             justifyContent: 'center',
             alignItems: 'center',
             padding: 24,
@@ -46,16 +48,13 @@ export function InfoTooltip({
         >
           <View
             style={{
-              backgroundColor: '#fff',
-              borderRadius: 18,
-              padding: 22,
+              backgroundColor: colors.surface,
+              borderRadius: tokens.radius.sm,
+              padding: tokens.spacing.lg,
               width: '100%',
               maxWidth: 380,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 12,
-              elevation: 8,
+              borderWidth: 1,
+              borderColor: colors.hairline,
             }}
           >
             <View
@@ -67,28 +66,30 @@ export function InfoTooltip({
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                <Ionicons name="information-circle" size={22} color="#4f46e5" style={{ marginRight: 8 }} />
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+                <Ionicons name="information-circle-outline" size={18} color={colors.accent} style={{ marginRight: 6 }} />
+                <Headline style={{ fontSize: 16, color: colors.ink }}>
                   {title}
-                </Text>
+                </Headline>
               </View>
               <TouchableOpacity onPress={() => setVisible(false)}>
-                <Ionicons name="close" size={20} color="#94a3b8" />
+                <Ionicons name="close" size={18} color={colors.mutedInk} />
               </TouchableOpacity>
             </View>
-            <Text style={{ fontSize: 14, color: '#475569', lineHeight: 21, marginBottom: 16 }}>
+            <BodyText style={{ fontSize: 13, color: colors.mutedInk, lineHeight: 19, marginBottom: 16 }}>
               {description}
-            </Text>
+            </BodyText>
             <TouchableOpacity
               onPress={() => setVisible(false)}
               style={{
-                backgroundColor: '#f1f5f9',
-                paddingVertical: 10,
-                borderRadius: 10,
+                backgroundColor: colors.paperSecondary,
+                paddingVertical: 9,
+                borderRadius: tokens.radius.xs,
+                borderWidth: 1,
+                borderColor: colors.hairline,
                 alignItems: 'center',
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: '600', color: '#334155' }}>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                 Got it
               </Text>
             </TouchableOpacity>

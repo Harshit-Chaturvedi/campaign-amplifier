@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,14 @@ import {
   Share,
   KeyboardAvoidingView,
   Platform,
+  AccessibilityInfo,
 } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useCampaignStore } from '../../store/useCampaignStore';
@@ -27,6 +34,7 @@ import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { demoConfig } from '../../config/demoConfig';
 import { estimateReach, calculateBackerFee } from '../../services/reach';
 import { apiClient } from '../../api/client';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 export function FundCampaignScreen({ route, navigation }: any) {
   const { campaignId, initialAmount } = route.params;
@@ -57,10 +65,10 @@ export function FundCampaignScreen({ route, navigation }: any) {
 
   if (!campaign) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#f8fafc', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>Campaign not found</Text>
+      <View style={{ flex: 1, backgroundColor: colors.paper, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+        <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink }}>Campaign not found</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 12 }}>
-          <Text style={{ color: '#4f46e5', fontWeight: '600' }}>Go Back</Text>
+          <Text style={{ color: colors.accent, fontFamily: fonts.sansSemiBold }}>Go Back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -169,7 +177,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#f8fafc' }}
+      style={{ flex: 1, backgroundColor: colors.paper }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <StatusBar barStyle="dark-content" />
@@ -180,9 +188,9 @@ export function FundCampaignScreen({ route, navigation }: any) {
           paddingTop: 52,
           paddingBottom: 12,
           paddingHorizontal: 16,
-          backgroundColor: '#fff',
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.border,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -202,21 +210,23 @@ export function FundCampaignScreen({ route, navigation }: any) {
               }
             }}
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              backgroundColor: '#f1f5f9',
+              width: 36,
+              height: 36,
+              borderRadius: tokens.radii.xs,
+              backgroundColor: colors.surfaceSecondary,
+              borderWidth: 1,
+              borderColor: colors.border,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="arrow-back" size={20} color="#0f172a" />
+            <Ionicons name="arrow-back" size={18} color={colors.ink} />
           </TouchableOpacity>
           <View style={{ marginLeft: 12 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink }}>
               Back This Campaign
             </Text>
-            <Text style={{ fontSize: 12, color: '#64748b' }}>
+            <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
               Step {step} of 3 • {step === 1 ? 'Choose Amount' : step === 2 ? 'Review & Fees' : 'Simulated Checkout'}
             </Text>
           </View>
@@ -228,10 +238,10 @@ export function FundCampaignScreen({ route, navigation }: any) {
             <View
               key={s}
               style={{
-                width: 8,
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: s === step ? '#4f46e5' : s < step ? '#22c55e' : '#cbd5e1',
+                width: 7,
+                height: 7,
+                borderRadius: 3.5,
+                backgroundColor: s === step ? colors.accent : s < step ? colors.positive : colors.border,
               }}
             />
           ))}
@@ -248,11 +258,11 @@ export function FundCampaignScreen({ route, navigation }: any) {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
             <Text
               style={{
-                fontSize: 11,
-                fontWeight: '700',
-                color: '#4f46e5',
+                fontSize: 10,
+                fontFamily: fonts.sansBold,
+                color: colors.accent,
                 textTransform: 'uppercase',
-                letterSpacing: 0.5,
+                letterSpacing: 0.9,
               }}
             >
               {campaign.category.replace('_', ' ')}
@@ -265,18 +275,18 @@ export function FundCampaignScreen({ route, navigation }: any) {
             >
               <Ionicons
                 name={showInspectModal ? 'chevron-up-circle' : 'information-circle-outline'}
-                size={16}
-                color="#6366f1"
+                size={15}
+                color={colors.accent}
               />
-              <Text style={{ fontSize: 12, fontWeight: '600', color: '#6366f1' }}>
+              <Text style={{ fontSize: 11, fontFamily: fonts.sansSemiBold, color: colors.accent }}>
                 {showInspectModal ? 'Hide Details' : 'Inspect'}
               </Text>
             </TouchableOpacity>
           </View>
-          <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }} numberOfLines={2}>
+          <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink }} numberOfLines={2}>
             {campaign.title}
           </Text>
-          <Text style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 4 }}>
             by {campaign.creatorName} • {formatCurrency(remaining)} needed to reach advertising goal
           </Text>
 
@@ -287,23 +297,23 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 marginTop: 12,
                 paddingTop: 12,
                 borderTopWidth: 1,
-                borderTopColor: '#f1f5f9',
-                gap: 8,
+                borderTopColor: colors.border,
+                gap: 6,
               }}
             >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#1e293b' }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.ink, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                 Campaign Distribution Specs:
               </Text>
-              <Text style={{ fontSize: 12, color: '#475569', lineHeight: 18 }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 18 }}>
                 • Visible Sources: {campaign.sources?.length || 2} citations checkable by backers.
               </Text>
-              <Text style={{ fontSize: 12, color: '#475569', lineHeight: 18 }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 18 }}>
                 • Distribution split: 95% goes directly to targeted ad platforms (Meta, Instagram, Reddit).
               </Text>
-              <Text style={{ fontSize: 12, color: '#475569', lineHeight: 18 }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 18 }}>
                 • 5% platform operations fee supports review, policy enforcement, and infrastructure.
               </Text>
-              <Text style={{ fontSize: 12, color: '#475569', lineHeight: 18 }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 18 }}>
                 • Goal Reached Policy: Reaching 100% funds locks allocation; platform review finalizes ads before delivery begins.
               </Text>
             </View>
@@ -320,7 +330,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
               <AmplificationNotice compact />
             </View>
 
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink, marginBottom: 12 }}>
               Select Contribution Amount
             </Text>
 
@@ -338,26 +348,21 @@ export function FundCampaignScreen({ route, navigation }: any) {
                       setCustomAmount('');
                     }}
                     style={{
-                      paddingHorizontal: 20,
-                      paddingVertical: 14,
-                      borderRadius: 14,
-                      marginRight: 10,
-                      marginBottom: 10,
-                      backgroundColor: selected ? '#4f46e5' : '#fff',
-                      borderWidth: 1.5,
-                      borderColor: selected ? '#4f46e5' : '#e2e8f0',
-                      shadowColor: '#000',
-                      shadowOffset: { width: 0, height: 1 },
-                      shadowOpacity: 0.05,
-                      shadowRadius: 2,
-                      elevation: 1,
+                      paddingHorizontal: 18,
+                      paddingVertical: 12,
+                      borderRadius: tokens.radii.xs,
+                      marginRight: 8,
+                      marginBottom: 8,
+                      backgroundColor: selected ? colors.ink : colors.surface,
+                      borderWidth: 1,
+                      borderColor: selected ? colors.ink : colors.border,
                     }}
                   >
                     <Text
                       style={{
                         fontSize: 16,
-                        fontWeight: '800',
-                        color: selected ? '#fff' : '#0f172a',
+                        fontFamily: fonts.serifBold,
+                        color: selected ? '#FFFFFF' : colors.ink,
                       }}
                     >
                       ${preset}
@@ -368,22 +373,22 @@ export function FundCampaignScreen({ route, navigation }: any) {
             </View>
 
             {/* Custom Amount Input */}
-            <Text style={{ fontSize: 14, fontWeight: '600', color: '#334155', marginBottom: 8 }}>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.inkSecondary, marginBottom: 8 }}>
               Or specify a custom amount
             </Text>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: '#fff',
-                borderWidth: 1.5,
-                borderColor: customAmount ? '#4f46e5' : '#e2e8f0',
-                borderRadius: 14,
+                backgroundColor: colors.surface,
+                borderWidth: 1,
+                borderColor: customAmount ? colors.ink : colors.border,
+                borderRadius: tokens.radii.xs,
                 paddingHorizontal: 16,
                 marginBottom: 20,
               }}
             >
-              <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a' }}>$</Text>
+              <Text style={{ fontSize: 22, fontFamily: fonts.serifBold, color: colors.ink }}>$</Text>
               <TextInput
                 accessibilityLabel="Custom contribution amount in dollars"
                 value={customAmount}
@@ -392,21 +397,21 @@ export function FundCampaignScreen({ route, navigation }: any) {
                   setSelectedPreset(0);
                 }}
                 placeholder="0.00"
-                placeholderTextColor="#94a3b8"
+                placeholderTextColor={colors.inkMuted}
                 keyboardType="decimal-pad"
                 style={{
                   flex: 1,
                   fontSize: 22,
-                  fontWeight: '800',
-                  color: '#0f172a',
-                  paddingVertical: 14,
+                  fontFamily: fonts.serifBold,
+                  color: colors.ink,
+                  paddingVertical: 12,
                   marginLeft: 6,
                 }}
               />
             </View>
 
-            {/* Live Estimated Reach Preview */}
-            <Card style={{ backgroundColor: '#eef2ff', borderColor: '#c7d2fe', marginBottom: 16 }}>
+            {/* Live Estimated Reach Preview - Broadsheet Hero (Requirement 6) */}
+            <Card style={{ backgroundColor: colors.surfaceSecondary, borderColor: colors.border, marginBottom: 16 }}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -415,30 +420,30 @@ export function FundCampaignScreen({ route, navigation }: any) {
                   marginBottom: 8,
                 }}
               >
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#3730a3' }}>
-                  Estimated Audience Reach
+                <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.9 }}>
+                  ESTIMATED AUDIENCE REACH
                 </Text>
                 <DemoDataBadge size="sm" />
               </View>
               <View style={{ flexDirection: 'row', marginTop: 4 }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 26, fontWeight: '800', color: '#312e81' }}>
+                  <Text style={{ fontSize: 28, fontFamily: fonts.serifBold, color: colors.ink, lineHeight: 34 }}>
                     {formatNumber(reachCalc.estimate)}
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#6366f1', marginTop: 2 }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                     Est. people reached
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 26, fontWeight: '800', color: '#312e81' }}>
+                  <Text style={{ fontSize: 28, fontFamily: fonts.serifBold, color: colors.ink, lineHeight: 34 }}>
                     {formatNumber(reachCalc.impressions)}
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#6366f1', marginTop: 2 }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
                     Est. ad impressions
                   </Text>
                 </View>
               </View>
-              <Text style={{ fontSize: 11, color: '#6366f1', marginTop: 12, lineHeight: 16 }}>
+              <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 12, lineHeight: 16 }}>
                 Based on ${demoConfig.cpmUsd} CPM and {demoConfig.avgFrequency}x frequency. Labelled estimate, not a guarantee.
               </Text>
             </Card>
@@ -446,21 +451,21 @@ export function FundCampaignScreen({ route, navigation }: any) {
             {/* Quick Fee Summary */}
             <Card>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}>
-                <Text style={{ fontSize: 14, color: '#64748b' }}>Contribution</Text>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }}>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Contribution</Text>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                   {formatCurrency(dollars)}
                 </Text>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}>
-                <Text style={{ fontSize: 14, color: '#64748b' }}>Payment fee (2.9% + $0.30)</Text>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }}>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Payment fee (2.9% + $0.30)</Text>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                   {formatCurrency(fee)}
                 </Text>
               </View>
-              <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 8 }} />
+              <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 8 }} />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2 }}>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>Total Payment</Text>
-                <Text style={{ fontSize: 17, fontWeight: '800', color: '#4f46e5' }}>
+                <Text style={{ fontSize: 14, fontFamily: fonts.serifBold, color: colors.ink }}>Total Payment</Text>
+                <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.accent }}>
                   {formatCurrency(total)}
                 </Text>
               </View>
@@ -478,42 +483,42 @@ export function FundCampaignScreen({ route, navigation }: any) {
               <AmplificationNotice />
             </View>
 
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink, marginBottom: 12 }}>
               Contribution & Fee Breakdown
             </Text>
 
             {/* Itemized Fee Breakdown Card */}
             <Card style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 }}>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#334155' }}>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>
                   Chosen Contribution
                 </Text>
-                <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
+                <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                   {formatCurrency(dollars)}
                 </Text>
               </View>
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 }}>
                 <View style={{ flex: 1, paddingRight: 10 }}>
-                  <Text style={{ fontSize: 14, color: '#64748b' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>
                     Payment Processing Fee
                   </Text>
-                  <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkMuted, marginTop: 1 }}>
                     2.9% + $0.30 standard gateway fee
                   </Text>
                 </View>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }}>
+                <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                   +{formatCurrency(fee)}
                 </Text>
               </View>
 
-              <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 10 }} />
+              <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 10 }} />
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}>
-                <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+                <Text style={{ fontSize: 14, fontFamily: fonts.serifBold, color: colors.ink }}>
                   Total Charged to Card
                 </Text>
-                <Text style={{ fontSize: 20, fontWeight: '800', color: '#4f46e5' }}>
+                <Text style={{ fontSize: 18, fontFamily: fonts.serifBold, color: colors.accent }}>
                   {formatCurrency(total)}
                 </Text>
               </View>
@@ -522,25 +527,25 @@ export function FundCampaignScreen({ route, navigation }: any) {
               <View
                 style={{
                   marginTop: 14,
-                  backgroundColor: '#f8fafc',
-                  borderRadius: 10,
+                  backgroundColor: colors.surfaceSecondary,
+                  borderRadius: tokens.radii.xs,
                   padding: 12,
                   borderWidth: 1,
-                  borderColor: '#e2e8f0',
+                  borderColor: colors.border,
                 }}
               >
-                <Text style={{ fontSize: 12, fontWeight: '700', color: '#334155', marginBottom: 6 }}>
+                <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: colors.ink, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 }}>
                   Where Your {formatCurrency(dollars)} Contribution Goes:
                 </Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <Text style={{ fontSize: 12, color: '#64748b' }}>• Direct Ad Spend (95%)</Text>
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#16a34a' }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>• Direct Ad Spend (95%)</Text>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.positive }}>
                     {formatCurrency(netAdBudget)}
                   </Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 12, color: '#64748b' }}>• Platform Review & Ops (5%)</Text>
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#475569' }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>• Platform Review & Ops (5%)</Text>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     {formatCurrency(platformFee)}
                   </Text>
                 </View>
@@ -549,25 +554,25 @@ export function FundCampaignScreen({ route, navigation }: any) {
 
             {/* Impact & Progress Projection Card */}
             <Card style={{ marginBottom: 16 }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 8 }}>
+              <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink, marginBottom: 8 }}>
                 Projected Impact on Campaign
               </Text>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                <Text style={{ fontSize: 13, color: '#64748b' }}>Current Funded Progress</Text>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Current Funded Progress</Text>
+                <Text style={{ fontSize: 13, fontFamily: fonts.serifBold, color: colors.ink }}>
                   {campaign.percentFunded}% ({formatCurrency(campaign.amountRaised)})
                 </Text>
               </View>
               <ProgressBar
                 progress={Math.min(100, campaign.percentFunded + Math.round((dollars / campaign.fundingGoal) * 100))}
-                color="#4f46e5"
-                height={8}
+                color={colors.accent}
+                height={3}
               />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-                <Text style={{ fontSize: 12, color: '#475569' }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
                   Projected with your backing:
                 </Text>
-                <Text style={{ fontSize: 12, fontWeight: '700', color: '#4f46e5' }}>
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.accent }}>
                   {Math.min(100, Math.round(((campaign.amountRaised + dollars) / campaign.fundingGoal) * 100))}% of goal
                 </Text>
               </View>
@@ -577,27 +582,27 @@ export function FundCampaignScreen({ route, navigation }: any) {
             <Card style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flex: 1, marginRight: 12 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     Show my name publicly
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginTop: 3, lineHeight: 17 }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 3, lineHeight: 17 }}>
                     Private by default. Turn on to display your name on the public campaign supporters list.
                   </Text>
                 </View>
                 <Switch
                   value={showName}
                   onValueChange={setShowName}
-                  trackColor={{ false: '#cbd5e1', true: '#4f46e5' }}
+                  trackColor={{ false: colors.border, true: colors.accent }}
                 />
               </View>
             </Card>
 
             {/* Terms & Refund Policy */}
-            <Card style={{ backgroundColor: '#fffbeb', borderColor: '#fef3c7', marginBottom: 16 }}>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: '#92400e', marginBottom: 4 }}>
+            <Card style={{ backgroundColor: colors.surfaceSecondary, borderColor: colors.border, marginBottom: 16 }}>
+              <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: colors.ink, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
                 Unspent Funds & Allocation Policy:
               </Text>
-              <Text style={{ fontSize: 11, color: '#b45309', lineHeight: 16 }}>
+              <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 16 }}>
                 Contributions purchase advertising distribution to spread checkable civic information. If a campaign is cancelled or fails to launch, all unspent funds are refunded. Reaching 100% of the funding goal does NOT start ads immediately; platform review finalizes targeting and creative setup first.
               </Text>
             </Card>
@@ -612,51 +617,51 @@ export function FundCampaignScreen({ route, navigation }: any) {
             {/* Demo Simulation Notice Banner */}
             <View
               style={{
-                backgroundColor: '#eff6ff',
-                borderColor: '#93c5fd',
-                borderWidth: 1.5,
-                borderRadius: 14,
+                backgroundColor: colors.surfaceSecondary,
+                borderColor: colors.borderDark,
+                borderWidth: 1,
+                borderRadius: tokens.radii.sm,
                 padding: 14,
                 marginBottom: 16,
               }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <Ionicons name="card-outline" size={18} color="#2563eb" />
-                <Text style={{ fontSize: 13, fontWeight: '800', color: '#1d4ed8', textTransform: 'uppercase' }}>
+                <Ionicons name="card-outline" size={16} color={colors.ink} />
+                <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: colors.ink, textTransform: 'uppercase', letterSpacing: 0.9 }}>
                   Test mode - no real payment
                 </Text>
               </View>
-              <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 17 }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 17 }}>
                 This is a prototype payment sandbox. No real credit card or bank account is billed. Use the simulation controls below to demonstrate success, pending, failed, and cancelled payment states.
               </Text>
             </View>
 
             {/* Backer identity info (Guest support) */}
             <Card style={{ marginBottom: 16 }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 8 }}>
+              <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink, marginBottom: 8 }}>
                 Backer Information
               </Text>
 
               {user ? (
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: 10, padding: 12 }}>
-                  <Ionicons name="person-circle" size={32} color="#4f46e5" />
+                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceSecondary, borderRadius: tokens.radii.xs, borderWidth: 1, borderColor: colors.border, padding: 12 }}>
+                  <Ionicons name="person-circle" size={28} color={colors.accent} />
                   <View style={{ marginLeft: 10, flex: 1 }}>
-                    <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>{user.name}</Text>
-                    <Text style={{ fontSize: 12, color: '#64748b' }}>{user.email}</Text>
+                    <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>{user.name}</Text>
+                    <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>{user.email}</Text>
                   </View>
-                  <View style={{ backgroundColor: '#dcfce7', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 }}>
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#16a34a' }}>Signed In</Text>
+                  <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: tokens.radii.xs, paddingHorizontal: 8, paddingVertical: 2 }}>
+                    <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.positive, textTransform: 'uppercase' }}>Signed In</Text>
                   </View>
                 </View>
               ) : (
                 <View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <Ionicons name="globe-outline" size={16} color="#64748b" />
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginLeft: 6 }}>
+                    <Ionicons name="globe-outline" size={16} color={colors.inkSecondary} />
+                    <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.ink, marginLeft: 6 }}>
                       Backing as a Guest (No account required)
                     </Text>
                   </View>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 8 }}>
                     Optional: Provide an email address to receive your confirmation and digital receipt.
                   </Text>
                   <TextInput
@@ -664,18 +669,19 @@ export function FundCampaignScreen({ route, navigation }: any) {
                     value={guestEmail}
                     onChangeText={setGuestEmail}
                     placeholder="you@example.com (optional)"
-                    placeholderTextColor="#94a3b8"
+                    placeholderTextColor={colors.inkMuted}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     style={{
-                      backgroundColor: '#fff',
-                      borderWidth: 1.5,
-                      borderColor: '#e2e8f0',
-                      borderRadius: 12,
+                      backgroundColor: colors.surface,
+                      borderWidth: 1,
+                      borderColor: colors.border,
+                      borderRadius: tokens.radii.xs,
                       paddingHorizontal: 14,
-                      paddingVertical: 12,
+                      paddingVertical: 10,
                       fontSize: 14,
-                      color: '#0f172a',
+                      fontFamily: fonts.sansRegular,
+                      color: colors.ink,
                     }}
                   />
                 </View>
@@ -685,49 +691,49 @@ export function FundCampaignScreen({ route, navigation }: any) {
             {/* Mock Payment Card Widget */}
             <Card style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+                <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
                   Simulated Payment Method
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Ionicons name="lock-closed" size={12} color="#16a34a" />
-                  <Text style={{ fontSize: 11, fontWeight: '600', color: '#16a34a' }}>Encrypted</Text>
+                  <Ionicons name="lock-closed" size={12} color={colors.positive} />
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansSemiBold, color: colors.positive }}>Encrypted</Text>
                 </View>
               </View>
 
               <View
                 style={{
-                  backgroundColor: '#1e293b',
-                  borderRadius: 12,
+                  backgroundColor: colors.ink,
+                  borderRadius: tokens.radii.sm,
                   padding: 16,
                   marginBottom: 12,
                 }}
               >
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '800', color: '#94a3b8', letterSpacing: 1 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.inkMuted, letterSpacing: 1 }}>
                     DEMO VISA
                   </Text>
-                  <Ionicons name="radio-outline" size={20} color="#94a3b8" />
+                  <Ionicons name="radio-outline" size={18} color={colors.inkMuted} />
                 </View>
-                <Text style={{ fontSize: 18, fontWeight: '700', color: '#ffffff', letterSpacing: 2, marginBottom: 16 }}>
+                <Text style={{ fontSize: 18, fontFamily: fonts.sansSemiBold, color: '#FFFFFF', letterSpacing: 2, marginBottom: 14 }}>
                   •••• •••• •••• 4242
                 </Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View>
-                    <Text style={{ fontSize: 9, color: '#94a3b8', textTransform: 'uppercase' }}>Cardholder</Text>
-                    <Text style={{ fontSize: 12, fontWeight: '600', color: '#ffffff', marginTop: 2 }}>
+                    <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase' }}>Cardholder</Text>
+                    <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: '#FFFFFF', marginTop: 2 }}>
                       {showName && user ? user.name : 'COMMUNITY BACKER'}
                     </Text>
                   </View>
                   <View>
-                    <Text style={{ fontSize: 9, color: '#94a3b8', textTransform: 'uppercase' }}>Expires</Text>
-                    <Text style={{ fontSize: 12, fontWeight: '600', color: '#ffffff', marginTop: 2 }}>12/28</Text>
+                    <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase' }}>Expires</Text>
+                    <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: '#FFFFFF', marginTop: 2 }}>12/28</Text>
                   </View>
                 </View>
               </View>
 
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 }}>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: '#64748b' }}>Amount to Authorize:</Text>
-                <Text style={{ fontSize: 18, fontWeight: '800', color: '#4f46e5' }}>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>Amount to Authorize:</Text>
+                <Text style={{ fontSize: 18, fontFamily: fonts.serifBold, color: colors.accent }}>
                   {formatCurrency(total)}
                 </Text>
               </View>
@@ -739,18 +745,18 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 style={{
                   backgroundColor:
                     simulationState === 'failed'
-                      ? '#fef2f2'
+                      ? colors.dangerFaint
                       : simulationState === 'pending'
-                      ? '#fffbeb'
-                      : '#f1f5f9',
+                      ? colors.warningFaint
+                      : colors.surfaceSecondary,
                   borderColor:
                     simulationState === 'failed'
-                      ? '#f87171'
+                      ? colors.danger
                       : simulationState === 'pending'
-                      ? '#fde68a'
-                      : '#cbd5e1',
-                  borderWidth: 1.5,
-                  borderRadius: 14,
+                      ? colors.warning
+                      : colors.border,
+                  borderWidth: 1,
+                  borderRadius: tokens.radii.sm,
                   padding: 14,
                   marginBottom: 16,
                 }}
@@ -764,26 +770,27 @@ export function FundCampaignScreen({ route, navigation }: any) {
                         ? 'time'
                         : 'close-circle'
                     }
-                    size={18}
+                    size={16}
                     color={
                       simulationState === 'failed'
-                        ? '#dc2626'
+                        ? colors.danger
                         : simulationState === 'pending'
-                        ? '#b45309'
-                        : '#475569'
+                        ? colors.warning
+                        : colors.inkSecondary
                     }
                   />
                   <Text
                     style={{
-                      fontSize: 13,
-                      fontWeight: '800',
+                      fontSize: 11,
+                      fontFamily: fonts.sansBold,
                       color:
                         simulationState === 'failed'
-                          ? '#dc2626'
+                          ? colors.danger
                           : simulationState === 'pending'
-                          ? '#92400e'
-                          : '#334155',
+                          ? colors.warning
+                          : colors.ink,
                       textTransform: 'uppercase',
+                      letterSpacing: 0.8,
                     }}
                   >
                     State: {simulationState}
@@ -792,12 +799,13 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 <Text
                   style={{
                     fontSize: 12,
+                    fontFamily: fonts.sansRegular,
                     color:
                       simulationState === 'failed'
-                        ? '#b91c1c'
+                        ? colors.danger
                         : simulationState === 'pending'
-                        ? '#b45309'
-                        : '#475569',
+                        ? colors.warning
+                        : colors.inkSecondary,
                     lineHeight: 17,
                   }}
                 >
@@ -807,11 +815,11 @@ export function FundCampaignScreen({ route, navigation }: any) {
             )}
 
             {/* 4 Outcome Simulation Buttons */}
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 10 }}>
+            <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>
               Simulate Payment Outcome:
             </Text>
 
-            <View style={{ gap: 10, marginBottom: 20 }}>
+            <View style={{ gap: 8, marginBottom: 20 }}>
               {/* 1. Simulate Success */}
               <TouchableOpacity
                 accessibilityRole="button"
@@ -820,9 +828,9 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 disabled={loading}
                 activeOpacity={0.8}
                 style={{
-                  backgroundColor: '#16a34a',
-                  paddingVertical: 14,
-                  borderRadius: 14,
+                  backgroundColor: colors.positive,
+                  paddingVertical: 12,
+                  borderRadius: tokens.radii.xs,
                   alignItems: 'center',
                   flexDirection: 'row',
                   justifyContent: 'center',
@@ -833,8 +841,8 @@ export function FundCampaignScreen({ route, navigation }: any) {
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
                   <>
-                    <Ionicons name="checkmark-circle" size={20} color="#fff" />
-                    <Text style={{ fontSize: 15, fontWeight: '700', color: '#fff' }}>
+                    <Ionicons name="checkmark-circle" size={18} color="#fff" />
+                    <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: '#fff' }}>
                       Simulate Success ({formatCurrency(total)})
                     </Text>
                   </>
@@ -849,17 +857,19 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 disabled={loading}
                 activeOpacity={0.8}
                 style={{
-                  backgroundColor: '#f59e0b',
-                  paddingVertical: 12,
-                  borderRadius: 14,
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.warning,
+                  paddingVertical: 11,
+                  borderRadius: tokens.radii.xs,
                   alignItems: 'center',
                   flexDirection: 'row',
                   justifyContent: 'center',
                   gap: 8,
                 }}
               >
-                <Ionicons name="time" size={18} color="#fff" />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>
+                <Ionicons name="time" size={16} color={colors.warning} />
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.warning }}>
                   Simulate Pending (ACH/Clearing)
                 </Text>
               </TouchableOpacity>
@@ -872,17 +882,19 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 disabled={loading}
                 activeOpacity={0.8}
                 style={{
-                  backgroundColor: '#dc2626',
-                  paddingVertical: 12,
-                  borderRadius: 14,
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.danger,
+                  paddingVertical: 11,
+                  borderRadius: tokens.radii.xs,
                   alignItems: 'center',
                   flexDirection: 'row',
                   justifyContent: 'center',
                   gap: 8,
                 }}
               >
-                <Ionicons name="close-circle" size={18} color="#fff" />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>
+                <Ionicons name="close-circle" size={16} color={colors.danger} />
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.danger }}>
                   Simulate Failed (Card Declined)
                 </Text>
               </TouchableOpacity>
@@ -895,19 +907,19 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 disabled={loading}
                 activeOpacity={0.8}
                 style={{
-                  backgroundColor: '#fff',
-                  borderWidth: 1.5,
-                  borderColor: '#cbd5e1',
-                  paddingVertical: 12,
-                  borderRadius: 14,
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  paddingVertical: 11,
+                  borderRadius: tokens.radii.xs,
                   alignItems: 'center',
                   flexDirection: 'row',
                   justifyContent: 'center',
                   gap: 8,
                 }}
               >
-                <Ionicons name="ban-outline" size={18} color="#64748b" />
-                <Text style={{ fontSize: 14, fontWeight: '700', color: '#64748b' }}>
+                <Ionicons name="ban-outline" size={16} color={colors.inkSecondary} />
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.inkSecondary }}>
                   Simulate Cancelled by User
                 </Text>
               </TouchableOpacity>
@@ -926,9 +938,9 @@ export function FundCampaignScreen({ route, navigation }: any) {
             right: 0,
             padding: 16,
             paddingBottom: 32,
-            backgroundColor: '#fff',
+            backgroundColor: colors.surface,
             borderTopWidth: 1,
-            borderTopColor: '#f1f5f9',
+            borderTopColor: colors.border,
             flexDirection: 'row',
             gap: 12,
           }}
@@ -978,6 +990,55 @@ export function ThankYouScreen({ route, navigation }: any) {
   const toggleFollow = usePreferencesStore((s) => s.toggleFollowCampaign);
 
   const [followed, setFollowed] = useState(isFollowing);
+  const [displayReach, setDisplayReach] = useState(0);
+  const animatedProgress = useSharedValue(0);
+
+  const targetReach = estimatedReach || 0;
+  const targetPercent = campaign?.percentFunded ?? 100;
+
+  useEffect(() => {
+    let isMounted = true;
+    AccessibilityInfo.isReduceMotionEnabled().then((reducedMotion) => {
+      if (!isMounted) return;
+
+      if (reducedMotion) {
+        setDisplayReach(targetReach);
+        animatedProgress.value = targetPercent;
+        return;
+      }
+
+      // Animate progress bar via Reanimated
+      animatedProgress.value = withTiming(targetPercent, {
+        duration: 1200,
+        easing: Easing.out(Easing.cubic),
+      });
+
+      // Count up estimated people
+      const startTime = Date.now();
+      const duration = 1200;
+      const step = () => {
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        if (isMounted) {
+          setDisplayReach(Math.round(eased * targetReach));
+          if (progress < 1) {
+            requestAnimationFrame(step);
+          }
+        }
+      };
+      requestAnimationFrame(step);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [targetPercent, targetReach]);
+
+  const animatedBarStyle = useAnimatedStyle(() => ({
+    width: `${Math.min(100, Math.max(0, animatedProgress.value))}%`,
+  }));
 
   const handleToggleFollow = () => {
     toggleFollow(campaignId);
@@ -996,7 +1057,7 @@ export function ThankYouScreen({ route, navigation }: any) {
   const isGoalReached = campaign && campaign.amountRaised >= campaign.fundingGoal;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Top Header */}
@@ -1004,16 +1065,16 @@ export function ThankYouScreen({ route, navigation }: any) {
         style={{
           paddingTop: 52,
           paddingBottom: 12,
-          paddingHorizontal: 16,
-          backgroundColor: '#fff',
+          paddingHorizontal: 20,
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.border,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
       >
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+        <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
           Contribution Confirmed
         </Text>
         <TouchableOpacity
@@ -1021,80 +1082,130 @@ export function ThankYouScreen({ route, navigation }: any) {
           style={{
             width: 36,
             height: 36,
-            borderRadius: 18,
-            backgroundColor: '#f1f5f9',
+            borderRadius: tokens.radii.xs,
+            backgroundColor: colors.surfaceSecondary,
+            borderWidth: 1,
+            borderColor: colors.border,
             alignItems: 'center',
             justifyContent: 'center',
           }}
+          accessibilityRole="button"
+          accessibilityLabel="Close and return to Home"
         >
-          <Ionicons name="close" size={20} color="#0f172a" />
+          <Ionicons name="close" size={20} color={colors.ink} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
-        {/* Celebration Header */}
-        <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+        {/* Editorial Confirmation Header */}
+        <View style={{ alignItems: 'center', paddingVertical: 18 }}>
           <View
             style={{
-              width: 72,
-              height: 72,
-              borderRadius: 36,
-              backgroundColor: '#dcfce7',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 16,
+              paddingHorizontal: 12,
+              paddingVertical: 4,
+              backgroundColor: colors.surfaceSecondary,
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: tokens.radii.xs,
+              marginBottom: 12,
             }}
           >
-            <Ionicons name="checkmark-circle" size={44} color="#16a34a" />
+            <Text
+              style={{
+                fontSize: 10,
+                fontFamily: fonts.sansBold,
+                color: colors.positive,
+                letterSpacing: 0.9,
+                textTransform: 'uppercase',
+              }}
+            >
+              CONFIRMED • TEST MODE
+            </Text>
           </View>
-          <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a', textAlign: 'center' }}>
-            Thank You for Amplifying!
+
+          <Text style={{ fontSize: 26, fontFamily: fonts.serifBold, color: colors.ink, textAlign: 'center', lineHeight: 32 }}>
+            Thank You for Amplifying
           </Text>
-          <Text style={{ fontSize: 14, color: '#64748b', textAlign: 'center', marginTop: 8, lineHeight: 21, paddingHorizontal: 10 }}>
-            Your contribution of <Text style={{ fontWeight: '700', color: '#0f172a' }}>{formatCurrency(amount)}</Text> will fund digital advertising to deliver this message to an estimated{' '}
-            <Text style={{ fontWeight: '700', color: '#4f46e5' }}>{formatNumber(estimatedReach || 0)} people</Text>.
+
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 8, lineHeight: 21, paddingHorizontal: 10 }}>
+            Your contribution of <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>{formatCurrency(amount)}</Text> pools to fund targeted digital advertising for this checkable message.
           </Text>
-          <Text style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', marginTop: 4 }}>
-            (Configured demo reach estimate, not a guarantee)
-          </Text>
+
+          {/* Animated Hero Numbers - Newspaper Graphic (Requirement 6) */}
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: tokens.radii.md,
+              padding: 16,
+              marginTop: 18,
+              width: '100%',
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 10,
+                fontFamily: fonts.sansBold,
+                color: colors.inkMuted,
+                letterSpacing: 0.9,
+                textTransform: 'uppercase',
+                marginBottom: 4,
+              }}
+            >
+              PROJECTED AUDIENCE REACH (ESTIMATE)
+            </Text>
+            <Text style={{ fontSize: 36, fontFamily: fonts.serifBold, color: colors.ink, lineHeight: 42 }}>
+              ~{formatNumber(displayReach)}
+            </Text>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 4 }}>
+              people estimated to see this message
+            </Text>
+          </View>
         </View>
 
         {/* Goal Reached Notice if this contribution pushed the campaign over goal */}
         {isGoalReached && (
           <View
             style={{
-              backgroundColor: '#ecfdf5',
-              borderColor: '#6ee7b7',
-              borderWidth: 1.5,
-              borderRadius: 14,
+              backgroundColor: colors.positiveFaint,
+              borderColor: colors.positive,
+              borderWidth: 1,
+              borderRadius: tokens.radii.sm,
               padding: 14,
               marginBottom: 16,
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-              <Ionicons name="trophy" size={18} color="#059669" />
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#065f46', textTransform: 'uppercase' }}>
-                100% Distribution Goal Reached!
-              </Text>
-            </View>
-            <Text style={{ fontSize: 12, color: '#047857', lineHeight: 17 }}>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.positive, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+              100% Distribution Goal Reached
+            </Text>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.ink, lineHeight: 17 }}>
               Backers have fully funded the distribution budget. Content, sources, and audience targeting will be finalized during platform review before advertising distribution begins. Goal reached does NOT start ads immediately.
             </Text>
           </View>
         )}
 
-        {/* Updated Campaign Funding Progress Card */}
+        {/* Updated Campaign Funding Progress Card with Reanimated Bar */}
         {campaign && (
           <Card style={{ marginBottom: 16 }}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
+            <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink, marginBottom: 8 }}>
               {campaign.title}
             </Text>
-            <ProgressBar progress={campaign.percentFunded} color="#4f46e5" height={8} />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-              <Text style={{ fontSize: 13, fontWeight: '700', color: '#4f46e5' }}>
+            {/* Animated Progress Bar */}
+            <View style={{ height: 4, backgroundColor: colors.border, borderRadius: 2, overflow: 'hidden', width: '100%' }}>
+              <Animated.View
+                style={[
+                  { height: '100%', backgroundColor: colors.accent, borderRadius: 2 },
+                  animatedBarStyle,
+                ]}
+              />
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+              <Text style={{ fontSize: 13, fontFamily: fonts.serifBold, color: colors.accent }}>
                 {campaign.percentFunded}% funded
               </Text>
-              <Text style={{ fontSize: 12, color: '#64748b' }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
                 {formatCurrency(campaign.amountRaised)} of {formatCurrency(campaign.fundingGoal)}
               </Text>
             </View>
@@ -1102,16 +1213,13 @@ export function ThankYouScreen({ route, navigation }: any) {
         )}
 
         {/* Digital Receipt Card */}
-        <Card style={{ marginBottom: 16, backgroundColor: '#ffffff' }}>
+        <Card style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="receipt-outline" size={18} color="#4f46e5" />
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
-                Digital Receipt
-              </Text>
-            </View>
-            <View style={{ backgroundColor: '#f1f5f9', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>
+            <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
+              Digital Receipt
+            </Text>
+            <View style={{ backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, borderRadius: tokens.radii.xs, paddingHorizontal: 8, paddingVertical: 2 }}>
+              <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.inkSecondary }}>
                 #{receiptNo || 'REC-2026-DEMO'}
               </Text>
             </View>
@@ -1119,60 +1227,54 @@ export function ThankYouScreen({ route, navigation }: any) {
 
           <View style={{ gap: 6 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 13, color: '#64748b' }}>Contribution</Text>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>{formatCurrency(amount)}</Text>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Contribution</Text>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>{formatCurrency(amount)}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 13, color: '#64748b' }}>Payment fee (2.9% + $0.30)</Text>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#0f172a' }}>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Payment fee (2.9% + $0.30)</Text>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                 {fee ? formatCurrency(fee) : '$1.75'}
               </Text>
             </View>
-            <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 6 }} />
+            <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 6 }} />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>Total Paid</Text>
-              <Text style={{ fontSize: 16, fontWeight: '800', color: '#4f46e5' }}>
+              <Text style={{ fontSize: 14, fontFamily: fonts.serifBold, color: colors.ink }}>Total Paid</Text>
+              <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.accent }}>
                 {total ? formatCurrency(total) : formatCurrency(amount + 1.75)}
               </Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
-              <Text style={{ fontSize: 12, color: '#94a3b8' }}>Payment Status</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: '#16a34a' }}>Succeeded (Settled)</Text>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>Payment Status</Text>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.positive }}>Succeeded (Settled)</Text>
             </View>
-            <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 6 }} />
-            <Text style={{ fontSize: 11, color: '#64748b', fontStyle: 'italic', textAlign: 'center' }}>
+            <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 6 }} />
+            <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, fontStyle: 'italic', textAlign: 'center' }}>
               Notice: Message amplification reach, not a charitable donation.
             </Text>
           </View>
         </Card>
 
         {/* Step 6 Actions: Track & Share */}
-        <View style={{ gap: 12 }}>
-          {/* Share */}
+        <View style={{ gap: 10 }}>
           <Button
             title="Share Campaign"
             onPress={handleShare}
             variant="primary"
-            icon="share-social-outline"
             fullWidth
             size="lg"
           />
 
-          {/* Follow toggle */}
           <Button
             title={followed ? 'Following Campaign ✓' : 'Follow for Campaign Updates'}
             onPress={handleToggleFollow}
             variant={followed ? 'secondary' : 'outline'}
-            icon={followed ? 'checkmark-circle' : 'notifications-outline'}
             fullWidth
           />
 
-          {/* Return Home */}
           <Button
             title="Return to Home Feed"
             onPress={() => navigation.navigate('Home')}
             variant="secondary"
-            icon="home-outline"
             fullWidth
           />
         </View>

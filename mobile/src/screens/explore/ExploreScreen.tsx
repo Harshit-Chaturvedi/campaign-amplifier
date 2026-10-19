@@ -13,11 +13,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useCampaigns } from '../../api/hooks';
 import { useServerStatusStore } from '../../api/client';
 import { CampaignCard } from '../../components/campaign/CampaignCard';
-import { getCategoryColor } from '../../theme/colors';
 import { CampaignCardSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { BottomSheet } from '../../components/ui/BottomSheet';
+import { colors, fonts, tokens } from '../../theme/tokens';
 import type { CampaignCategory } from '../../types/campaign';
 
 const CATEGORIES: { key: CampaignCategory | 'all'; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
@@ -118,7 +118,7 @@ export function ExploreScreen({ navigation }: any) {
     SORT_OPTIONS.find((s) => s.key === sort)?.label || 'Trending';
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Header with Search & Filter controls */}
@@ -127,22 +127,24 @@ export function ExploreScreen({ navigation }: any) {
           paddingTop: 52,
           paddingBottom: 12,
           paddingHorizontal: 20,
-          backgroundColor: '#fff',
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.border,
         }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>Explore</Text>
+          <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink }}>
+            Explore
+          </Text>
           {isServerWakingUp ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#eef2ff', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
-              <ActivityIndicator size="small" color="#4f46e5" style={{ marginRight: 6 }} />
-              <Text style={{ fontSize: 11, fontWeight: '600', color: '#3730a3' }}>Waking server...</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceSecondary, paddingHorizontal: 8, paddingVertical: 4, borderRadius: tokens.radii.xs, borderWidth: 1, borderColor: colors.border }}>
+              <ActivityIndicator size="small" color={colors.accent} style={{ marginRight: 6 }} />
+              <Text style={{ fontSize: 11, fontFamily: fonts.sansMedium, color: colors.ink }}>Waking server...</Text>
             </View>
           ) : isOffline ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#fffbeb', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
-              <Ionicons name="cloud-offline-outline" size={13} color="#b45309" style={{ marginRight: 4 }} />
-              <Text style={{ fontSize: 11, fontWeight: '600', color: '#b45309' }}>Offline demo</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.warningFaint, paddingHorizontal: 8, paddingVertical: 4, borderRadius: tokens.radii.xs, borderWidth: 1, borderColor: colors.warning }}>
+              <Ionicons name="cloud-offline-outline" size={13} color={colors.warning} style={{ marginRight: 4 }} />
+              <Text style={{ fontSize: 11, fontFamily: fonts.sansMedium, color: colors.warning }}>Offline demo</Text>
             </View>
           ) : null}
         </View>
@@ -154,20 +156,22 @@ export function ExploreScreen({ navigation }: any) {
               flex: 1,
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: '#f1f5f9',
-              borderRadius: 14,
+              backgroundColor: colors.surfaceSecondary,
+              borderRadius: tokens.radii.sm,
+              borderWidth: 1,
+              borderColor: colors.border,
               paddingHorizontal: 12,
-              height: 44,
+              height: 42,
             }}
           >
-            <Ionicons name="search" size={18} color="#94a3b8" />
+            <Ionicons name="search" size={18} color={colors.inkMuted} />
             <TextInput
               accessibilityLabel="Search campaigns by title, topic, creator"
               value={searchInput}
               onChangeText={setSearchInput}
               placeholder="Search by title, topic, creator..."
-              placeholderTextColor="#94a3b8"
-              style={{ flex: 1, fontSize: 14, color: '#0f172a', marginLeft: 8 }}
+              placeholderTextColor={colors.inkMuted}
+              style={{ flex: 1, fontSize: 14, fontFamily: fonts.sansRegular, color: colors.ink, marginLeft: 8 }}
             />
             {searchInput.length > 0 && (
               <TouchableOpacity
@@ -176,7 +180,7 @@ export function ExploreScreen({ navigation }: any) {
                 onPress={() => setSearchInput('')}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Ionicons name="close-circle" size={18} color="#94a3b8" />
+                <Ionicons name="close-circle" size={18} color={colors.inkMuted} />
               </TouchableOpacity>
             )}
           </View>
@@ -187,11 +191,11 @@ export function ExploreScreen({ navigation }: any) {
             accessibilityLabel={`Filter campaigns (${activeFiltersCount} active)`}
             onPress={() => setFilterSheetVisible(true)}
             style={{
-              height: 44,
-              width: 44,
-              borderRadius: 14,
-              backgroundColor: activeFiltersCount > 0 ? '#eef2ff' : '#f1f5f9',
-              borderColor: activeFiltersCount > 0 ? '#c7d2fe' : '#f1f5f9',
+              height: 42,
+              width: 42,
+              borderRadius: tokens.radii.sm,
+              backgroundColor: activeFiltersCount > 0 ? colors.accentFaint : colors.surfaceSecondary,
+              borderColor: activeFiltersCount > 0 ? colors.accent : colors.border,
               borderWidth: 1,
               alignItems: 'center',
               justifyContent: 'center',
@@ -199,19 +203,19 @@ export function ExploreScreen({ navigation }: any) {
           >
             <Ionicons
               name="options-outline"
-              size={20}
-              color={activeFiltersCount > 0 ? '#4f46e5' : '#475569'}
+              size={19}
+              color={activeFiltersCount > 0 ? colors.accent : colors.inkSecondary}
             />
             {activeFiltersCount > 0 && (
               <View
                 style={{
                   position: 'absolute',
-                  top: 6,
-                  right: 6,
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: '#4f46e5',
+                  top: 5,
+                  right: 5,
+                  width: 7,
+                  height: 7,
+                  borderRadius: 3.5,
+                  backgroundColor: colors.accent,
                 }}
               />
             )}
@@ -227,24 +231,24 @@ export function ExploreScreen({ navigation }: any) {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: '#f8fafc',
-              borderColor: '#e2e8f0',
+              backgroundColor: colors.surfaceSecondary,
+              borderColor: colors.border,
               borderWidth: 1,
-              borderRadius: 10,
+              borderRadius: tokens.radii.xs,
               paddingHorizontal: 10,
               paddingVertical: 5,
             }}
           >
-            <Ionicons name="swap-vertical" size={14} color="#64748b" style={{ marginRight: 4 }} />
-            <Text style={{ fontSize: 12, fontWeight: '600', color: '#475569' }}>
+            <Ionicons name="swap-vertical" size={13} color={colors.inkSecondary} style={{ marginRight: 4 }} />
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>
               Sort: {currentSortLabel}
             </Text>
-            <Ionicons name="chevron-down" size={14} color="#94a3b8" style={{ marginLeft: 4 }} />
+            <Ionicons name="chevron-down" size={13} color={colors.inkMuted} style={{ marginLeft: 4 }} />
           </TouchableOpacity>
 
           {activeFiltersCount > 0 && (
             <TouchableOpacity onPress={clearAllFilters} style={{ paddingVertical: 4 }}>
-              <Text style={{ fontSize: 12, fontWeight: '600', color: '#ef4444' }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.danger }}>
                 Reset filters ({activeFiltersCount})
               </Text>
             </TouchableOpacity>
@@ -252,8 +256,8 @@ export function ExploreScreen({ navigation }: any) {
         </View>
       </View>
 
-      {/* 10 Category Chips */}
-      <View style={{ backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
+      {/* Category Chips */}
+      <View style={{ backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -261,7 +265,6 @@ export function ExploreScreen({ navigation }: any) {
         >
           {CATEGORIES.map((cat) => {
             const selected = category === cat.key;
-            const color = cat.key === 'all' ? '#4f46e5' : getCategoryColor(cat.key);
             return (
               <TouchableOpacity
                 key={cat.key}
@@ -271,25 +274,26 @@ export function ExploreScreen({ navigation }: any) {
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingHorizontal: 12,
-                  paddingVertical: 7,
-                  borderRadius: 20,
+                  paddingVertical: 6,
+                  borderRadius: tokens.radii.xs,
                   marginRight: 8,
-                  backgroundColor: selected ? color : '#f8fafc',
+                  backgroundColor: selected ? colors.accent : colors.surfaceSecondary,
                   borderWidth: 1,
-                  borderColor: selected ? color : '#e2e8f0',
+                  borderColor: selected ? colors.accent : colors.border,
                 }}
               >
                 <Ionicons
                   name={cat.icon}
-                  size={14}
-                  color={selected ? '#fff' : color}
+                  size={13}
+                  color={selected ? colors.inkInverse : colors.inkSecondary}
                   style={{ marginRight: 5 }}
                 />
                 <Text
                   style={{
-                    fontSize: 12,
-                    fontWeight: selected ? '700' : '600',
-                    color: selected ? '#fff' : '#475569',
+                    fontSize: 11,
+                    fontFamily: selected ? fonts.sansSemiBold : fonts.sansMedium,
+                    color: selected ? colors.inkInverse : colors.inkSecondary,
+                    letterSpacing: 0.3,
                   }}
                 >
                   {cat.label}
@@ -304,18 +308,18 @@ export function ExploreScreen({ navigation }: any) {
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 80 }}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); }} tintColor="#4f46e5" />
+          <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); }} tintColor={colors.accent} />
         }
       >
         {/* Results count header */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 13, color: '#64748b', fontWeight: '500' }}>
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>
             {isLoading
               ? 'Loading campaigns...'
               : `${campaigns.length} campaign${campaigns.length !== 1 ? 's' : ''} found`}
           </Text>
           {debouncedSearch && (
-            <Text style={{ fontSize: 12, color: '#94a3b8' }}>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>
               Query: "{debouncedSearch}"
             </Text>
           )}
@@ -377,7 +381,7 @@ export function ExploreScreen({ navigation }: any) {
       >
         <View style={{ paddingVertical: 8 }}>
           {/* Status section */}
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 10 }}>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 10 }}>
             Campaign Status
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
@@ -389,18 +393,18 @@ export function ExploreScreen({ navigation }: any) {
                   onPress={() => setStatusFilter(s.key)}
                   style={{
                     paddingHorizontal: 14,
-                    paddingVertical: 8,
-                    borderRadius: 12,
-                    backgroundColor: selected ? '#4f46e5' : '#f1f5f9',
+                    paddingVertical: 7,
+                    borderRadius: tokens.radii.xs,
+                    backgroundColor: selected ? colors.accent : colors.surfaceSecondary,
                     borderWidth: 1,
-                    borderColor: selected ? '#4f46e5' : '#e2e8f0',
+                    borderColor: selected ? colors.accent : colors.border,
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 13,
-                      fontWeight: selected ? '700' : '500',
-                      color: selected ? '#fff' : '#334155',
+                      fontSize: 12,
+                      fontFamily: selected ? fonts.sansSemiBold : fonts.sansMedium,
+                      color: selected ? colors.inkInverse : colors.ink,
                     }}
                   >
                     {s.label}
@@ -411,7 +415,7 @@ export function ExploreScreen({ navigation }: any) {
           </View>
 
           {/* Funding % section */}
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 10 }}>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 10 }}>
             Funding Progress
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
@@ -423,18 +427,18 @@ export function ExploreScreen({ navigation }: any) {
                   onPress={() => setFundingPctFilter(f.key)}
                   style={{
                     paddingHorizontal: 14,
-                    paddingVertical: 8,
-                    borderRadius: 12,
-                    backgroundColor: selected ? '#4f46e5' : '#f1f5f9',
+                    paddingVertical: 7,
+                    borderRadius: tokens.radii.xs,
+                    backgroundColor: selected ? colors.accent : colors.surfaceSecondary,
                     borderWidth: 1,
-                    borderColor: selected ? '#4f46e5' : '#e2e8f0',
+                    borderColor: selected ? colors.accent : colors.border,
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 13,
-                      fontWeight: selected ? '700' : '500',
-                      color: selected ? '#fff' : '#334155',
+                      fontSize: 12,
+                      fontFamily: selected ? fonts.sansSemiBold : fonts.sansMedium,
+                      color: selected ? colors.inkInverse : colors.ink,
                     }}
                   >
                     {f.label}
@@ -454,12 +458,14 @@ export function ExploreScreen({ navigation }: any) {
               style={{
                 flex: 1,
                 paddingVertical: 12,
-                borderRadius: 12,
-                backgroundColor: '#f1f5f9',
+                borderRadius: tokens.radii.sm,
+                backgroundColor: colors.surfaceSecondary,
+                borderWidth: 1,
+                borderColor: colors.border,
                 alignItems: 'center',
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: '600', color: '#64748b' }}>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>
                 Reset All
               </Text>
             </TouchableOpacity>
@@ -469,12 +475,12 @@ export function ExploreScreen({ navigation }: any) {
               style={{
                 flex: 1,
                 paddingVertical: 12,
-                borderRadius: 12,
-                backgroundColor: '#4f46e5',
+                borderRadius: tokens.radii.sm,
+                backgroundColor: colors.accent,
                 alignItems: 'center',
               }}
             >
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>
+              <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.inkInverse }}>
                 Show Results
               </Text>
             </TouchableOpacity>
@@ -502,31 +508,31 @@ export function ExploreScreen({ navigation }: any) {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  paddingVertical: 14,
+                  paddingVertical: 12,
                   paddingHorizontal: 12,
-                  borderRadius: 12,
-                  backgroundColor: selected ? '#eef2ff' : 'transparent',
+                  borderRadius: tokens.radii.xs,
+                  backgroundColor: selected ? colors.accentFaint : 'transparent',
                   marginBottom: 4,
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons
                     name={opt.icon as any}
-                    size={20}
-                    color={selected ? '#4f46e5' : '#64748b'}
+                    size={18}
+                    color={selected ? colors.accent : colors.inkSecondary}
                     style={{ marginRight: 12 }}
                   />
                   <Text
                     style={{
-                      fontSize: 15,
-                      fontWeight: selected ? '700' : '500',
-                      color: selected ? '#4f46e5' : '#0f172a',
+                      fontSize: 14,
+                      fontFamily: selected ? fonts.sansSemiBold : fonts.sansRegular,
+                      color: selected ? colors.accent : colors.ink,
                     }}
                   >
                     {opt.label}
                   </Text>
                 </View>
-                {selected && <Ionicons name="checkmark" size={18} color="#4f46e5" />}
+                {selected && <Ionicons name="checkmark" size={16} color={colors.accent} />}
               </TouchableOpacity>
             );
           })}

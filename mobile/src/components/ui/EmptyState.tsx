@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { Headline, BodyText, MetaLabel } from './Typography';
 
 interface EmptyStateProps {
   icon?: keyof typeof Ionicons.glyphMap;
@@ -33,55 +35,56 @@ export function EmptyState({
     >
       <View
         style={{
-          width: 64,
-          height: 64,
-          borderRadius: 32,
-          backgroundColor: '#eef2ff',
+          width: 48,
+          height: 48,
+          borderRadius: tokens.radius.xs,
+          backgroundColor: colors.paperSecondary,
+          borderWidth: 1,
+          borderColor: colors.hairline,
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: 16,
+          marginBottom: 14,
         }}
       >
-        <Ionicons name={icon} size={32} color="#4f46e5" />
+        <Ionicons name={icon} size={24} color={colors.mutedInk} />
       </View>
-      <Text
+      <Headline
         style={{
           fontSize: 17,
-          fontWeight: '700',
-          color: '#0f172a',
+          color: colors.ink,
           textAlign: 'center',
-          marginBottom: 6,
+          marginBottom: 4,
         }}
       >
         {title}
-      </Text>
+      </Headline>
       {message && (
-        <Text
+        <BodyText
           style={{
-            fontSize: 14,
-            color: '#64748b',
+            fontSize: 13,
+            color: colors.mutedInk,
             textAlign: 'center',
-            lineHeight: 20,
+            lineHeight: 18,
             maxWidth: 320,
             marginBottom: actionLabel && onAction ? 16 : 0,
           }}
         >
           {message}
-        </Text>
+        </BodyText>
       )}
       {actionLabel && onAction && (
         <TouchableOpacity
           onPress={onAction}
           activeOpacity={0.8}
           style={{
-            backgroundColor: '#4f46e5',
-            paddingHorizontal: 18,
-            paddingVertical: 10,
-            borderRadius: 12,
+            backgroundColor: colors.accent,
+            paddingHorizontal: 16,
+            paddingVertical: 9,
+            borderRadius: tokens.radius.xs,
             marginTop: 8,
           }}
         >
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#fff' }}>
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.surface }}>
             {actionLabel}
           </Text>
         </TouchableOpacity>

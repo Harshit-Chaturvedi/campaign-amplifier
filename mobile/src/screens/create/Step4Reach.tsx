@@ -1,13 +1,21 @@
 import React from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../../components/ui/Card';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 import { CampaignDraft } from '../../store/useDraftStore';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 const LOCATION_OPTIONS = [
   'Cook County',
@@ -160,43 +168,43 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
   return (
     <View>
       {/* Step Header */}
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>
+      <View style={{ marginBottom: tokens.spacing.lg }}>
+        <Headline style={{ fontSize: 22, color: colors.ink }}>
           Audience & Reach
-        </Text>
-        <Text style={{ fontSize: 14, color: '#64748b', marginTop: 4, lineHeight: 20 }}>
+        </Headline>
+        <MetaLabel style={{ marginTop: 4 }}>
           Define who should see your message and how budget should be distributed across social channels.
-        </Text>
+        </MetaLabel>
       </View>
 
       {/* SECTION 1: YOU CHOOSE */}
       <View
         style={{
-          borderLeftWidth: 4,
-          borderLeftColor: '#4f46e5',
-          paddingLeft: 12,
-          marginBottom: 16,
+          borderLeftWidth: 3,
+          borderLeftColor: colors.accent,
+          paddingLeft: 10,
+          marginBottom: tokens.spacing.md,
         }}
       >
-        <Text style={{ fontSize: 13, fontWeight: '800', color: '#4f46e5', textTransform: 'uppercase', letterSpacing: 0.8 }}>
-          Section 1: You Choose
-        </Text>
-        <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', marginTop: 2 }}>
+        <SmallCapsLabel style={{ fontSize: 11, color: colors.accent }}>
+          SECTION 1: YOU CHOOSE
+        </SmallCapsLabel>
+        <Subheading style={{ fontSize: 15, color: colors.ink, marginTop: 2 }}>
           Your Desired Reach Profile
-        </Text>
+        </Subheading>
       </View>
 
       {/* 1. Locations */}
-      <Card style={{ marginBottom: 18, padding: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-          <Ionicons name="location-outline" size={18} color="#4f46e5" style={{ marginRight: 6 }} />
-          <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
+      <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+          <Ionicons name="location-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
+          <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
             Target Locations
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+        <MetaLabel style={{ marginBottom: 10 }}>
           Select the geographic areas where your ad messages should be displayed.
-        </Text>
+        </MetaLabel>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {LOCATION_OPTIONS.map((loc) => {
             const isSelected = locations.includes(loc);
@@ -210,20 +218,20 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                   alignItems: 'center',
                   paddingHorizontal: 12,
                   paddingVertical: 7,
-                  borderRadius: 20,
-                  backgroundColor: isSelected ? '#4f46e5' : '#f1f5f9',
+                  borderRadius: tokens.radius.xs,
+                  backgroundColor: isSelected ? colors.surface : colors.paperSecondary,
                   borderWidth: 1,
-                  borderColor: isSelected ? '#4f46e5' : '#e2e8f0',
+                  borderColor: isSelected ? colors.accent : colors.hairline,
                 }}
               >
                 {isSelected && (
-                  <Ionicons name="checkmark-circle" size={14} color="#fff" style={{ marginRight: 5 }} />
+                  <Ionicons name="checkmark" size={13} color={colors.accent} style={{ marginRight: 5 }} />
                 )}
                 <Text
                   style={{
                     fontSize: 13,
-                    fontWeight: isSelected ? '700' : '500',
-                    color: isSelected ? '#fff' : '#334155',
+                    fontFamily: isSelected ? fonts.sansSemiBold : fonts.sansRegular,
+                    color: isSelected ? colors.accent : colors.ink,
                   }}
                 >
                   {loc}
@@ -235,16 +243,16 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
       </Card>
 
       {/* 2. Interests */}
-      <Card style={{ marginBottom: 18, padding: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-          <Ionicons name="sparkles-outline" size={18} color="#4f46e5" style={{ marginRight: 6 }} />
-          <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
+      <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+          <Ionicons name="sparkles-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
+          <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
             Audience Interests
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+        <MetaLabel style={{ marginBottom: 10 }}>
           Connect with audiences engaged in related civic, local, and community topics.
-        </Text>
+        </MetaLabel>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {INTEREST_OPTIONS.map((interest) => {
             const isSelected = interests.includes(interest);
@@ -258,23 +266,23 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                   alignItems: 'center',
                   paddingHorizontal: 12,
                   paddingVertical: 7,
-                  borderRadius: 20,
-                  backgroundColor: isSelected ? '#eef2ff' : '#f8fafc',
+                  borderRadius: tokens.radius.xs,
+                  backgroundColor: isSelected ? colors.surface : colors.paperSecondary,
                   borderWidth: 1,
-                  borderColor: isSelected ? '#6366f1' : '#e2e8f0',
+                  borderColor: isSelected ? colors.accent : colors.hairline,
                 }}
               >
                 <Ionicons
-                  name={isSelected ? 'checkbox' : 'square-outline'}
+                  name={isSelected ? 'checkbox-outline' : 'square-outline'}
                   size={14}
-                  color={isSelected ? '#4f46e5' : '#94a3b8'}
+                  color={isSelected ? colors.accent : colors.mutedInk}
                   style={{ marginRight: 6 }}
                 />
                 <Text
                   style={{
                     fontSize: 13,
-                    fontWeight: isSelected ? '700' : '500',
-                    color: isSelected ? '#3730a3' : '#334155',
+                    fontFamily: isSelected ? fonts.sansSemiBold : fonts.sansRegular,
+                    color: isSelected ? colors.accent : colors.ink,
                   }}
                 >
                   {interest}
@@ -286,35 +294,37 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
       </Card>
 
       {/* 3. Channels & Budget Allocation */}
-      <Card style={{ marginBottom: 18, padding: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+      <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="pie-chart-outline" size={18} color="#4f46e5" style={{ marginRight: 6 }} />
-            <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
+            <Ionicons name="pie-chart-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
+            <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
               Advertising Channels
             </Text>
           </View>
           <TouchableOpacity
             onPress={distributeEvenly}
             style={{
-              paddingHorizontal: 10,
-              paddingVertical: 4,
-              borderRadius: 6,
-              backgroundColor: '#f1f5f9',
+              paddingHorizontal: 8,
+              paddingVertical: 3,
+              borderRadius: tokens.radius.xs,
+              backgroundColor: colors.paperSecondary,
+              borderWidth: 1,
+              borderColor: colors.hairline,
             }}
           >
-            <Text style={{ fontSize: 11, fontWeight: '700', color: '#4f46e5' }}>
-              Distribute Evenly
-            </Text>
+            <SmallCapsLabel style={{ fontSize: 10, color: colors.accent }}>
+              DISTRIBUTE EVENLY
+            </SmallCapsLabel>
           </TouchableOpacity>
         </View>
 
-        <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+        <MetaLabel style={{ marginBottom: 12 }}>
           Choose active networks and allocate percentage of ad spend. Budget must total 100%.
-        </Text>
+        </MetaLabel>
 
         {/* Channel Selection Chips */}
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 14 }}>
           {ALL_CHANNELS.map((ch) => {
             const isSelected = channels.includes(ch.id);
             return (
@@ -327,23 +337,23 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                   alignItems: 'center',
                   paddingHorizontal: 12,
                   paddingVertical: 7,
-                  borderRadius: 12,
-                  backgroundColor: isSelected ? '#1e293b' : '#f8fafc',
+                  borderRadius: tokens.radius.xs,
+                  backgroundColor: isSelected ? colors.surface : colors.paperSecondary,
                   borderWidth: 1,
-                  borderColor: isSelected ? '#0f172a' : '#cbd5e1',
+                  borderColor: isSelected ? colors.accent : colors.hairline,
                 }}
               >
                 <Ionicons
                   name={ch.icon as any}
-                  size={15}
-                  color={isSelected ? '#fff' : '#64748b'}
+                  size={14}
+                  color={isSelected ? colors.accent : colors.mutedInk}
                   style={{ marginRight: 6 }}
                 />
                 <Text
                   style={{
                     fontSize: 13,
-                    fontWeight: isSelected ? '700' : '500',
-                    color: isSelected ? '#fff' : '#334155',
+                    fontFamily: isSelected ? fonts.sansSemiBold : fonts.sansRegular,
+                    color: isSelected ? colors.accent : colors.ink,
                   }}
                 >
                   {ch.name}
@@ -354,10 +364,10 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
         </View>
 
         {/* Budget Allocation Steppers per Selected Channel */}
-        <View style={{ backgroundColor: '#f8fafc', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#f1f5f9' }}>
-          <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a', marginBottom: 10 }}>
-            Budget Allocation Across Channels
-          </Text>
+        <View style={{ backgroundColor: colors.paperSecondary, borderRadius: tokens.radius.sm, padding: 12, borderWidth: 1, borderColor: colors.hairline }}>
+          <SmallCapsLabel style={{ color: colors.ink, marginBottom: 8 }}>
+            BUDGET ALLOCATION ACROSS CHANNELS
+          </SmallCapsLabel>
 
           {channels.map((chId) => {
             const chMeta = ALL_CHANNELS.find((c) => c.id === chId);
@@ -371,17 +381,17 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                   justifyContent: 'space-between',
                   paddingVertical: 8,
                   borderBottomWidth: 1,
-                  borderBottomColor: '#e2e8f0',
+                  borderBottomColor: colors.hairline,
                 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons
                     name={chMeta?.icon as any || 'megaphone-outline'}
-                    size={16}
-                    color={chMeta?.color || '#4f46e5'}
+                    size={15}
+                    color={colors.mutedInk}
                     style={{ marginRight: 8 }}
                   />
-                  <Text style={{ fontSize: 14, fontWeight: '600', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 14, fontFamily: fonts.sansMedium, color: colors.ink }}>
                     {chMeta?.name || chId}
                   </Text>
                 </View>
@@ -392,19 +402,21 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                     accessibilityLabel={`Decrease ${chMeta?.name || chId} budget allocation`}
                     onPress={() => adjustAllocation(chId, -5)}
                     style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 15,
-                      backgroundColor: '#e2e8f0',
+                      width: 28,
+                      height: 28,
+                      borderRadius: tokens.radius.xs,
+                      backgroundColor: colors.surface,
+                      borderWidth: 1,
+                      borderColor: colors.hairline,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="remove" size={16} color="#0f172a" />
+                    <Ionicons name="remove" size={14} color={colors.ink} />
                   </TouchableOpacity>
 
-                  <View style={{ minWidth: 50, alignItems: 'center' }}>
-                    <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a' }}>
+                  <View style={{ minWidth: 46, alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: colors.ink }}>
                       {pct}%
                     </Text>
                   </View>
@@ -414,15 +426,17 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                     accessibilityLabel={`Increase ${chMeta?.name || chId} budget allocation`}
                     onPress={() => adjustAllocation(chId, 5)}
                     style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 15,
-                      backgroundColor: '#e2e8f0',
+                      width: 28,
+                      height: 28,
+                      borderRadius: tokens.radius.xs,
+                      backgroundColor: colors.surface,
+                      borderWidth: 1,
+                      borderColor: colors.hairline,
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Ionicons name="add" size={16} color="#0f172a" />
+                    <Ionicons name="add" size={14} color={colors.ink} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -435,34 +449,36 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
-              marginTop: 12,
-              paddingTop: 8,
+              marginTop: 10,
+              paddingTop: 6,
             }}
           >
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>
-              Total Allocation:
-            </Text>
+            <SmallCapsLabel style={{ color: colors.ink }}>
+              TOTAL ALLOCATION:
+            </SmallCapsLabel>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-                borderRadius: 8,
-                backgroundColor: isBudgetValid ? '#dcfce7' : '#fee2e2',
+                paddingHorizontal: 8,
+                paddingVertical: 3,
+                borderRadius: tokens.radius.xs,
+                backgroundColor: isBudgetValid ? colors.surface : colors.dangerFaint,
+                borderWidth: 1,
+                borderColor: isBudgetValid ? colors.hairline : colors.border,
               }}
             >
               <Ionicons
-                name={isBudgetValid ? 'checkmark-circle' : 'alert-circle'}
-                size={16}
-                color={isBudgetValid ? '#16a34a' : '#dc2626'}
-                style={{ marginRight: 5 }}
+                name={isBudgetValid ? 'checkmark-circle-outline' : 'alert-circle-outline'}
+                size={14}
+                color={isBudgetValid ? colors.positive : colors.danger}
+                style={{ marginRight: 4 }}
               />
               <Text
                 style={{
-                  fontSize: 14,
-                  fontWeight: '800',
-                  color: isBudgetValid ? '#15803d' : '#b91c1c',
+                  fontSize: 13,
+                  fontFamily: fonts.sansBold,
+                  color: isBudgetValid ? colors.positive : colors.danger,
                 }}
               >
                 {currentTotalPct}%
@@ -471,26 +487,26 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
           </View>
 
           {!isBudgetValid && (
-            <View style={{ marginTop: 8, backgroundColor: '#fef2f2', padding: 8, borderRadius: 8 }}>
-              <Text style={{ fontSize: 12, color: '#b91c1c', fontWeight: '500' }}>
+            <View style={{ marginTop: 8, backgroundColor: colors.dangerFaint, padding: 8, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.border }}>
+              <MetaLabel style={{ color: colors.danger }}>
                 Budget allocations must total exactly 100% (currently {currentTotalPct}%). Tap "Distribute Evenly" or adjust manually.
-              </Text>
+              </MetaLabel>
             </View>
           )}
         </View>
       </Card>
 
       {/* 4. Campaign Duration */}
-      <Card style={{ marginBottom: 24, padding: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-          <Ionicons name="calendar-outline" size={18} color="#4f46e5" style={{ marginRight: 6 }} />
-          <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
+      <Card style={{ marginBottom: tokens.spacing.lg, padding: tokens.spacing.md }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+          <Ionicons name="calendar-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
+          <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
             Campaign Flight Duration
           </Text>
         </View>
-        <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+        <MetaLabel style={{ marginBottom: 12 }}>
           How long ad campaigns run once funded and approved for launch.
-        </Text>
+        </MetaLabel>
         <View style={{ gap: 8 }}>
           {DURATION_OPTIONS.map((d) => {
             const isSelected = durationDays === d.days;
@@ -503,42 +519,42 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                   flexDirection: 'row',
                   alignItems: 'center',
                   padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: isSelected ? '#eef2ff' : '#fff',
-                  borderWidth: 1.5,
-                  borderColor: isSelected ? '#4f46e5' : '#e2e8f0',
+                  borderRadius: tokens.radius.sm,
+                  backgroundColor: isSelected ? colors.surface : colors.paperSecondary,
+                  borderWidth: 1,
+                  borderColor: isSelected ? colors.accent : colors.hairline,
                 }}
               >
                 <View
                   style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 10,
-                    borderWidth: 2,
-                    borderColor: isSelected ? '#4f46e5' : '#cbd5e1',
+                    width: 18,
+                    height: 18,
+                    borderRadius: 9,
+                    borderWidth: 1.5,
+                    borderColor: isSelected ? colors.accent : colors.hairlineDark,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginRight: 12,
+                    marginRight: 10,
                   }}
                 >
                   {isSelected && (
                     <View
                       style={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: 5,
-                        backgroundColor: '#4f46e5',
+                        width: 8,
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: colors.accent,
                       }}
                     />
                   )}
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     {d.label}
                   </Text>
-                  <Text style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
+                  <MetaLabel style={{ marginTop: 2 }}>
                     {d.description}
-                  </Text>
+                  </MetaLabel>
                 </View>
               </TouchableOpacity>
             );
@@ -549,113 +565,114 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
       {/* SECTION 2: THE PLATFORM MAY FINALISE DURING REVIEW */}
       <View
         style={{
-          borderLeftWidth: 4,
-          borderLeftColor: '#0284c7',
-          paddingLeft: 12,
-          marginBottom: 16,
+          borderLeftWidth: 3,
+          borderLeftColor: colors.mutedInk,
+          paddingLeft: 10,
+          marginBottom: tokens.spacing.md,
         }}
       >
-        <Text style={{ fontSize: 13, fontWeight: '800', color: '#0284c7', textTransform: 'uppercase', letterSpacing: 0.8 }}>
-          Section 2: The Platform May Finalise During Review
-        </Text>
-        <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', marginTop: 2 }}>
+        <SmallCapsLabel style={{ fontSize: 11, color: colors.mutedInk }}>
+          SECTION 2: THE PLATFORM MAY FINALISE DURING REVIEW
+        </SmallCapsLabel>
+        <Subheading style={{ fontSize: 15, color: colors.ink, marginTop: 2 }}>
           Platform Calibration & Safeguards
-        </Text>
+        </Subheading>
       </View>
 
-      <Card style={{ marginBottom: 24, padding: 16, backgroundColor: '#f0f9ff', borderColor: '#bae6fd' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 }}>
-          <Ionicons name="shield-checkmark" size={20} color="#0284c7" style={{ marginRight: 8, marginTop: 2 }} />
+      <Card style={{ marginBottom: tokens.spacing.lg, padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 8 }}>
+          <Ionicons name="shield-outline" size={18} color={colors.accent} style={{ marginRight: 8, marginTop: 2 }} />
           <View style={{ flex: 1 }}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#0369a1' }}>
+            <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
               Review Team Optimization & Compliance
             </Text>
-            <Text style={{ fontSize: 13, color: '#334155', marginTop: 4, lineHeight: 18 }}>
+            <BodyText style={{ fontSize: 13, color: colors.mutedInk, marginTop: 4, lineHeight: 18 }}>
               To ensure ad approvals across strict ad network policies (Meta, Reddit, Google), our review team may fine-tune the final parameters:
-            </Text>
+            </BodyText>
           </View>
         </View>
 
         <View style={{ gap: 6, paddingLeft: 8, marginTop: 4 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="chevron-forward" size={14} color="#0284c7" style={{ marginRight: 6 }} />
-            <Text style={{ fontSize: 12, color: '#334155', fontWeight: '500' }}>
+            <Ionicons name="chevron-forward" size={13} color={colors.mutedInk} style={{ marginRight: 6 }} />
+            <BodyText style={{ fontSize: 12, color: colors.mutedInk }}>
               Bidding strategies, auction pacing, and impression distribution
-            </Text>
+            </BodyText>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="chevron-forward" size={14} color="#0284c7" style={{ marginRight: 6 }} />
-            <Text style={{ fontSize: 12, color: '#334155', fontWeight: '500' }}>
+            <Ionicons name="chevron-forward" size={13} color={colors.mutedInk} style={{ marginRight: 6 }} />
+            <BodyText style={{ fontSize: 12, color: colors.mutedInk }}>
               Negative keyword exclusions and policy safety boundary checks
-            </Text>
+            </BodyText>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="chevron-forward" size={14} color="#0284c7" style={{ marginRight: 6 }} />
-            <Text style={{ fontSize: 12, color: '#334155', fontWeight: '500' }}>
+            <Ionicons name="chevron-forward" size={13} color={colors.mutedInk} style={{ marginRight: 6 }} />
+            <BodyText style={{ fontSize: 12, color: colors.mutedInk }}>
               Cross-network demographic balancing to prevent click fatigue
-            </Text>
+            </BodyText>
           </View>
         </View>
 
         {/* Mandatory Copy Notice */}
         <View
           style={{
-            marginTop: 14,
+            marginTop: 12,
             padding: 10,
-            backgroundColor: '#ffffff',
-            borderRadius: 8,
+            backgroundColor: colors.surface,
+            borderRadius: tokens.radius.xs,
             borderWidth: 1,
-            borderColor: '#e0f2fe',
+            borderColor: colors.hairline,
           }}
         >
-          <Text
+          <BodyText
             style={{
               fontSize: 12,
               fontStyle: 'italic',
-              color: '#475569',
+              color: colors.mutedInk,
               textAlign: 'center',
-              fontWeight: '600',
             }}
           >
             "Actual reach depends on inventory, prices, targeting, delivery and performance."
-          </Text>
+          </BodyText>
         </View>
       </Card>
 
       {/* AUDIENCE PREVIEW CARD */}
       <View style={{ marginBottom: 12 }}>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 8 }}>
+        <Headline style={{ fontSize: 18, color: colors.ink, marginBottom: 4 }}>
           Audience Preview
-        </Text>
-        <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+        </Headline>
+        <MetaLabel style={{ marginBottom: 12 }}>
           Summary of intended recipients and sample ad layout. Promised audience sizes are never shown.
-        </Text>
+        </MetaLabel>
 
-        <Card style={{ padding: 16, borderColor: '#cbd5e1' }}>
+        <Card style={{ padding: tokens.spacing.md, backgroundColor: colors.surface }}>
           {/* Target Profile Summary */}
           <View style={{ marginBottom: 14 }}>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: 6 }}>
-              Intended Audience Profile
-            </Text>
-            <Text style={{ fontSize: 14, color: '#0f172a', lineHeight: 20 }}>
-              Residents in <Text style={{ fontWeight: '700' }}>{locations.join(', ')}</Text> interested in{' '}
-              <Text style={{ fontWeight: '700' }}>{interests.join(', ')}</Text>.
-            </Text>
+            <SmallCapsLabel style={{ color: colors.mutedInk, marginBottom: 6 }}>
+              INTENDED AUDIENCE PROFILE
+            </SmallCapsLabel>
+            <BodyText style={{ fontSize: 14, color: colors.ink, lineHeight: 20 }}>
+              Residents in <Text style={{ fontFamily: fonts.sansSemiBold }}>{locations.join(', ')}</Text> interested in{' '}
+              <Text style={{ fontFamily: fonts.sansSemiBold }}>{interests.join(', ')}</Text>.
+            </BodyText>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 6, flexWrap: 'wrap' }}>
-              <Text style={{ fontSize: 12, color: '#64748b' }}>Active on:</Text>
+              <MetaLabel>Active on:</MetaLabel>
               {channels.map((c) => (
                 <View
                   key={c}
                   style={{
                     paddingHorizontal: 8,
-                    paddingVertical: 3,
-                    borderRadius: 6,
-                    backgroundColor: '#f1f5f9',
+                    paddingVertical: 2,
+                    borderRadius: tokens.radius.xs,
+                    backgroundColor: colors.paperSecondary,
+                    borderWidth: 1,
+                    borderColor: colors.hairline,
                   }}
                 >
-                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#334155' }}>
+                  <SmallCapsLabel style={{ fontSize: 10, color: colors.ink }}>
                     {c} ({budgetAllocation[c] || 0}%)
-                  </Text>
+                  </SmallCapsLabel>
                 </View>
               ))}
             </View>
@@ -664,19 +681,19 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
           {/* Sample Ad Mockup */}
           <View
             style={{
-              borderRadius: 12,
+              borderRadius: tokens.radius.sm,
               overflow: 'hidden',
               borderWidth: 1,
-              borderColor: '#e2e8f0',
-              backgroundColor: '#fff',
+              borderColor: colors.hairline,
+              backgroundColor: colors.surface,
             }}
           >
-            <View style={{ padding: 10, flexDirection: 'row', alignItems: 'center', backgroundColor: '#f8fafc' }}>
-              <Ionicons name="megaphone" size={16} color="#4f46e5" style={{ marginRight: 6 }} />
-              <Text style={{ fontSize: 12, fontWeight: '700', color: '#0f172a' }}>
+            <View style={{ padding: 10, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.paperSecondary }}>
+              <Ionicons name="megaphone-outline" size={15} color={colors.accent} style={{ marginRight: 6 }} />
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                 {draft.creatorName || 'Campaign Organizer'}
               </Text>
-              <Text style={{ fontSize: 11, color: '#64748b', marginLeft: 4 }}>• Sponsored Ad</Text>
+              <MetaLabel style={{ marginLeft: 4 }}>• Sponsored Ad</MetaLabel>
             </View>
 
             {draft.coverUrl ? (
@@ -686,19 +703,19 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                 resizeMode="cover"
               />
             ) : (
-              <View style={{ height: 120, backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
-                <Ionicons name="image-outline" size={32} color="#94a3b8" />
-                <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 4 }}>Cover Visual</Text>
+              <View style={{ height: 120, backgroundColor: colors.paperSecondary, alignItems: 'center', justifyContent: 'center' }}>
+                <Ionicons name="image-outline" size={28} color={colors.secondaryCaption} />
+                <MetaLabel style={{ marginTop: 4 }}>Cover Visual</MetaLabel>
               </View>
             )}
 
             <View style={{ padding: 12 }}>
-              <Text style={{ fontSize: 14, fontWeight: '800', color: '#0f172a' }} numberOfLines={2}>
+              <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }} numberOfLines={2}>
                 {draft.headline || draft.title || 'Campaign Title'}
               </Text>
-              <Text style={{ fontSize: 12, color: '#475569', marginTop: 4 }} numberOfLines={2}>
+              <BodyText style={{ fontSize: 12, color: colors.mutedInk, marginTop: 4 }} numberOfLines={2}>
                 {draft.adDescription || draft.summary || 'Summary and checkable facts for the public.'}
-              </Text>
+              </BodyText>
             </View>
 
             <View
@@ -707,14 +724,14 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: 10,
-                backgroundColor: '#f8fafc',
+                backgroundColor: colors.paperSecondary,
                 borderTopWidth: 1,
-                borderTopColor: '#f1f5f9',
+                borderTopColor: colors.hairline,
               }}
             >
-              <Text style={{ fontSize: 11, color: '#64748b' }}>campaigns.app</Text>
-              <View style={{ backgroundColor: '#4f46e5', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: '#fff' }}>
+              <MetaLabel>campaigns.app</MetaLabel>
+              <View style={{ backgroundColor: colors.accent, paddingHorizontal: 10, paddingVertical: 4, borderRadius: tokens.radius.xs }}>
+                <Text style={{ fontSize: 11, fontFamily: fonts.sansSemiBold, color: colors.surface }}>
                   {draft.cta || 'Learn More'}
                 </Text>
               </View>

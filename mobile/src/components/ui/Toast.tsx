@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface ToastProps {
   message: string;
@@ -17,32 +18,32 @@ export function Toast({
 }: ToastProps) {
   const configs = {
     info: {
-      bg: '#eff6ff',
-      border: '#bfdbfe',
-      text: '#1e40af',
-      icon: 'information-circle' as const,
-      iconColor: '#3b82f6',
+      bg: colors.paperSecondary,
+      border: colors.hairline,
+      text: colors.ink,
+      icon: 'information-circle-outline' as const,
+      iconColor: colors.accent,
     },
     success: {
-      bg: '#f0fdf4',
-      border: '#bbf7d0',
-      text: '#166534',
-      icon: 'checkmark-circle' as const,
-      iconColor: '#22c55e',
+      bg: colors.paperSecondary,
+      border: colors.hairline,
+      text: colors.positive,
+      icon: 'checkmark-circle-outline' as const,
+      iconColor: colors.positive,
     },
     warning: {
-      bg: '#fffbeb',
-      border: '#fde68a',
-      text: '#92400e',
-      icon: 'alert-circle' as const,
-      iconColor: '#f59e0b',
+      bg: colors.warningFaint,
+      border: colors.border,
+      text: colors.warning,
+      icon: 'alert-circle-outline' as const,
+      iconColor: colors.warning,
     },
     error: {
-      bg: '#fef2f2',
-      border: '#fecaca',
-      text: '#991b1b',
-      icon: 'close-circle' as const,
-      iconColor: '#ef4444',
+      bg: colors.dangerFaint,
+      border: colors.border,
+      text: colors.danger,
+      icon: 'close-circle-outline' as const,
+      iconColor: colors.danger,
     },
   };
 
@@ -57,9 +58,9 @@ export function Toast({
           backgroundColor: config.bg,
           borderColor: config.border,
           borderWidth: 1,
-          borderRadius: 12,
+          borderRadius: tokens.radius.xs,
           paddingVertical: 10,
-          paddingHorizontal: 14,
+          paddingHorizontal: 12,
           marginVertical: 6,
         },
         style,
@@ -67,7 +68,7 @@ export function Toast({
     >
       <Ionicons
         name={config.icon}
-        size={18}
+        size={16}
         color={config.iconColor}
         style={{ marginRight: 8 }}
       />
@@ -75,7 +76,7 @@ export function Toast({
         style={{
           flex: 1,
           fontSize: 13,
-          fontWeight: '500',
+          fontFamily: fonts.sansMedium,
           color: config.text,
           lineHeight: 18,
         }}
@@ -88,7 +89,7 @@ export function Toast({
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           style={{ marginLeft: 8 }}
         >
-          <Ionicons name="close" size={16} color={config.text} />
+          <Ionicons name="close" size={15} color={config.text} />
         </TouchableOpacity>
       )}
     </View>

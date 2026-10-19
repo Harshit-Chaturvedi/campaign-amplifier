@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { CampaignStatus } from '../../types/campaign';
 import { getStatusMetadata } from '../../services/lifecycle';
+import { fonts, tokens } from '../../theme/tokens';
 
 interface StatusBadgeProps {
   status: CampaignStatus;
@@ -19,13 +20,13 @@ export function StatusBadge({
 
   const paddingClasses =
     size === 'sm'
-      ? { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }
+      ? { paddingHorizontal: 7, paddingVertical: 2, borderRadius: tokens.radius.xs }
       : size === 'md'
-      ? { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }
-      : { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 12 };
+      ? { paddingHorizontal: 9, paddingVertical: 4, borderRadius: tokens.radius.xs }
+      : { paddingHorizontal: 12, paddingVertical: 6, borderRadius: tokens.radius.sm };
 
-  const textSize = size === 'sm' ? 11 : size === 'md' ? 12 : 14;
-  const iconSize = size === 'sm' ? 12 : size === 'md' ? 14 : 16;
+  const textSize = size === 'sm' ? 10 : size === 'md' ? 11 : 13;
+  const iconSize = size === 'sm' ? 11 : size === 'md' ? 13 : 15;
   const dotSize = size === 'sm' ? 5 : size === 'md' ? 6 : 8;
 
   return (
@@ -60,9 +61,10 @@ export function StatusBadge({
       <Text
         style={{
           fontSize: textSize,
-          fontWeight: '700',
+          fontFamily: fonts.sansBold,
           color: meta.badgeText,
-          letterSpacing: 0.2,
+          letterSpacing: 0.5,
+          textTransform: 'uppercase',
         }}
       >
         {meta.label}

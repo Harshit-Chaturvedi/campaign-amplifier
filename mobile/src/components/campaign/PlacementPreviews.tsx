@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../ui/Card';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { SmallCapsLabel, MetaLabel } from '../ui/Typography';
 
 interface FeedPreviewProps {
   headline: string;
@@ -19,46 +21,48 @@ export function FeedPlacementPreview({
   creatorName = 'Campaign Organizer',
 }: FeedPreviewProps) {
   return (
-    <Card style={{ padding: 0, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' }}>
+    <Card style={{ padding: 0, overflow: 'hidden', borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.surface }}>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12, backgroundColor: '#fff' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', padding: 12, backgroundColor: colors.surface }}>
         <View
           style={{
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: '#eef2ff',
+            width: 32,
+            height: 32,
+            borderRadius: tokens.radius.xs,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             alignItems: 'center',
             justifyContent: 'center',
             marginRight: 10,
           }}
         >
-          <Ionicons name="megaphone" size={18} color="#4f46e5" />
+          <Ionicons name="megaphone-outline" size={16} color={colors.accent} />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }} numberOfLines={1}>
             {creatorName}
           </Text>
-          <Text style={{ fontSize: 11, color: '#64748b' }}>Sponsored • Social Feed Placement</Text>
+          <MetaLabel>Sponsored • Social Feed Placement</MetaLabel>
         </View>
-        <Ionicons name="ellipsis-horizontal" size={16} color="#94a3b8" />
+        <Ionicons name="ellipsis-horizontal" size={16} color={colors.secondaryCaption} />
       </View>
 
       {/* Description text */}
-      <View style={{ paddingHorizontal: 12, paddingBottom: 10, backgroundColor: '#fff' }}>
-        <Text style={{ fontSize: 13, color: '#334155', lineHeight: 18 }} numberOfLines={3}>
+      <View style={{ paddingHorizontal: 12, paddingBottom: 10, backgroundColor: colors.surface }}>
+        <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.mutedInk, lineHeight: 18 }} numberOfLines={3}>
           {description || 'Your campaign primary copy will appear here across audience news feeds.'}
         </Text>
       </View>
 
       {/* Creative Image */}
-      <View style={{ height: 180, backgroundColor: '#f1f5f9', width: '100%', overflow: 'hidden' }}>
+      <View style={{ height: 180, backgroundColor: colors.paperSecondary, width: '100%', overflow: 'hidden' }}>
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
         ) : (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="image-outline" size={36} color="#94a3b8" />
-            <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>No creative image selected</Text>
+            <Ionicons name="image-outline" size={32} color={colors.secondaryCaption} />
+            <MetaLabel style={{ marginTop: 4 }}>No creative image selected</MetaLabel>
           </View>
         )}
       </View>
@@ -67,31 +71,31 @@ export function FeedPlacementPreview({
       <View
         style={{
           padding: 12,
-          backgroundColor: '#f8fafc',
+          backgroundColor: colors.paperSecondary,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
           borderTopWidth: 1,
-          borderTopColor: '#f1f5f9',
+          borderTopColor: colors.hairline,
         }}
       >
         <View style={{ flex: 1, marginRight: 10 }}>
-          <Text style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>
-            campaigns.app
-          </Text>
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
+          <SmallCapsLabel style={{ fontSize: 10, color: colors.mutedInk }}>
+            CAMPAIGNS.APP
+          </SmallCapsLabel>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }} numberOfLines={1}>
             {headline || 'Campaign Headline'}
           </Text>
         </View>
         <View
           style={{
-            backgroundColor: '#4f46e5',
-            paddingHorizontal: 14,
-            paddingVertical: 8,
-            borderRadius: 8,
+            backgroundColor: colors.accent,
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: tokens.radius.xs,
           }}
         >
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>{cta}</Text>
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.surface }}>{cta}</Text>
         </View>
       </View>
     </Card>
@@ -119,13 +123,13 @@ export function VerticalStoryPlacementPreview({
         width: '100%',
         maxWidth: 260,
         height: 380,
-        borderRadius: 20,
+        borderRadius: tokens.radius.md,
         overflow: 'hidden',
-        backgroundColor: '#0f172a',
+        backgroundColor: colors.ink,
         alignSelf: 'center',
         position: 'relative',
-        borderWidth: 2,
-        borderColor: '#334155',
+        borderWidth: 1,
+        borderColor: colors.hairlineDark,
       }}
     >
       {/* Background image */}
@@ -140,13 +144,13 @@ export function VerticalStoryPlacementPreview({
           style={{
             width: '100%',
             height: '100%',
-            backgroundColor: '#1e293b',
+            backgroundColor: colors.ink,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="phone-portrait-outline" size={44} color="#64748b" />
-          <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 8 }}>9:16 Story Preview</Text>
+          <Ionicons name="phone-portrait-outline" size={40} color={colors.mutedInk} />
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.secondaryCaption, marginTop: 8 }}>9:16 Story Preview</Text>
         </View>
       )}
 
@@ -159,29 +163,31 @@ export function VerticalStoryPlacementPreview({
           right: 14,
           flexDirection: 'row',
           alignItems: 'center',
-          backgroundColor: 'rgba(0,0,0,0.4)',
+          backgroundColor: 'rgba(22, 19, 15, 0.65)',
           paddingHorizontal: 10,
-          paddingVertical: 6,
-          borderRadius: 20,
+          paddingVertical: 5,
+          borderRadius: tokens.radius.xs,
+          borderWidth: 1,
+          borderColor: 'rgba(255, 255, 255, 0.1)',
         }}
       >
         <View
           style={{
-            width: 24,
-            height: 24,
-            borderRadius: 12,
-            backgroundColor: '#4f46e5',
+            width: 22,
+            height: 22,
+            borderRadius: 11,
+            backgroundColor: colors.accent,
             alignItems: 'center',
             justifyContent: 'center',
             marginRight: 8,
           }}
         >
-          <Ionicons name="megaphone" size={12} color="#fff" />
+          <Ionicons name="megaphone" size={11} color="#fff" />
         </View>
-        <Text style={{ fontSize: 12, fontWeight: '700', color: '#fff', flex: 1 }} numberOfLines={1}>
+        <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: '#fff', flex: 1 }} numberOfLines={1}>
           {creatorName}
         </Text>
-        <Text style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)' }}>Sponsored</Text>
+        <Text style={{ fontSize: 10, fontFamily: fonts.sansRegular, color: 'rgba(255,255,255,0.7)' }}>Sponsored</Text>
       </View>
 
       {/* Bottom Content Card */}
@@ -191,28 +197,30 @@ export function VerticalStoryPlacementPreview({
           bottom: 14,
           left: 12,
           right: 12,
-          backgroundColor: 'rgba(15, 23, 42, 0.88)',
-          borderRadius: 14,
+          backgroundColor: 'rgba(22, 19, 15, 0.88)',
+          borderRadius: tokens.radius.sm,
           padding: 12,
+          borderWidth: 1,
+          borderColor: 'rgba(255, 255, 255, 0.1)',
         }}
       >
-        <Text style={{ fontSize: 14, fontWeight: '800', color: '#fff', marginBottom: 4 }} numberOfLines={2}>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: '#fff', marginBottom: 4 }} numberOfLines={2}>
           {headline || 'Campaign Headline'}
         </Text>
-        <Text style={{ fontSize: 11, color: '#cbd5e1', lineHeight: 15, marginBottom: 10 }} numberOfLines={2}>
+        <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.border, lineHeight: 15, marginBottom: 10 }} numberOfLines={2}>
           {description || 'Swipe up to read the public citations and help reach residents.'}
         </Text>
         <View
           style={{
-            backgroundColor: '#4f46e5',
-            borderRadius: 8,
-            paddingVertical: 8,
+            backgroundColor: colors.accent,
+            borderRadius: tokens.radius.xs,
+            paddingVertical: 7,
             alignItems: 'center',
             flexDirection: 'row',
             justifyContent: 'center',
           }}
         >
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#fff', marginRight: 4 }}>
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: '#fff', marginRight: 4 }}>
             {cta}
           </Text>
           <Ionicons name="chevron-up" size={14} color="#fff" />
@@ -234,38 +242,42 @@ export function TextOnlyPlacementPreview({
   cta = 'Learn More',
 }: TextOnlyPreviewProps) {
   return (
-    <Card style={{ padding: 14, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#fff' }}>
+    <Card style={{ padding: 14, borderWidth: 1, borderColor: colors.hairline, backgroundColor: colors.surface }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
         <View
           style={{
-            backgroundColor: '#f1f5f9',
+            backgroundColor: colors.paperSecondary,
             paddingHorizontal: 6,
             paddingVertical: 2,
-            borderRadius: 4,
+            borderRadius: tokens.radius.xs,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             marginRight: 8,
           }}
         >
-          <Text style={{ fontSize: 10, fontWeight: '700', color: '#64748b' }}>PROMOTED</Text>
+          <SmallCapsLabel style={{ fontSize: 9, color: colors.mutedInk }}>PROMOTED</SmallCapsLabel>
         </View>
-        <Text style={{ fontSize: 11, color: '#94a3b8' }}>r/community • Search & text channels</Text>
+        <MetaLabel>r/community • Search & text channels</MetaLabel>
       </View>
-      <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a', marginBottom: 6 }} numberOfLines={2}>
+      <Text style={{ fontSize: 15, fontFamily: fonts.serifBold, color: colors.ink, marginBottom: 6 }} numberOfLines={2}>
         {headline || 'Campaign Headline'}
       </Text>
-      <Text style={{ fontSize: 13, color: '#475569', lineHeight: 19, marginBottom: 10 }} numberOfLines={3}>
+      <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.mutedInk, lineHeight: 19, marginBottom: 10 }} numberOfLines={3}>
         {description || 'Summary of the public issue with citations.'}
       </Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text style={{ fontSize: 11, color: '#4f46e5', fontWeight: '700' }}>campaigns.app/read</Text>
+        <Text style={{ fontSize: 11, fontFamily: fonts.sansSemiBold, color: colors.accent }}>campaigns.app/read</Text>
         <View
           style={{
-            backgroundColor: '#f1f5f9',
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 6,
+            paddingVertical: 5,
+            borderRadius: tokens.radius.xs,
           }}
         >
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#334155' }}>{cta}</Text>
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.ink }}>{cta}</Text>
         </View>
       </View>
     </Card>

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from './Card';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { SmallCapsLabel } from './Typography';
 
 interface ExpandableProps {
   title: string;
@@ -16,7 +18,7 @@ interface ExpandableProps {
 export function Expandable({
   title,
   icon,
-  iconColor = '#4f46e5',
+  iconColor = colors.accent,
   badgeText,
   defaultExpanded = false,
   children,
@@ -25,7 +27,7 @@ export function Expandable({
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   return (
-    <Card style={[{ marginTop: 12, padding: 16 }, style]}>
+    <Card style={[{ marginTop: tokens.spacing.sm, padding: tokens.spacing.md }, style]}>
       <TouchableOpacity
         onPress={() => setExpanded(!expanded)}
         activeOpacity={0.7}
@@ -39,34 +41,36 @@ export function Expandable({
           {icon && (
             <Ionicons
               name={icon}
-              size={20}
+              size={18}
               color={iconColor}
-              style={{ marginRight: 10 }}
+              style={{ marginRight: 8 }}
             />
           )}
-          <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a', flex: 1 }}>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, flex: 1 }}>
             {title}
           </Text>
           {badgeText && (
             <View
               style={{
-                backgroundColor: '#eef2ff',
-                paddingHorizontal: 8,
+                backgroundColor: colors.paperSecondary,
+                paddingHorizontal: 6,
                 paddingVertical: 2,
-                borderRadius: 8,
+                borderRadius: tokens.radius.xs,
+                borderWidth: 1,
+                borderColor: colors.hairline,
                 marginRight: 6,
               }}
             >
-              <Text style={{ fontSize: 11, fontWeight: '700', color: '#4f46e5' }}>
+              <SmallCapsLabel style={{ fontSize: 9, color: colors.accent }}>
                 {badgeText}
-              </Text>
+              </SmallCapsLabel>
             </View>
           )}
         </View>
         <Ionicons
           name={expanded ? 'chevron-up' : 'chevron-down'}
-          size={18}
-          color="#64748b"
+          size={16}
+          color={colors.mutedInk}
         />
       </TouchableOpacity>
 
@@ -76,7 +80,7 @@ export function Expandable({
             marginTop: 12,
             paddingTop: 12,
             borderTopWidth: 1,
-            borderTopColor: '#f1f5f9',
+            borderTopColor: colors.hairline,
           }}
         >
           {children}

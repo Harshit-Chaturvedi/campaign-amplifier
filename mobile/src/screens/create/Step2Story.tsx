@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   Alert,
@@ -12,6 +11,15 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { StoryBlockRenderer } from '../../components/story/StoryBlockRenderer';
 import { SourceItem } from '../../components/ui/SourceItem';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
+import { colors, fonts, tokens } from '../../theme/tokens';
 import type { StoryBlock, Source } from '../../types/campaign';
 
 interface Step2StoryProps {
@@ -119,34 +127,33 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
   };
 
   return (
-    <View style={{ gap: 20 }}>
+    <View style={{ gap: tokens.spacing.lg }}>
       {/* View Mode Toggle: Edit vs Live Preview */}
       <View
         style={{
           flexDirection: 'row',
-          backgroundColor: '#f1f5f9',
-          borderRadius: 12,
-          padding: 4,
+          backgroundColor: colors.paperSecondary,
+          borderRadius: tokens.radius.sm,
+          borderWidth: 1,
+          borderColor: colors.hairline,
+          padding: 3,
         }}
       >
         <TouchableOpacity
           onPress={() => setViewMode('edit')}
           style={{
             flex: 1,
-            paddingVertical: 10,
-            borderRadius: 8,
-            backgroundColor: viewMode === 'edit' ? '#fff' : 'transparent',
+            paddingVertical: 8,
+            borderRadius: tokens.radius.xs,
+            backgroundColor: viewMode === 'edit' ? colors.surface : 'transparent',
+            borderWidth: viewMode === 'edit' ? 1 : 0,
+            borderColor: colors.hairline,
             alignItems: 'center',
-            shadowColor: viewMode === 'edit' ? '#000' : 'transparent',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: viewMode === 'edit' ? 2 : 0,
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Ionicons name="create-outline" size={16} color={viewMode === 'edit' ? '#4f46e5' : '#64748b'} />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: viewMode === 'edit' ? '#0f172a' : '#64748b' }}>
+            <Ionicons name="create-outline" size={15} color={viewMode === 'edit' ? colors.accent : colors.mutedInk} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: viewMode === 'edit' ? colors.ink : colors.mutedInk }}>
               Edit Story Blocks
             </Text>
           </View>
@@ -156,20 +163,17 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
           onPress={() => setViewMode('preview')}
           style={{
             flex: 1,
-            paddingVertical: 10,
-            borderRadius: 8,
-            backgroundColor: viewMode === 'preview' ? '#fff' : 'transparent',
+            paddingVertical: 8,
+            borderRadius: tokens.radius.xs,
+            backgroundColor: viewMode === 'preview' ? colors.surface : 'transparent',
+            borderWidth: viewMode === 'preview' ? 1 : 0,
+            borderColor: colors.hairline,
             alignItems: 'center',
-            shadowColor: viewMode === 'preview' ? '#000' : 'transparent',
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.1,
-            shadowRadius: 2,
-            elevation: viewMode === 'preview' ? 2 : 0,
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Ionicons name="eye-outline" size={16} color={viewMode === 'preview' ? '#4f46e5' : '#64748b'} />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: viewMode === 'preview' ? '#0f172a' : '#64748b' }}>
+            <Ionicons name="eye-outline" size={15} color={viewMode === 'preview' ? colors.accent : colors.mutedInk} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: viewMode === 'preview' ? colors.ink : colors.mutedInk }}>
               Live Reader Preview
             </Text>
           </View>
@@ -178,34 +182,34 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
 
       {/* PREVIEW MODE */}
       {viewMode === 'preview' ? (
-        <Card style={{ padding: 20, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#fff' }}>
-          <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a', marginBottom: 16 }}>
+        <Card style={{ padding: tokens.spacing.lg, backgroundColor: colors.surface }}>
+          <Headline style={{ fontSize: 20, color: colors.ink, marginBottom: tokens.spacing.md }}>
             Story Preview
-          </Text>
+          </Headline>
 
           {storyBlocks.length === 0 ? (
             <View style={{ paddingVertical: 30, alignItems: 'center' }}>
-              <Ionicons name="reader-outline" size={38} color="#cbd5e1" />
-              <Text style={{ fontSize: 14, color: '#94a3b8', marginTop: 8 }}>
+              <Ionicons name="reader-outline" size={32} color={colors.secondaryCaption} />
+              <MetaLabel style={{ marginTop: 8 }}>
                 No story blocks added yet. Switch to Edit to add blocks.
-              </Text>
+              </MetaLabel>
             </View>
           ) : (
             storyBlocks.map((b, idx) => <StoryBlockRenderer key={idx} block={b} index={idx} />)
           )}
 
           {/* Sources Section in Preview */}
-          <View style={{ marginTop: 24, paddingTop: 18, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a', marginBottom: 6 }}>
+          <View style={{ marginTop: tokens.spacing.lg, paddingTop: tokens.spacing.md, borderTopWidth: 1, borderTopColor: colors.hairline }}>
+            <Headline style={{ fontSize: 16, color: colors.ink, marginBottom: 4 }}>
               Sources & Citations
-            </Text>
-            <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+            </Headline>
+            <MetaLabel style={{ marginBottom: tokens.spacing.md }}>
               All sources are listed so readers can review the documented records themselves.
-            </Text>
+            </MetaLabel>
             {sources.length === 0 ? (
-              <Text style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic' }}>
+              <MetaLabel style={{ fontStyle: 'italic' }}>
                 No external sources attached yet.
-              </Text>
+              </MetaLabel>
             ) : (
               sources.map((s, idx) => <SourceItem key={s.id || idx} source={s} index={idx} />)
             )}
@@ -213,12 +217,12 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
         </Card>
       ) : (
         /* EDIT MODE */
-        <View style={{ gap: 20 }}>
+        <View style={{ gap: tokens.spacing.lg }}>
           {/* Add Block Toolbar */}
-          <Card style={{ padding: 14, backgroundColor: '#f8fafc', borderWidth: 1, borderColor: '#e2e8f0' }}>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#475569', textTransform: 'uppercase', marginBottom: 10 }}>
-              Add Editorial Block
-            </Text>
+          <Card style={{ padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
+            <SmallCapsLabel style={{ color: colors.ink, marginBottom: tokens.spacing.sm }}>
+              ADD EDITORIAL BLOCK
+            </SmallCapsLabel>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {[
                 { type: 'heading', label: 'Heading', icon: 'text' },
@@ -234,16 +238,16 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    backgroundColor: '#fff',
+                    backgroundColor: colors.surface,
                     paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    borderRadius: 8,
+                    paddingVertical: 7,
+                    borderRadius: tokens.radius.xs,
                     borderWidth: 1,
-                    borderColor: '#cbd5e1',
+                    borderColor: colors.hairline,
                   }}
                 >
-                  <Ionicons name={item.icon as any} size={14} color="#4f46e5" style={{ marginRight: 6 }} />
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#334155' }}>
+                  <Ionicons name={item.icon as any} size={14} color={colors.accent} style={{ marginRight: 6 }} />
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.ink }}>
                     {item.label}
                   </Text>
                 </TouchableOpacity>
@@ -253,24 +257,22 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
 
           {/* Block Composer List */}
           {storyBlocks.length === 0 ? (
-            <Card style={{ padding: 24, alignItems: 'center', borderStyle: 'dashed', borderWidth: 1.5, borderColor: '#cbd5e1' }}>
-              <Ionicons name="document-text-outline" size={36} color="#94a3b8" />
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#475569', marginTop: 8 }}>
+            <Card style={{ padding: tokens.spacing.xl, alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: colors.hairlineDark, backgroundColor: colors.paperSecondary }}>
+              <Ionicons name="document-text-outline" size={32} color={colors.secondaryCaption} />
+              <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginTop: 8 }}>
                 Your story has no blocks yet
               </Text>
-              <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 4 }}>
+              <MetaLabel style={{ textAlign: 'center', marginTop: 4 }}>
                 Choose a block above (Heading, Paragraph, Statistic, Quote, Image, or Action) to compose the argument.
-              </Text>
+              </MetaLabel>
             </Card>
           ) : (
             storyBlocks.map((block, idx) => (
               <Card
                 key={idx}
                 style={{
-                  padding: 16,
-                  borderWidth: 1,
-                  borderColor: '#e2e8f0',
-                  backgroundColor: '#fff',
+                  padding: tokens.spacing.md,
+                  backgroundColor: colors.surface,
                 }}
               >
                 {/* Block Header: Type + Reorder / Delete */}
@@ -282,23 +284,25 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                     marginBottom: 12,
                     paddingBottom: 8,
                     borderBottomWidth: 1,
-                    borderBottomColor: '#f1f5f9',
+                    borderBottomColor: colors.hairline,
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                     <View
                       style={{
-                        backgroundColor: '#eef2ff',
-                        paddingHorizontal: 8,
-                        paddingVertical: 3,
-                        borderRadius: 6,
+                        backgroundColor: colors.paperSecondary,
+                        borderWidth: 1,
+                        borderColor: colors.hairline,
+                        paddingHorizontal: 6,
+                        paddingVertical: 2,
+                        borderRadius: tokens.radius.xs,
                       }}
                     >
-                      <Text style={{ fontSize: 11, fontWeight: '700', color: '#4f46e5', textTransform: 'uppercase' }}>
+                      <SmallCapsLabel style={{ fontSize: 10, color: colors.ink }}>
                         {block.type}
-                      </Text>
+                      </SmallCapsLabel>
                     </View>
-                    <Text style={{ fontSize: 12, color: '#94a3b8' }}>#{idx + 1}</Text>
+                    <MetaLabel>#{idx + 1}</MetaLabel>
                   </View>
 
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
@@ -310,7 +314,7 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                       disabled={idx === 0}
                       style={{ padding: 4, opacity: idx === 0 ? 0.3 : 1 }}
                     >
-                      <Ionicons name="arrow-up" size={18} color="#64748b" />
+                      <Ionicons name="arrow-up" size={17} color={colors.mutedInk} />
                     </TouchableOpacity>
                     {/* Move Down */}
                     <TouchableOpacity
@@ -320,7 +324,7 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                       disabled={idx === storyBlocks.length - 1}
                       style={{ padding: 4, opacity: idx === storyBlocks.length - 1 ? 0.3 : 1 }}
                     >
-                      <Ionicons name="arrow-down" size={18} color="#64748b" />
+                      <Ionicons name="arrow-down" size={17} color={colors.mutedInk} />
                     </TouchableOpacity>
                     {/* Delete */}
                     <TouchableOpacity
@@ -329,7 +333,7 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                       onPress={() => removeBlock(idx)}
                       style={{ padding: 4, marginLeft: 4 }}
                     >
-                      <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                      <Ionicons name="trash-outline" size={17} color={colors.danger} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -345,15 +349,17 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                           style={{
                             paddingHorizontal: 10,
                             paddingVertical: 4,
-                            borderRadius: 6,
-                            backgroundColor: (block.level || 2) === lvl ? '#4f46e5' : '#f1f5f9',
+                            borderRadius: tokens.radius.xs,
+                            backgroundColor: (block.level || 2) === lvl ? colors.accent : colors.paperSecondary,
+                            borderWidth: 1,
+                            borderColor: (block.level || 2) === lvl ? colors.accent : colors.hairline,
                           }}
                         >
                           <Text
                             style={{
                               fontSize: 12,
-                              fontWeight: '700',
-                              color: (block.level || 2) === lvl ? '#fff' : '#475569',
+                              fontFamily: fonts.sansSemiBold,
+                              color: (block.level || 2) === lvl ? colors.surface : colors.ink,
                             }}
                           >
                             H{lvl}
@@ -375,15 +381,15 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                     <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
                       <TouchableOpacity
                         onPress={() => wrapSelectedText(idx, 'bold')}
-                        style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: '#f1f5f9', borderRadius: 6 }}
+                        style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: colors.paperSecondary, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}
                       >
-                        <Text style={{ fontSize: 12, fontWeight: '800', color: '#334155' }}>B</Text>
+                        <Text style={{ fontSize: 12, fontFamily: fonts.sansBold, color: colors.ink }}>B</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         onPress={() => wrapSelectedText(idx, 'italic')}
-                        style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: '#f1f5f9', borderRadius: 6 }}
+                        style={{ paddingHorizontal: 10, paddingVertical: 4, backgroundColor: colors.paperSecondary, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}
                       >
-                        <Text style={{ fontSize: 12, fontStyle: 'italic', fontWeight: '700', color: '#334155' }}>I</Text>
+                        <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, fontStyle: 'italic', color: colors.ink }}>I</Text>
                       </TouchableOpacity>
                     </View>
                     <Input
@@ -483,38 +489,38 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
           )}
 
           {/* Sources Manager */}
-          <Card style={{ padding: 18, borderWidth: 1, borderColor: '#e2e8f0', backgroundColor: '#fff', marginTop: 10 }}>
+          <Card style={{ padding: tokens.spacing.md, backgroundColor: colors.surface, marginTop: tokens.spacing.sm }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-              <Ionicons name="link-outline" size={20} color="#4f46e5" style={{ marginRight: 8 }} />
-              <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+              <Ionicons name="link-outline" size={18} color={colors.accent} style={{ marginRight: 8 }} />
+              <Headline style={{ fontSize: 16, color: colors.ink }}>
                 Sources Manager
-              </Text>
+              </Headline>
             </View>
-            <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 14 }}>
+            <MetaLabel style={{ marginBottom: tokens.spacing.md }}>
               All campaigns must cite grounded public sources (government audits, published research, meeting minutes).
-            </Text>
+            </MetaLabel>
 
             {/* Existing Sources List */}
             {sources.length > 0 && (
-              <View style={{ marginBottom: 16, gap: 8 }}>
+              <View style={{ marginBottom: tokens.spacing.md, gap: 8 }}>
                 {sources.map((src) => (
                   <View
                     key={src.id}
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      backgroundColor: '#f8fafc',
+                      backgroundColor: colors.paperSecondary,
                       padding: 10,
-                      borderRadius: 10,
+                      borderRadius: tokens.radius.xs,
                       borderWidth: 1,
-                      borderColor: '#e2e8f0',
+                      borderColor: colors.hairline,
                     }}
                   >
                     <View style={{ flex: 1, marginRight: 8 }}>
-                      <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
+                      <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }} numberOfLines={1}>
                         {src.title}
                       </Text>
-                      <Text style={{ fontSize: 11, color: '#4f46e5' }} numberOfLines={1}>
+                      <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.accent }} numberOfLines={1}>
                         {src.url}
                       </Text>
                     </View>
@@ -524,7 +530,7 @@ export function Step2Story({ draft, onChange }: Step2StoryProps) {
                       onPress={() => handleRemoveSource(src.id)}
                       style={{ padding: 4 }}
                     >
-                      <Ionicons name="trash-outline" size={16} color="#ef4444" />
+                      <Ionicons name="trash-outline" size={16} color={colors.danger} />
                     </TouchableOpacity>
                   </View>
                 ))}

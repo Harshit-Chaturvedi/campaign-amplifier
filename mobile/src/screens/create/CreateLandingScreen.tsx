@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import {
   View,
-  Text,
   ScrollView,
   TouchableOpacity,
   StatusBar,
@@ -12,8 +11,17 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useDraftStore, CampaignDraft } from '../../store/useDraftStore';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 import { formatDate } from '../../utils/formatting';
 import { getCategoryColor } from '../../theme/colors';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 const STEP_LABELS: Record<number, string> = {
   1: 'Step 1: Basics',
@@ -93,7 +101,7 @@ export function CreateLandingScreen({ navigation }: any) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Header */}
@@ -101,44 +109,44 @@ export function CreateLandingScreen({ navigation }: any) {
         style={{
           paddingTop: 54,
           paddingBottom: 16,
-          paddingHorizontal: 20,
-          backgroundColor: '#fff',
+          paddingHorizontal: tokens.spacing.lg,
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.hairline,
         }}
       >
-        <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>
+        <Headline style={{ fontSize: 24, color: colors.ink }}>
           Create Campaign
-        </Text>
-        <Text style={{ fontSize: 13, color: '#64748b', marginTop: 4 }}>
+        </Headline>
+        <MetaLabel style={{ marginTop: 4 }}>
           Turn evidence and public records into a community-funded reach campaign
-        </Text>
+        </MetaLabel>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ padding: 18, paddingBottom: 60 }}
+        contentContainerStyle={{ padding: tokens.spacing.lg, paddingBottom: 60 }}
       >
         {/* Guest Banner if not signed in */}
         {!isAuthenticated && (
           <Card
             style={{
-              padding: 16,
-              marginBottom: 20,
-              backgroundColor: '#eef2ff',
+              padding: tokens.spacing.md,
+              marginBottom: tokens.spacing.lg,
+              backgroundColor: colors.paperSecondary,
               borderWidth: 1,
-              borderColor: '#c7d2fe',
+              borderColor: colors.hairline,
             }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
-              <Ionicons name="information-circle-outline" size={20} color="#4f46e5" style={{ marginRight: 8 }} />
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#1e1b4b' }}>
+              <Ionicons name="information-circle-outline" size={18} color={colors.accent} style={{ marginRight: 8 }} />
+              <Subheading style={{ fontSize: 15, color: colors.ink }}>
                 Sign in to save and launch campaigns
-              </Text>
+              </Subheading>
             </View>
-            <Text style={{ fontSize: 13, color: '#3730a3', lineHeight: 19, marginBottom: 14 }}>
+            <BodyText style={{ fontSize: 13, color: colors.mutedInk, lineHeight: 19, marginBottom: 14 }}>
               Campaigns undergo editorial and evidence review before funding. Please sign in to draft and manage your campaign.
-            </Text>
+            </BodyText>
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <View style={{ flex: 1 }}>
                 <Button
@@ -163,121 +171,131 @@ export function CreateLandingScreen({ navigation }: any) {
         )}
 
         {/* Section: Start New Campaign */}
-        <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a', marginBottom: 12 }}>
-          Start a New Campaign
-        </Text>
+        <SmallCapsLabel style={{ fontSize: 12, color: colors.ink, marginBottom: 10 }}>
+          START A NEW CAMPAIGN
+        </SmallCapsLabel>
 
-        <View style={{ flexDirection: 'column', gap: 12, marginBottom: 26 }}>
+        <View style={{ flexDirection: 'column', gap: 10, marginBottom: tokens.spacing.xl }}>
           {/* Card 1: Create Manually */}
           <TouchableOpacity
-            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Create Manually: step-by-step editorial composer"
+            activeOpacity={0.8}
             onPress={handleStartManual}
             style={{
-              backgroundColor: '#fff',
-              borderRadius: 16,
-              padding: 18,
-              borderWidth: 1.5,
-              borderColor: '#e2e8f0',
+              backgroundColor: colors.surface,
+              borderRadius: tokens.radius.md,
+              padding: tokens.spacing.md,
+              borderWidth: 1,
+              borderColor: colors.hairline,
               flexDirection: 'row',
               alignItems: 'center',
             }}
           >
             <View
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
-                backgroundColor: '#eef2ff',
+                width: 44,
+                height: 44,
+                borderRadius: tokens.radius.sm,
+                backgroundColor: colors.paperSecondary,
+                borderWidth: 1,
+                borderColor: colors.hairline,
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginRight: 14,
+                marginRight: tokens.spacing.md,
               }}
             >
-              <Ionicons name="create-outline" size={24} color="#4f46e5" />
+              <Ionicons name="create-outline" size={22} color={colors.accent} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+              <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                 Create Manually
               </Text>
-              <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>
+              <MetaLabel style={{ marginTop: 2 }}>
                 Step-by-step editorial composer with citations and ad previews
-              </Text>
+              </MetaLabel>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
+            <Ionicons name="chevron-forward" size={18} color={colors.mutedInk} />
           </TouchableOpacity>
 
           {/* Card 2: Create with Your Voice */}
           <TouchableOpacity
-            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Create with Your Voice: guided questions and AI formulation"
+            activeOpacity={0.8}
             onPress={handleStartVoice}
             style={{
-              backgroundColor: '#fff',
-              borderRadius: 16,
-              padding: 18,
-              borderWidth: 1.5,
-              borderColor: '#e2e8f0',
+              backgroundColor: colors.surface,
+              borderRadius: tokens.radius.md,
+              padding: tokens.spacing.md,
+              borderWidth: 1,
+              borderColor: colors.hairline,
               flexDirection: 'row',
               alignItems: 'center',
             }}
           >
             <View
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
-                backgroundColor: '#eef2ff',
+                width: 44,
+                height: 44,
+                borderRadius: tokens.radius.sm,
+                backgroundColor: colors.paperSecondary,
+                borderWidth: 1,
+                borderColor: colors.hairline,
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginRight: 14,
+                marginRight: tokens.spacing.md,
               }}
             >
-              <Ionicons name="mic" size={24} color="#4f46e5" />
+              <Ionicons name="mic-outline" size={22} color={colors.accent} />
             </View>
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+                <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                   Create with Your Voice
                 </Text>
                 <View
                   style={{
-                    backgroundColor: '#e0e7ff',
-                    borderRadius: 6,
-                    paddingHorizontal: 6,
-                    paddingVertical: 2,
+                    backgroundColor: colors.paperSecondary,
+                    borderWidth: 1,
+                    borderColor: colors.hairline,
+                    borderRadius: tokens.radius.xs,
+                    paddingHorizontal: 5,
+                    paddingVertical: 1,
                   }}
                 >
-                  <Text style={{ fontSize: 10, fontWeight: '700', color: '#4338ca' }}>
-                    AI Guided
-                  </Text>
+                  <SmallCapsLabel style={{ fontSize: 9, color: colors.accent }}>
+                    AI GUIDED
+                  </SmallCapsLabel>
                 </View>
               </View>
-              <Text style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>
+              <MetaLabel style={{ marginTop: 2 }}>
                 Speak your answers to 4 guided questions and let AI formulate your campaign draft
-              </Text>
+              </MetaLabel>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
+            <Ionicons name="chevron-forward" size={18} color={colors.mutedInk} />
           </TouchableOpacity>
         </View>
 
         {/* Section: Saved Drafts */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
-            Saved Drafts
-          </Text>
-          <Text style={{ fontSize: 12, color: '#64748b', fontWeight: '600' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
+            SAVED DRAFTS
+          </SmallCapsLabel>
+          <MetaLabel>
             {drafts.length} {drafts.length === 1 ? 'draft' : 'drafts'}
-          </Text>
+          </MetaLabel>
         </View>
 
         {drafts.length === 0 ? (
-          <Card style={{ padding: 24, alignItems: 'center', justifyContent: 'center' }}>
-            <Ionicons name="document-text-outline" size={38} color="#cbd5e1" />
-            <Text style={{ fontSize: 15, fontWeight: '700', color: '#64748b', marginTop: 10 }}>
+          <Card style={{ padding: tokens.spacing.xl, alignItems: 'center', justifyContent: 'center' }}>
+            <Ionicons name="document-text-outline" size={32} color={colors.secondaryCaption} />
+            <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.mutedInk, marginTop: 10 }}>
               No saved drafts yet
             </Text>
-            <Text style={{ fontSize: 13, color: '#94a3b8', textAlign: 'center', marginTop: 4, maxWidth: 260 }}>
+            <MetaLabel style={{ textAlign: 'center', marginTop: 4, maxWidth: 260 }}>
               Drafts are autosaved locally and synced when online so you can safely leave and return at any time.
-            </Text>
+            </MetaLabel>
           </Card>
         ) : (
           <View style={{ flexDirection: 'column', gap: 10 }}>
@@ -287,15 +305,13 @@ export function CreateLandingScreen({ navigation }: any) {
                 <Card
                   key={d.id}
                   style={{
-                    padding: 16,
-                    borderWidth: 1,
-                    borderColor: '#e2e8f0',
+                    padding: tokens.spacing.md,
                   }}
                 >
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{ flex: 1, marginRight: 10 }}>
                       <Text
-                        style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}
+                        style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}
                         numberOfLines={2}
                       >
                         {d.title || 'Untitled Draft'}
@@ -303,45 +319,49 @@ export function CreateLandingScreen({ navigation }: any) {
                       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, flexWrap: 'wrap', gap: 6 }}>
                         <View
                           style={{
-                            backgroundColor: catColor + '18',
-                            paddingHorizontal: 8,
-                            paddingVertical: 2,
-                            borderRadius: 6,
+                            backgroundColor: colors.paperSecondary,
+                            borderWidth: 1,
+                            borderColor: colors.hairline,
+                            paddingHorizontal: 6,
+                            paddingVertical: 1,
+                            borderRadius: tokens.radius.xs,
                           }}
                         >
-                          <Text style={{ fontSize: 11, fontWeight: '700', color: catColor }}>
+                          <SmallCapsLabel style={{ fontSize: 10, color: colors.ink }}>
                             {d.category ? d.category.replace('_', ' ').toUpperCase() : 'COMMUNITY'}
-                          </Text>
+                          </SmallCapsLabel>
                         </View>
-                        <Text style={{ fontSize: 12, color: '#4f46e5', fontWeight: '600' }}>
+                        <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.accent }}>
                           {STEP_LABELS[d.step || 1] || `Step ${d.step || 1}`}
                         </Text>
-                        <Text style={{ fontSize: 12, color: '#94a3b8' }}>•</Text>
-                        <Text style={{ fontSize: 12, color: '#64748b' }}>
+                        <MetaLabel>•</MetaLabel>
+                        <MetaLabel>
                           Saved {formatDate(d.updatedAt)}
-                        </Text>
+                        </MetaLabel>
                       </View>
                     </View>
 
                     <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={`Delete draft ${d.title || 'Untitled Draft'}`}
                       onPress={() => handleDelete(d.id, d.title)}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                       style={{ padding: 4 }}
                     >
-                      <Ionicons name="trash-outline" size={18} color="#ef4444" />
+                      <Ionicons name="trash-outline" size={17} color={colors.danger} />
                     </TouchableOpacity>
                   </View>
 
                   {d.summary ? (
-                    <Text
-                      style={{ fontSize: 13, color: '#475569', marginTop: 8, lineHeight: 18 }}
+                    <BodyText
+                      style={{ fontSize: 13, color: colors.mutedInk, marginTop: 8, lineHeight: 18 }}
                       numberOfLines={2}
                     >
                       {d.summary}
-                    </Text>
+                    </BodyText>
                   ) : null}
 
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 14 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 12 }}>
                     <Button
                       title="Resume Draft"
                       size="sm"

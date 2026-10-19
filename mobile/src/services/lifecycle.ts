@@ -1,5 +1,6 @@
 import type { Campaign, CampaignStatus } from '../types/campaign';
 import { demoConfig } from '../config/demoConfig';
+import { colors } from '../theme/tokens';
 
 export type UserLifecycleRole = 'creator' | 'reviewer' | 'admin' | 'system';
 
@@ -256,150 +257,150 @@ export function getStatusMetadata(status: CampaignStatus): StatusMetadata {
     case 'draft':
       return {
         label: 'Draft',
-        badgeBg: '#f1f5f9',
-        badgeText: '#475569',
-        badgeBorder: '#cbd5e1',
-        dotColor: '#94a3b8',
+        badgeBg: colors.surfaceSecondary,
+        badgeText: colors.inkSecondary,
+        badgeBorder: colors.border,
+        dotColor: colors.inkMuted,
         icon: 'document-outline',
         description: 'Saved draft in progress; editable by creator',
       };
     case 'submitted':
       return {
         label: 'Under Review',
-        badgeBg: '#eff6ff',
-        badgeText: '#1d4ed8',
-        badgeBorder: '#bfdbfe',
-        dotColor: '#3b82f6',
+        badgeBg: colors.accentFaint,
+        badgeText: colors.accent,
+        badgeBorder: colors.border,
+        dotColor: colors.accent,
         icon: 'time-outline',
         description: 'Content and sources are being reviewed by platform reviewers',
       };
     case 'changes_requested':
       return {
         label: 'Changes Requested',
-        badgeBg: '#fffbeb',
-        badgeText: '#b45309',
-        badgeBorder: '#fde68a',
-        dotColor: '#f59e0b',
+        badgeBg: colors.warningFaint,
+        badgeText: colors.warning,
+        badgeBorder: colors.border,
+        dotColor: colors.warning,
         icon: 'alert-circle-outline',
         description: 'Revisions to claims, sources, or targeting are required',
       };
     case 'approved':
       return {
         label: 'Approved',
-        badgeBg: '#f0fdf4',
-        badgeText: '#15803d',
-        badgeBorder: '#bbf7d0',
-        dotColor: '#22c55e',
+        badgeBg: colors.positiveFaint,
+        badgeText: colors.positive,
+        badgeBorder: colors.border,
+        dotColor: colors.positive,
         icon: 'checkmark-circle-outline',
         description: 'Approved and eligible to open for community funding',
       };
     case 'available_for_funding':
       return {
         label: 'Funding Open',
-        badgeBg: '#eef2ff',
-        badgeText: '#4338ca',
-        badgeBorder: '#c7d2fe',
-        dotColor: '#6366f1',
+        badgeBg: colors.accentFaint,
+        badgeText: colors.accent,
+        badgeBorder: colors.border,
+        dotColor: colors.accent,
         icon: 'megaphone-outline',
         description: 'Open for backer amplification contributions',
       };
     case 'goal_reached':
       return {
         label: 'Goal Reached',
-        badgeBg: '#ecfdf5',
-        badgeText: '#047857',
-        badgeBorder: '#a7f3d0',
-        dotColor: '#10b981',
+        badgeBg: colors.positiveFaint,
+        badgeText: colors.positive,
+        badgeBorder: colors.border,
+        dotColor: colors.positive,
         icon: 'trophy-outline',
         description: '100% funded! Preparing advertising queue',
       };
     case 'funding_ended':
       return {
         label: 'Funding Closed',
-        badgeBg: '#f8fafc',
-        badgeText: '#334155',
-        badgeBorder: '#e2e8f0',
-        dotColor: '#64748b',
+        badgeBg: colors.surfaceSecondary,
+        badgeText: colors.inkSecondary,
+        badgeBorder: colors.border,
+        dotColor: colors.inkMuted,
         icon: 'calendar-outline',
         description: 'Funding window ended; distribution will be evaluated',
       };
     case 'distribution_preparation':
       return {
         label: 'Preparing Ads',
-        badgeBg: '#fdf4ff',
-        badgeText: '#86198f',
-        badgeBorder: '#f5d0fe',
-        dotColor: '#d946ef',
+        badgeBg: colors.surfaceSecondary,
+        badgeText: colors.inkSecondary,
+        badgeBorder: colors.border,
+        dotColor: colors.inkMuted,
         icon: 'settings-outline',
         description: 'Configuring advertising accounts, creatives, and inventory',
       };
     case 'promoting':
       return {
         label: 'Ads Active',
-        badgeBg: '#f0fdfa',
-        badgeText: '#0f766e',
-        badgeBorder: '#99f6e4',
-        dotColor: '#14b8a6',
+        badgeBg: colors.positiveFaint,
+        badgeText: colors.positive,
+        badgeBorder: colors.border,
+        dotColor: colors.positive,
         icon: 'radio-outline',
         description: 'Advertising is actively running across distribution channels',
       };
     case 'completed':
       return {
         label: 'Completed',
-        badgeBg: '#f1f5f9',
-        badgeText: '#0f172a',
-        badgeBorder: '#cbd5e1',
-        dotColor: '#0f172a',
+        badgeBg: colors.surfaceSecondary,
+        badgeText: colors.ink,
+        badgeBorder: colors.border,
+        dotColor: colors.ink,
         icon: 'checkbox-outline',
         description: 'Advertising run completed; final distribution report published',
       };
     case 'rejected':
       return {
         label: 'Ineligible',
-        badgeBg: '#fef2f2',
-        badgeText: '#b91c1c',
-        badgeBorder: '#fecaca',
-        dotColor: '#ef4444',
+        badgeBg: colors.dangerFaint,
+        badgeText: colors.danger,
+        badgeBorder: colors.border,
+        dotColor: colors.danger,
         icon: 'close-circle-outline',
         description: 'Submission does not meet advertising safety or evidence guidelines',
       };
     case 'cancelled':
       return {
         label: 'Cancelled',
-        badgeBg: '#f8fafc',
-        badgeText: '#64748b',
-        badgeBorder: '#e2e8f0',
-        dotColor: '#94a3b8',
+        badgeBg: colors.surfaceSecondary,
+        badgeText: colors.inkSecondary,
+        badgeBorder: colors.border,
+        dotColor: colors.inkMuted,
         icon: 'ban-outline',
         description: 'Campaign was cancelled by creator or platform administrator',
       };
     case 'refund_pending':
       return {
         label: 'Refund Pending',
-        badgeBg: '#fff7ed',
-        badgeText: '#c2410c',
-        badgeBorder: '#ffedd5',
-        dotColor: '#f97316',
+        badgeBg: colors.warningFaint,
+        badgeText: colors.warning,
+        badgeBorder: colors.border,
+        dotColor: colors.warning,
         icon: 'refresh-outline',
         description: 'Backer contributions are being refunded to original payment methods',
       };
     case 'failed':
       return {
         label: 'Failed',
-        badgeBg: '#fef2f2',
-        badgeText: '#991b1b',
-        badgeBorder: '#fee2e2',
-        dotColor: '#dc2626',
+        badgeBg: colors.dangerFaint,
+        badgeText: colors.danger,
+        badgeBorder: colors.border,
+        dotColor: colors.danger,
         icon: 'warning-outline',
         description: 'Campaign halted and refunded',
       };
     default:
       return {
         label: status,
-        badgeBg: '#f1f5f9',
-        badgeText: '#475569',
-        badgeBorder: '#cbd5e1',
-        dotColor: '#94a3b8',
+        badgeBg: colors.surfaceSecondary,
+        badgeText: colors.inkSecondary,
+        badgeBorder: colors.border,
+        dotColor: colors.inkMuted,
         icon: 'information-circle-outline',
         description: '',
       };

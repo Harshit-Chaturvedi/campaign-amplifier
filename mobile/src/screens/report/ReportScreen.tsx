@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
-  Text,
   ScrollView,
   TouchableOpacity,
   StatusBar,
@@ -13,9 +12,19 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  StatHero,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 import { useCampaignStore } from '../../store/useCampaignStore';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
 import { apiClient } from '../../api/client';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 export function ReportScreen({ route, navigation }: any) {
   const { campaignId } = route.params;
@@ -109,7 +118,7 @@ export function ReportScreen({ route, navigation }: any) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Top Header */}
@@ -117,10 +126,10 @@ export function ReportScreen({ route, navigation }: any) {
         style={{
           paddingTop: 52,
           paddingBottom: 14,
-          paddingHorizontal: 16,
-          backgroundColor: '#fff',
+          paddingHorizontal: tokens.spacing.lg,
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.hairline,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -131,137 +140,141 @@ export function ReportScreen({ route, navigation }: any) {
           accessibilityLabel="Go back"
           onPress={() => navigation.goBack()}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#f1f5f9',
+            width: 38,
+            height: 38,
+            borderRadius: tokens.radius.sm,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="arrow-back" size={20} color="#0f172a" />
+          <Ionicons name="arrow-back" size={18} color={colors.ink} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+        <Headline style={{ fontSize: 18, color: colors.ink }}>
           Distribution Report
-        </Text>
+        </Headline>
         <TouchableOpacity
           accessibilityRole="button"
           accessibilityLabel={showInfoSheet ? 'Hide metrics explanation' : 'View metrics explanation'}
           onPress={() => setShowInfoSheet(!showInfoSheet)}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#eef2ff',
+            width: 38,
+            height: 38,
+            borderRadius: tokens.radius.sm,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="help-circle-outline" size={20} color="#4f46e5" />
+          <Ionicons name="help-circle-outline" size={18} color={colors.accent} />
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ padding: tokens.spacing.lg, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
         {/* Loading State */}
         {loading && (
           <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-            <ActivityIndicator size="large" color="#4f46e5" />
-            <Text style={{ fontSize: 13, color: '#64748b', marginTop: 12 }}>
+            <ActivityIndicator size="large" color={colors.accent} />
+            <MetaLabel style={{ marginTop: 12 }}>
               Loading distribution analytics...
-            </Text>
+            </MetaLabel>
           </View>
         )}
 
         {/* Error State */}
         {error && !loading && (
-          <Card style={{ backgroundColor: '#fef2f2', borderColor: '#fecaca', marginBottom: 16 }}>
-            <Text style={{ fontSize: 14, fontWeight: '700', color: '#dc2626', marginBottom: 4 }}>
+          <Card style={{ backgroundColor: colors.dangerFaint, borderColor: colors.border, marginBottom: tokens.spacing.md }}>
+            <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.danger, marginBottom: 4 }}>
               Unable to load report
             </Text>
-            <Text style={{ fontSize: 12, color: '#b91c1c' }}>{error}</Text>
+            <MetaLabel style={{ color: colors.danger }}>{error}</MetaLabel>
           </Card>
         )}
 
         {/* Header Summary */}
-        <Card style={{ marginBottom: 20 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <View style={{ backgroundColor: '#f1f5f9', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569', textTransform: 'uppercase' }}>
-                Status: {campaign?.status ? campaign.status.replace(/_/g, ' ') : 'Funding'}
-              </Text>
+        <Card style={{ marginBottom: tokens.spacing.md }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+            <View style={{ backgroundColor: colors.paperSecondary, paddingHorizontal: 8, paddingVertical: 3, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}>
+              <SmallCapsLabel style={{ color: colors.mutedInk }}>
+                STATUS: {campaign?.status ? campaign.status.replace(/_/g, ' ') : 'FUNDING'}
+              </SmallCapsLabel>
             </View>
             <DemoDataBadge size="sm" />
           </View>
 
-          <Text style={{ fontSize: 18, fontWeight: '800', color: '#0f172a', marginBottom: 4 }}>
+          <Headline style={{ fontSize: 20, color: colors.ink, marginBottom: 6 }}>
             {campaign?.title || 'Campaign Amplification'}
-          </Text>
-          <Text style={{ fontSize: 12, color: '#64748b' }}>
-            Transparent breakdown of funds raised, budget allocation, estimated reach, and measured delivery.
-          </Text>
+          </Headline>
+          <BodyText style={{ fontSize: 13, color: colors.mutedInk, lineHeight: 18 }}>
+            Transparent accounting of backer funding, advertising allocation, and audience reach.
+          </BodyText>
         </Card>
 
-        {/* Metric Definitions Info Sheet (Accordion / Card) */}
+        {/* Metric Definitions Info Sheet */}
         {showInfoSheet && (
-          <Card style={{ backgroundColor: '#eff6ff', borderColor: '#bfdbfe', marginBottom: 20 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#1d4ed8' }}>
+          <Card style={{ backgroundColor: colors.paperSecondary, borderColor: colors.hairline, marginBottom: tokens.spacing.md }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: tokens.spacing.sm }}>
+              <SmallCapsLabel style={{ color: colors.ink, fontSize: 12 }}>
                 Metric Definitions & Accounting Policy
-              </Text>
+              </SmallCapsLabel>
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="Close metric definitions"
                 onPress={() => setShowInfoSheet(false)}
               >
-                <Ionicons name="close" size={18} color="#1d4ed8" />
+                <Ionicons name="close" size={18} color={colors.mutedInk} />
               </TouchableOpacity>
             </View>
-            <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, marginBottom: 6 }}>
-              • <Text style={{ fontWeight: '700' }}>Estimated Reach:</Text> Projected audience size calculated from advertising CPM and frequency prior to launch. Always labelled as "Estimate" and never guaranteed.
-            </Text>
-            <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, marginBottom: 6 }}>
-              • <Text style={{ fontWeight: '700' }}>Measured (demo data):</Text> Actual delivery metrics recorded from ad servers (Meta, Instagram, Reddit). Never combined or confused with estimates.
-            </Text>
-            <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18, marginBottom: 6 }}>
-              • <Text style={{ fontWeight: '700' }}>Ad Spend (95%):</Text> Direct expenditure on digital advertising inventory.
-            </Text>
-            <Text style={{ fontSize: 12, color: '#1e40af', lineHeight: 18 }}>
-              • <Text style={{ fontWeight: '700' }}>Platform Fee (5%):</Text> Retained to cover editorial moderation, source checks, and delivery infrastructure.
-            </Text>
+            <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 18, marginBottom: 6 }}>
+              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Estimated Reach:</Text> Projected audience size calculated from advertising CPM and frequency prior to launch. Always labelled as "Estimate" and never guaranteed.
+            </BodyText>
+            <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 18, marginBottom: 6 }}>
+              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Measured (demo data):</Text> Actual delivery metrics recorded from ad platforms. Never combined or confused with estimates.
+            </BodyText>
+            <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 18, marginBottom: 6 }}>
+              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Ad Spend (95%):</Text> Direct expenditure on digital advertising inventory.
+            </BodyText>
+            <BodyText style={{ fontSize: 12, color: colors.mutedInk, lineHeight: 18 }}>
+              • <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>Platform Fee (5%):</Text> Retained to cover editorial moderation, source verification, and delivery infrastructure.
+            </BodyText>
           </Card>
         )}
 
         {/* SECTION 1: FUNDING */}
-        <Card style={{ marginBottom: 20 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+        <Card style={{ marginBottom: tokens.spacing.md }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: tokens.spacing.sm }}>
+            <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
               1. Funding Summary
-            </Text>
-            <Ionicons name="cash-outline" size={18} color="#16a34a" />
+            </SmallCapsLabel>
+            <Ionicons name="cash-outline" size={16} color={colors.positive} />
           </View>
 
-          <View style={{ flexDirection: 'row', marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', marginBottom: tokens.spacing.sm }}>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a' }}>
+              <StatHero style={{ fontSize: 24, color: colors.ink }}>
                 {formatCurrency(fundingData.amount_raised)}
-              </Text>
-              <Text style={{ fontSize: 12, color: '#64748b' }}>Raised of {formatCurrency(fundingData.funding_goal)} goal</Text>
+              </StatHero>
+              <MetaLabel>Raised of {formatCurrency(fundingData.funding_goal)} goal</MetaLabel>
             </View>
             <View style={{ flex: 1, alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 22, fontWeight: '800', color: '#4f46e5' }}>
+              <StatHero style={{ fontSize: 24, color: colors.accent }}>
                 {fundingData.backer_count}
-              </Text>
-              <Text style={{ fontSize: 12, color: '#64748b' }}>Community Backers</Text>
+              </StatHero>
+              <SmallCapsLabel>COMMUNITY BACKERS</SmallCapsLabel>
             </View>
           </View>
 
-          <ProgressBar progress={fundingData.percent_funded} color="#4f46e5" height={8} />
+          <ProgressBar progress={fundingData.percent_funded} color={colors.accent} height={3} />
 
           {/* Contributions List (Backer names private by default!) */}
-          <View style={{ marginTop: 16, borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: 12 }}>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#334155', marginBottom: 8 }}>
-              Recent Backer Transactions (Names Private by Default):
-            </Text>
+          <View style={{ marginTop: tokens.spacing.md, borderTopWidth: 1, borderTopColor: colors.hairline, paddingTop: tokens.spacing.sm }}>
+            <SmallCapsLabel style={{ color: colors.mutedInk, marginBottom: 8 }}>
+              Recent Transactions (Backer Names Private by Default):
+            </SmallCapsLabel>
             {contributions.length > 0 ? (
               contributions.slice(0, 4).map((c, i) => (
                 <View
@@ -274,62 +287,62 @@ export function ReportScreen({ route, navigation }: any) {
                   }}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Ionicons name="shield" size={14} color="#94a3b8" />
-                    <Text style={{ fontSize: 13, color: '#475569' }}>
+                    <Ionicons name="shield-outline" size={13} color={colors.mutedInk} />
+                    <BodyText style={{ fontSize: 13, color: colors.mutedInk }}>
                       {c.showName && c.backerName && c.backerName !== 'Anonymous'
                         ? c.backerName
                         : 'Private Supporter'}
-                    </Text>
+                    </BodyText>
                   </View>
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                     {formatCurrency(c.amount)}
                   </Text>
                 </View>
               ))
             ) : (
-              <Text style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic' }}>
+              <MetaLabel style={{ fontStyle: 'italic' }}>
                 No public individual records. Backer identities remain private.
-              </Text>
+              </MetaLabel>
             )}
           </View>
         </Card>
 
         {/* SECTION 2: BUDGET ALLOCATION */}
-        <Card style={{ marginBottom: 20 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+        <Card style={{ marginBottom: tokens.spacing.md }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: tokens.spacing.sm }}>
+            <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
               2. Budget & Expenditure
-            </Text>
-            <Ionicons name="pie-chart-outline" size={18} color="#4f46e5" />
+            </SmallCapsLabel>
+            <Ionicons name="pie-chart-outline" size={16} color={colors.accent} />
           </View>
 
           <View style={{ gap: 8 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 13, color: '#475569' }}>Total Backer Pool</Text>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
+              <BodyText style={{ fontSize: 13, color: colors.mutedInk }}>Total Backer Pool</BodyText>
+              <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
                 {formatCurrency(budgetData.total_raised)}
               </Text>
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 13, color: '#16a34a' }}>• Direct Advertising Inventory (95%)</Text>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#16a34a' }}>
+              <BodyText style={{ fontSize: 13, color: colors.positive }}>• Direct Advertising Inventory (95%)</BodyText>
+              <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.positive }}>
                 {formatCurrency(budgetData.ad_budget)}
               </Text>
             </View>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 13, color: '#64748b' }}>• Platform Review & Infrastructure (5%)</Text>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: '#64748b' }}>
+              <BodyText style={{ fontSize: 13, color: colors.mutedInk }}>• Platform Review & Infrastructure (5%)</BodyText>
+              <Text style={{ fontSize: 14, fontFamily: fonts.sansMedium, color: colors.mutedInk }}>
                 {formatCurrency(budgetData.platform_fee)}
               </Text>
             </View>
 
-            <View style={{ height: 1, backgroundColor: '#f1f5f9', marginVertical: 4 }} />
+            <View style={{ height: 1, backgroundColor: colors.hairline, marginVertical: 4 }} />
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#334155' }}>Ad Spend Disbursed to Date</Text>
-              <Text style={{ fontSize: 14, fontWeight: '800', color: '#0f172a' }}>
+              <BodyText style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>Ad Spend Disbursed to Date</BodyText>
+              <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: colors.ink }}>
                 {formatCurrency(budgetData.spent)}
               </Text>
             </View>
@@ -337,97 +350,97 @@ export function ReportScreen({ route, navigation }: any) {
         </Card>
 
         {/* SECTION 3: DELIVERY - MEASURED (LABELED "Measured (demo data)") */}
-        <Card style={{ marginBottom: 20, backgroundColor: '#ffffff', borderColor: '#e2e8f0' }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+        <Card style={{ marginBottom: tokens.spacing.md }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: tokens.spacing.sm }}>
+            <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
               3. Delivery — Measured
-            </Text>
-            <View style={{ backgroundColor: '#dbeafe', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-              <Text style={{ fontSize: 10, fontWeight: '800', color: '#1e40af', textTransform: 'uppercase' }}>
-                Measured (demo data)
-              </Text>
+            </SmallCapsLabel>
+            <View style={{ backgroundColor: colors.paperSecondary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}>
+              <SmallCapsLabel style={{ fontSize: 10, color: colors.mutedInk }}>
+                MEASURED (DEMO DATA)
+              </SmallCapsLabel>
             </View>
           </View>
 
           {deliveryData.measured ? (
             <View>
-              <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+              <MetaLabel style={{ marginBottom: tokens.spacing.sm }}>
                 Real ad server telemetry recorded during active delivery.
-              </Text>
+              </MetaLabel>
 
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                <View style={{ flex: 1, minWidth: '45%', backgroundColor: '#f8fafc', padding: 12, borderRadius: 10 }}>
-                  <Text style={{ fontSize: 20, fontWeight: '800', color: '#0f172a' }}>
+                <View style={{ flex: 1, minWidth: '45%', backgroundColor: colors.paperSecondary, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                  <StatHero style={{ fontSize: 20, color: colors.ink }}>
                     {formatNumber(deliveryData.measured.measured_reach)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Measured Unique Reach</Text>
+                  </StatHero>
+                  <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>MEASURED UNIQUE REACH</SmallCapsLabel>
                 </View>
 
-                <View style={{ flex: 1, minWidth: '45%', backgroundColor: '#f8fafc', padding: 12, borderRadius: 10 }}>
-                  <Text style={{ fontSize: 20, fontWeight: '800', color: '#0f172a' }}>
+                <View style={{ flex: 1, minWidth: '45%', backgroundColor: colors.paperSecondary, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                  <StatHero style={{ fontSize: 20, color: colors.ink }}>
                     {formatNumber(deliveryData.measured.impressions)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Measured Impressions</Text>
+                  </StatHero>
+                  <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>MEASURED IMPRESSIONS</SmallCapsLabel>
                 </View>
 
-                <View style={{ flex: 1, minWidth: '45%', backgroundColor: '#f8fafc', padding: 12, borderRadius: 10 }}>
-                  <Text style={{ fontSize: 20, fontWeight: '800', color: '#0f172a' }}>
+                <View style={{ flex: 1, minWidth: '45%', backgroundColor: colors.paperSecondary, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                  <StatHero style={{ fontSize: 20, color: colors.ink }}>
                     {formatNumber(deliveryData.measured.clicks)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Link Clicks to Evidence</Text>
+                  </StatHero>
+                  <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>LINK CLICKS TO EVIDENCE</SmallCapsLabel>
                 </View>
 
-                <View style={{ flex: 1, minWidth: '45%', backgroundColor: '#f8fafc', padding: 12, borderRadius: 10 }}>
-                  <Text style={{ fontSize: 20, fontWeight: '800', color: '#16a34a' }}>
+                <View style={{ flex: 1, minWidth: '45%', backgroundColor: colors.paperSecondary, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                  <StatHero style={{ fontSize: 20, color: colors.positive }}>
                     {formatCurrency(deliveryData.measured.ad_spend)}
-                  </Text>
-                  <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Ad Inventory Expended</Text>
+                  </StatHero>
+                  <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>AD INVENTORY EXPENDED</SmallCapsLabel>
                 </View>
               </View>
             </View>
           ) : (
             <View style={{ paddingVertical: 14, alignItems: 'center' }}>
-              <Ionicons name="time-outline" size={28} color="#94a3b8" />
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#475569', marginTop: 6 }}>
+              <Ionicons name="time-outline" size={24} color={colors.mutedInk} />
+              <BodyText style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.ink, marginTop: 6 }}>
                 Measured telemetry pending delivery
-              </Text>
-              <Text style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', marginTop: 2 }}>
+              </BodyText>
+              <MetaLabel style={{ textAlign: 'center', marginTop: 2 }}>
                 Measured impressions and clicks will be recorded once the campaign is approved and starts promotion.
-              </Text>
+              </MetaLabel>
             </View>
           )}
         </Card>
 
         {/* SECTION 4: ESTIMATES (LABELED "Estimate") */}
-        <Card style={{ marginBottom: 20, backgroundColor: '#f8fafc' }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }}>
+        <Card style={{ marginBottom: tokens.spacing.lg, backgroundColor: colors.paperSecondary }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: tokens.spacing.sm }}>
+            <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
               4. Estimates
-            </Text>
-            <View style={{ backgroundColor: '#fef3c7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-              <Text style={{ fontSize: 10, fontWeight: '800', color: '#b45309', textTransform: 'uppercase' }}>
-                Estimate
-              </Text>
+            </SmallCapsLabel>
+            <View style={{ backgroundColor: colors.warningFaint, paddingHorizontal: 6, paddingVertical: 2, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.border }}>
+              <SmallCapsLabel style={{ fontSize: 10, color: colors.warning }}>
+                ESTIMATE
+              </SmallCapsLabel>
             </View>
           </View>
 
-          <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 12 }}>
+          <MetaLabel style={{ marginBottom: tokens.spacing.sm }}>
             Projections based on campaign funding goal and standard platform CPM ($14.50, 2.2x frequency).
-          </Text>
+          </MetaLabel>
 
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            <View style={{ flex: 1, backgroundColor: '#fff', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
-              <Text style={{ fontSize: 20, fontWeight: '800', color: '#4f46e5' }}>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flex: 1, backgroundColor: colors.surface, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+              <StatHero style={{ fontSize: 20, color: colors.accent }}>
                 {formatNumber(deliveryData.estimated.reach)}
-              </Text>
-              <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Projected Reach at Goal</Text>
+              </StatHero>
+              <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>PROJECTED REACH (ESTIMATE)</SmallCapsLabel>
             </View>
 
-            <View style={{ flex: 1, backgroundColor: '#fff', padding: 12, borderRadius: 10, borderWidth: 1, borderColor: '#e2e8f0' }}>
-              <Text style={{ fontSize: 20, fontWeight: '800', color: '#4f46e5' }}>
+            <View style={{ flex: 1, backgroundColor: colors.surface, padding: tokens.spacing.sm, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+              <StatHero style={{ fontSize: 20, color: colors.accent }}>
                 {formatNumber(deliveryData.estimated.impressions)}
-              </Text>
-              <Text style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Projected Impressions</Text>
+              </StatHero>
+              <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>PROJECTED IMPRESSIONS (ESTIMATE)</SmallCapsLabel>
             </View>
           </View>
         </Card>

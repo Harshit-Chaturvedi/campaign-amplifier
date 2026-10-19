@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
-  Text,
   ScrollView,
   TouchableOpacity,
   StatusBar,
@@ -21,6 +20,8 @@ import { Step4Reach } from './Step4Reach';
 import { Step5Submit } from './Step5Submit';
 import { SubmitConfirmationModal } from './SubmitConfirmationModal';
 import { Button } from '../../components/ui/Button';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import { Headline, Subheading, BodyText, SmallCapsLabel, MetaLabel, Text } from '../../components/ui/Typography';
 
 const STEPS = [
   { step: 1, title: 'Basics' },
@@ -292,7 +293,7 @@ export function CreateFlowScreen({ route, navigation }: any) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#f8fafc' }}
+      style={{ flex: 1, backgroundColor: colors.paper }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <StatusBar barStyle="dark-content" />
@@ -302,10 +303,10 @@ export function CreateFlowScreen({ route, navigation }: any) {
         style={{
           paddingTop: 52,
           paddingBottom: 12,
-          paddingHorizontal: 16,
-          backgroundColor: '#fff',
+          paddingHorizontal: tokens.spacing.lg,
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.hairline,
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -317,19 +318,21 @@ export function CreateFlowScreen({ route, navigation }: any) {
             style={{
               width: 38,
               height: 38,
-              borderRadius: 19,
-              backgroundColor: '#f1f5f9',
+              borderRadius: tokens.radius.sm,
+              backgroundColor: colors.paperSecondary,
+              borderWidth: 1,
+              borderColor: colors.hairline,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="arrow-back" size={20} color="#0f172a" />
+            <Ionicons name="arrow-back" size={18} color={colors.ink} />
           </TouchableOpacity>
 
           <View style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+            <Headline style={{ fontSize: 16, color: colors.ink }}>
               Step {currentStep} of 5: {STEPS[currentStep - 1]?.title}
-            </Text>
+            </Headline>
             {/* Autosave status pill */}
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2, gap: 4 }}>
               <Ionicons
@@ -343,22 +346,22 @@ export function CreateFlowScreen({ route, navigation }: any) {
                 size={12}
                 color={
                   saveStatus === 'synced'
-                    ? '#16a34a'
+                    ? colors.positive
                     : saveStatus === 'saving'
-                    ? '#4f46e5'
-                    : '#64748b'
+                    ? colors.accent
+                    : colors.mutedInk
                 }
               />
               <Text
                 style={{
                   fontSize: 11,
+                  fontFamily: fonts.sansMedium,
                   color:
                     saveStatus === 'synced'
-                      ? '#16a34a'
+                      ? colors.positive
                       : saveStatus === 'saving'
-                      ? '#4f46e5'
-                      : '#64748b',
-                  fontWeight: '500',
+                      ? colors.accent
+                      : colors.mutedInk,
                 }}
               >
                 {saveStatus === 'synced'
@@ -378,11 +381,13 @@ export function CreateFlowScreen({ route, navigation }: any) {
             style={{
               paddingHorizontal: 10,
               paddingVertical: 6,
-              borderRadius: 8,
-              backgroundColor: '#f1f5f9',
+              borderRadius: tokens.radius.sm,
+              backgroundColor: colors.paperSecondary,
+              borderWidth: 1,
+              borderColor: colors.hairline,
             }}
           >
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#475569' }}>Close</Text>
+            <SmallCapsLabel style={{ fontSize: 11, color: colors.mutedInk }}>Close</SmallCapsLabel>
           </TouchableOpacity>
         </View>
 
@@ -396,13 +401,13 @@ export function CreateFlowScreen({ route, navigation }: any) {
                 key={s.step}
                 style={{
                   flex: 1,
-                  height: 4,
-                  borderRadius: 2,
+                  height: 3,
+                  borderRadius: 1.5,
                   backgroundColor: isActive
-                    ? '#4f46e5'
+                    ? colors.accent
                     : isCompleted
-                    ? '#818cf8'
-                    : '#e2e8f0',
+                    ? colors.hairlineDark
+                    : colors.hairline,
                 }}
               />
             );
@@ -458,11 +463,11 @@ export function CreateFlowScreen({ route, navigation }: any) {
             bottom: 0,
             left: 0,
             right: 0,
-            backgroundColor: '#fff',
+            backgroundColor: colors.surface,
             borderTopWidth: 1,
-            borderTopColor: '#f1f5f9',
-            padding: 16,
-            paddingBottom: Platform.OS === 'ios' ? 32 : 16,
+            borderTopColor: colors.hairline,
+            padding: tokens.spacing.md,
+            paddingBottom: Platform.OS === 'ios' ? 32 : tokens.spacing.md,
             flexDirection: 'row',
             gap: 12,
           }}

@@ -98,12 +98,27 @@ function ProfileNavigator() {
   );
 }
 
+import { colors, fonts } from '../theme/tokens';
+import { DefaultTheme } from '@react-navigation/native';
+
+const EditorialTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: colors.background,
+    card: colors.surface,
+    text: colors.ink,
+    border: colors.border,
+    primary: colors.accent,
+  },
+};
+
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused, color }) => {
           let iconName: keyof typeof Ionicons.glyphMap;
           switch (route.name) {
             case 'HomeTab':
@@ -124,13 +139,13 @@ function MainTabs() {
             default:
               iconName = 'ellipse';
           }
-          return <Ionicons name={iconName} size={route.name === 'CreateTab' ? 32 : 24} color={color} />;
+          return <Ionicons name={iconName} size={route.name === 'CreateTab' ? 28 : 22} color={color} />;
         },
-        tabBarActiveTintColor: '#4f46e5',
-        tabBarInactiveTintColor: '#94a3b8',
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.inkSecondary,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopColor: '#f1f5f9',
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
           paddingTop: 6,
           paddingBottom: 8,
@@ -138,7 +153,7 @@ function MainTabs() {
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '600',
+          fontFamily: fonts.sansMedium,
         },
       })}
     >
@@ -153,7 +168,7 @@ function MainTabs() {
 
 export function RootNavigator() {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={EditorialTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         <RootStack.Screen name="Main" component={MainTabs} />
         <RootStack.Group screenOptions={{ presentation: 'modal' }}>

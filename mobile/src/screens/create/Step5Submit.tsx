@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   Image,
@@ -14,9 +13,19 @@ import { Button } from '../../components/ui/Button';
 import { StoryBlockRenderer } from '../../components/story/StoryBlockRenderer';
 import { SourceItem } from '../../components/ui/SourceItem';
 import { FeedPlacementPreview } from '../../components/campaign/PlacementPreviews';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  StatHero,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 import { estimateReach } from '../../services/reach';
 import { demoConfig } from '../../config/demoConfig';
 import { CampaignDraft } from '../../store/useDraftStore';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface Step5SubmitProps {
   draft: Partial<CampaignDraft>;
@@ -70,61 +79,63 @@ export function Step5Submit({
   return (
     <View>
       {/* Header */}
-      <View style={{ marginBottom: 20 }}>
-        <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a' }}>
+      <View style={{ marginBottom: tokens.spacing.lg }}>
+        <Headline style={{ fontSize: 22, color: colors.ink }}>
           Funding Goal & Submit
-        </Text>
-        <Text style={{ fontSize: 14, color: '#64748b', marginTop: 4, lineHeight: 20 }}>
+        </Headline>
+        <MetaLabel style={{ marginTop: 4 }}>
           Set your required funding goal, review your complete campaign draft, and submit for editorial review.
-        </Text>
+        </MetaLabel>
       </View>
 
       {/* 1. REQUIRED FUNDING GOAL (NO DEFAULT VALUE) */}
       <Card
         style={{
-          marginBottom: 20,
-          padding: 18,
-          borderWidth: 2,
-          borderColor: isGoalValid ? '#4f46e5' : isGoalTyped ? '#ef4444' : '#cbd5e1',
+          marginBottom: tokens.spacing.md,
+          padding: tokens.spacing.md,
+          borderWidth: 1,
+          borderColor: isGoalValid ? colors.accent : isGoalTyped ? colors.danger : colors.hairline,
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="cash-outline" size={20} color="#4f46e5" style={{ marginRight: 8 }} />
-            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+            <Ionicons name="cash-outline" size={18} color={colors.accent} style={{ marginRight: 6 }} />
+            <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
               Required Funding Goal (USD)
             </Text>
           </View>
           <View
             style={{
-              backgroundColor: '#fee2e2',
-              paddingHorizontal: 8,
+              backgroundColor: colors.paperSecondary,
+              paddingHorizontal: 6,
               paddingVertical: 2,
-              borderRadius: 6,
+              borderRadius: tokens.radius.xs,
+              borderWidth: 1,
+              borderColor: colors.hairline,
             }}
           >
-            <Text style={{ fontSize: 11, fontWeight: '700', color: '#dc2626' }}>Required</Text>
+            <SmallCapsLabel style={{ fontSize: 10, color: colors.danger }}>REQUIRED</SmallCapsLabel>
           </View>
         </View>
 
-        <Text style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>
+        <MetaLabel style={{ marginBottom: 12 }}>
           Type the exact amount needed to fund advertising reach for this campaign. Must be between ${demoConfig.minGoal.toLocaleString()} and ${demoConfig.maxGoal.toLocaleString()}.
-        </Text>
+        </MetaLabel>
 
         {/* Amount Input with $ Prefix */}
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: '#f8fafc',
-            borderWidth: 1.5,
-            borderColor: isGoalValid ? '#4f46e5' : isGoalTyped ? '#ef4444' : '#cbd5e1',
-            borderRadius: 12,
-            paddingHorizontal: 16,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: isGoalValid ? colors.accent : isGoalTyped ? colors.danger : colors.hairline,
+            borderRadius: tokens.radius.sm,
+            paddingHorizontal: 14,
             paddingVertical: 10,
           }}
         >
-          <Text style={{ fontSize: 24, fontWeight: '800', color: '#0f172a', marginRight: 8 }}>
+          <Text style={{ fontSize: 22, fontFamily: fonts.sansBold, color: colors.ink, marginRight: 6 }}>
             $
           </Text>
           <TextInput
@@ -132,27 +143,27 @@ export function Step5Submit({
             value={goalText}
             onChangeText={handleGoalChange}
             placeholder="e.g. 5000 (No default value)"
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={colors.secondaryCaption}
             keyboardType="number-pad"
             style={{
               flex: 1,
-              fontSize: 22,
-              fontWeight: '800',
-              color: '#0f172a',
+              fontSize: 20,
+              fontFamily: fonts.sansBold,
+              color: colors.ink,
             }}
           />
           {isGoalValid && (
-            <Ionicons name="checkmark-circle" size={24} color="#16a34a" />
+            <Ionicons name="checkmark-circle-outline" size={20} color={colors.positive} />
           )}
         </View>
 
         {/* Validation Error / Helper Text */}
         {!isGoalTyped ? (
-          <Text style={{ fontSize: 12, color: '#64748b', marginTop: 8 }}>
+          <MetaLabel style={{ marginTop: 8 }}>
             * Please type a funding target. No default is prefilled.
-          </Text>
+          </MetaLabel>
         ) : !isGoalValid ? (
-          <Text style={{ fontSize: 12, color: '#dc2626', fontWeight: '600', marginTop: 8 }}>
+          <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.danger, marginTop: 8 }}>
             Funding goal must be between ${demoConfig.minGoal.toLocaleString()} and ${demoConfig.maxGoal.toLocaleString()} (entered: ${numericGoal.toLocaleString()}).
           </Text>
         ) : null}
@@ -161,71 +172,71 @@ export function Step5Submit({
         {reachCalc && (
           <View
             style={{
-              marginTop: 16,
-              padding: 14,
-              backgroundColor: '#eef2ff',
-              borderRadius: 12,
+              marginTop: 14,
+              padding: tokens.spacing.md,
+              backgroundColor: colors.surface,
+              borderRadius: tokens.radius.sm,
               borderWidth: 1,
-              borderColor: '#c7d2fe',
+              borderColor: colors.hairline,
             }}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
-              <Ionicons name="people" size={18} color="#4f46e5" style={{ marginRight: 6 }} />
-              <Text style={{ fontSize: 13, fontWeight: '800', color: '#4338ca', textTransform: 'uppercase' }}>
-                Estimated Reach (Estimate, not a guarantee)
-              </Text>
+              <Ionicons name="people-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
+              <SmallCapsLabel style={{ fontSize: 11, color: colors.accent }}>
+                ESTIMATED REACH (ESTIMATE, NOT A GUARANTEE)
+              </SmallCapsLabel>
             </View>
-            <Text style={{ fontSize: 22, fontWeight: '900', color: '#312e81' }}>
+            <StatHero style={{ fontSize: 24, color: colors.ink }}>
               ~{reachCalc.estimate.toLocaleString()} people
-            </Text>
-            <Text style={{ fontSize: 12, color: '#4338ca', marginTop: 4, lineHeight: 16 }}>
+            </StatHero>
+            <MetaLabel style={{ marginTop: 4, lineHeight: 16 }}>
               At ${numericGoal.toLocaleString()} goal: ~${reachCalc.adBudget.toLocaleString()} dedicated ad budget creates ~{reachCalc.impressions.toLocaleString()} ad impressions at ${(demoConfig.cpmUsd).toFixed(2)} CPM.
-            </Text>
+            </MetaLabel>
           </View>
         )}
       </Card>
 
       {/* 2. FEES & FUNDING POLICY */}
-      <Card style={{ marginBottom: 20, padding: 16, backgroundColor: '#f8fafc' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-          <Ionicons name="shield-outline" size={18} color="#0f172a" style={{ marginRight: 6 }} />
-          <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>
-            Fees & Funding Policy
-          </Text>
+      <Card style={{ marginBottom: tokens.spacing.md, padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+          <Ionicons name="shield-outline" size={16} color={colors.ink} style={{ marginRight: 6 }} />
+          <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
+            FEES & FUNDING POLICY
+          </SmallCapsLabel>
         </View>
 
-        <View style={{ gap: 8 }}>
+        <View style={{ gap: 6 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{ fontSize: 13, color: '#64748b' }}>Platform Maintenance & Editorial Review</Text>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>5.0%</Text>
+            <BodyText style={{ fontSize: 13, color: colors.mutedInk }}>Platform Maintenance & Editorial Review</BodyText>
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>5.0%</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{ fontSize: 13, color: '#64748b' }}>Payment Processing (Stripe / Banking)</Text>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a' }}>2.9% + $0.30</Text>
+            <BodyText style={{ fontSize: 13, color: colors.mutedInk }}>Payment Processing (Stripe / Banking)</BodyText>
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>2.9% + $0.30</Text>
           </View>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              paddingTop: 8,
+              paddingTop: 6,
               borderTopWidth: 1,
-              borderTopColor: '#e2e8f0',
+              borderTopColor: colors.hairline,
             }}
           >
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#16a34a' }}>
+            <BodyText style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.positive }}>
               Direct Ad Spend on Selected Channels
-            </Text>
-            <Text style={{ fontSize: 13, fontWeight: '800', color: '#16a34a' }}>~92.1%</Text>
+            </BodyText>
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansBold, color: colors.positive }}>~92.1%</Text>
           </View>
         </View>
 
-        <Text style={{ fontSize: 12, color: '#64748b', marginTop: 12, lineHeight: 17 }}>
+        <MetaLabel style={{ marginTop: 10, lineHeight: 16 }}>
           Policy: All net contributions are deployed directly to ad network delivery once the campaign is funded and approved. If a campaign is not funded within the duration window, contributions are returned or credited per backer preference.
-        </Text>
+        </MetaLabel>
       </Card>
 
       {/* 3. COMPLETE CAMPAIGN PREVIEW SECTION */}
-      <View style={{ marginBottom: 20 }}>
+      <View style={{ marginBottom: tokens.spacing.md }}>
         <TouchableOpacity
           onPress={() => setPreviewExpanded(!previewExpanded)}
           activeOpacity={0.8}
@@ -233,85 +244,87 @@ export function Step5Submit({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: '#ffffff',
-            padding: 16,
-            borderRadius: 14,
+            backgroundColor: colors.surface,
+            padding: tokens.spacing.md,
+            borderRadius: tokens.radius.sm,
             borderWidth: 1,
-            borderColor: '#e2e8f0',
+            borderColor: colors.hairline,
           }}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons name="eye-outline" size={20} color="#4f46e5" style={{ marginRight: 8 }} />
-            <Text style={{ fontSize: 16, fontWeight: '800', color: '#0f172a' }}>
+            <Ionicons name="eye-outline" size={18} color={colors.accent} style={{ marginRight: 8 }} />
+            <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
               Complete Campaign Preview
             </Text>
           </View>
           <Ionicons
             name={previewExpanded ? 'chevron-up' : 'chevron-down'}
-            size={20}
-            color="#64748b"
+            size={18}
+            color={colors.mutedInk}
           />
         </TouchableOpacity>
 
         {previewExpanded && (
-          <View style={{ marginTop: 12, gap: 14 }}>
+          <View style={{ marginTop: 10, gap: 10 }}>
             {/* Basics Header Preview */}
-            <Card style={{ padding: 16 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+            <Card style={{ padding: tokens.spacing.md }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
                 <View
                   style={{
-                    backgroundColor: '#eef2ff',
-                    paddingHorizontal: 8,
-                    paddingVertical: 3,
-                    borderRadius: 6,
+                    backgroundColor: colors.paperSecondary,
+                    paddingHorizontal: 6,
+                    paddingVertical: 2,
+                    borderRadius: tokens.radius.xs,
+                    borderWidth: 1,
+                    borderColor: colors.hairline,
                   }}
                 >
-                  <Text style={{ fontSize: 11, fontWeight: '800', color: '#4f46e5', textTransform: 'uppercase' }}>
-                    {draft.category || 'Community'}
-                  </Text>
+                  <SmallCapsLabel style={{ fontSize: 10, color: colors.ink }}>
+                    {draft.category || 'COMMUNITY'}
+                  </SmallCapsLabel>
                 </View>
-                <Text style={{ fontSize: 12, color: '#64748b' }}>
+                <MetaLabel>
                   by {draft.creatorName || 'Campaign Organizer'}
-                </Text>
+                </MetaLabel>
               </View>
 
-              <Text style={{ fontSize: 20, fontWeight: '900', color: '#0f172a', marginBottom: 8 }}>
+              <Headline style={{ fontSize: 18, color: colors.ink, marginBottom: 6 }}>
                 {draft.title || 'Untitled Campaign'}
-              </Text>
+              </Headline>
 
               {draft.summary ? (
-                <Text style={{ fontSize: 14, color: '#475569', lineHeight: 21 }}>
+                <BodyText style={{ fontSize: 13, color: colors.mutedInk, lineHeight: 18 }}>
                   {draft.summary}
-                </Text>
+                </BodyText>
               ) : null}
 
               {draft.coverUrl && (
-                <View style={{ marginTop: 12, borderRadius: 12, overflow: 'hidden', height: 180 }}>
+                <View style={{ marginTop: 10, borderRadius: tokens.radius.sm, overflow: 'hidden', height: 160 }}>
                   <Image source={{ uri: draft.coverUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
                 </View>
               )}
             </Card>
 
-            {/* Story Blocks Preview (using StoryBlockRenderer) */}
+            {/* Story Blocks Preview */}
             {draft.storyBlocks && draft.storyBlocks.length > 0 && (
-              <Card style={{ padding: 16 }}>
-                <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a', marginBottom: 12 }}>
-                  Editorial Story
-                </Text>
+              <Card style={{ padding: tokens.spacing.md }}>
+                <SmallCapsLabel style={{ color: colors.ink, marginBottom: 10 }}>
+                  EDITORIAL STORY
+                </SmallCapsLabel>
                 {draft.storyBlocks.map((block: any, idx: number) => (
                   <StoryBlockRenderer key={block.id || idx} block={block} index={idx} />
                 ))}
               </Card>
             )}
 
-            {/* Grounding Sources Preview (using SourceItem) */}
+            {/* Grounding Sources Preview */}
             {draft.sources && draft.sources.length > 0 && (
-              <Card style={{ padding: 16 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-                  <Ionicons name="library-outline" size={18} color="#4f46e5" style={{ marginRight: 6 }} />
-                  <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a' }}>
-                    Grounding Sources ({draft.sources.length})
-                  </Text>
+              <Card style={{ padding: tokens.spacing.md }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                  <Ionicons name="library-outline" size={16} color={colors.accent} style={{ marginRight: 6 }} />
+                  <SmallCapsLabel style={{ color: colors.ink }}>
+                    GROUNDING SOURCES ({draft.sources.length})
+                  </SmallCapsLabel>
                 </View>
                 {draft.sources.map((src: any, idx: number) => (
                   <SourceItem
@@ -327,11 +340,11 @@ export function Step5Submit({
               </Card>
             )}
 
-            {/* Visuals & Ad Preview (using FeedPlacementPreview) */}
-            <Card style={{ padding: 16 }}>
-              <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a', marginBottom: 10 }}>
-                Social Ad Creative
-              </Text>
+            {/* Visuals & Ad Preview */}
+            <Card style={{ padding: tokens.spacing.md }}>
+              <SmallCapsLabel style={{ color: colors.ink, marginBottom: 10 }}>
+                SOCIAL AD CREATIVE
+              </SmallCapsLabel>
               <FeedPlacementPreview
                 headline={draft.headline || draft.title || 'Ad Headline'}
                 description={draft.adDescription || draft.summary || 'Ad primary text'}
@@ -342,27 +355,27 @@ export function Step5Submit({
             </Card>
 
             {/* Audience & Distribution Breakdown */}
-            <Card style={{ padding: 16, backgroundColor: '#f8fafc' }}>
-              <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a', marginBottom: 10 }}>
-                Audience & Distribution
-              </Text>
-              <View style={{ gap: 6 }}>
-                <Text style={{ fontSize: 13, color: '#334155' }}>
-                  <Text style={{ fontWeight: '700' }}>Locations: </Text>
+            <Card style={{ padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
+              <SmallCapsLabel style={{ color: colors.ink, marginBottom: 8 }}>
+                AUDIENCE & DISTRIBUTION
+              </SmallCapsLabel>
+              <View style={{ gap: 4 }}>
+                <BodyText style={{ fontSize: 13, color: colors.ink }}>
+                  <Text style={{ fontFamily: fonts.sansSemiBold }}>Locations: </Text>
                   {draft.locations?.join(', ') || 'Cook County'}
-                </Text>
-                <Text style={{ fontSize: 13, color: '#334155' }}>
-                  <Text style={{ fontWeight: '700' }}>Interests: </Text>
+                </BodyText>
+                <BodyText style={{ fontSize: 13, color: colors.ink }}>
+                  <Text style={{ fontFamily: fonts.sansSemiBold }}>Interests: </Text>
                   {draft.interests?.join(', ') || 'Public Health'}
-                </Text>
-                <Text style={{ fontSize: 13, color: '#334155' }}>
-                  <Text style={{ fontWeight: '700' }}>Channels: </Text>
+                </BodyText>
+                <BodyText style={{ fontSize: 13, color: colors.ink }}>
+                  <Text style={{ fontFamily: fonts.sansSemiBold }}>Channels: </Text>
                   {draft.channels?.join(', ') || 'Meta, Instagram'}
-                </Text>
-                <Text style={{ fontSize: 13, color: '#334155' }}>
-                  <Text style={{ fontWeight: '700' }}>Duration: </Text>
+                </BodyText>
+                <BodyText style={{ fontSize: 13, color: colors.ink }}>
+                  <Text style={{ fontFamily: fonts.sansSemiBold }}>Duration: </Text>
                   {draft.durationDays || 30} days
-                </Text>
+                </BodyText>
               </View>
             </Card>
           </View>
@@ -370,26 +383,26 @@ export function Step5Submit({
       </View>
 
       {/* 4. REQUIRED SUBMISSION CHECKBOXES */}
-      <Card style={{ marginBottom: 24, padding: 16 }}>
-        <Text style={{ fontSize: 15, fontWeight: '800', color: '#0f172a', marginBottom: 12 }}>
-          Submission Agreements & Review
-        </Text>
+      <Card style={{ marginBottom: tokens.spacing.lg, padding: tokens.spacing.md }}>
+        <SmallCapsLabel style={{ color: colors.ink, marginBottom: 10 }}>
+          SUBMISSION AGREEMENTS & REVIEW
+        </SmallCapsLabel>
 
         {/* Checkbox 1: Grounded Claims */}
         <TouchableOpacity
           onPress={() => setConfirmGroundedSources(!confirmGroundedSources)}
           activeOpacity={0.7}
-          style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 14 }}
+          style={{ flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 }}
         >
           <Ionicons
-            name={confirmGroundedSources ? 'checkbox' : 'square-outline'}
-            size={22}
-            color={confirmGroundedSources ? '#4f46e5' : '#94a3b8'}
-            style={{ marginRight: 10, marginTop: 1 }}
+            name={confirmGroundedSources ? 'checkbox-outline' : 'square-outline'}
+            size={20}
+            color={confirmGroundedSources ? colors.accent : colors.mutedInk}
+            style={{ marginRight: 8, marginTop: 1 }}
           />
-          <Text style={{ fontSize: 13, color: '#334155', flex: 1, lineHeight: 19 }}>
+          <BodyText style={{ fontSize: 13, color: colors.ink, flex: 1, lineHeight: 18 }}>
             I confirm that all factual claims in this campaign are grounded in the listed public sources and official records.
-          </Text>
+          </BodyText>
         </TouchableOpacity>
 
         {/* Checkbox 2: Rules & Policies */}
@@ -399,14 +412,14 @@ export function Step5Submit({
           style={{ flexDirection: 'row', alignItems: 'flex-start' }}
         >
           <Ionicons
-            name={agreePolicies ? 'checkbox' : 'square-outline'}
-            size={22}
-            color={agreePolicies ? '#4f46e5' : '#94a3b8'}
-            style={{ marginRight: 10, marginTop: 1 }}
+            name={agreePolicies ? 'checkbox-outline' : 'square-outline'}
+            size={20}
+            color={agreePolicies ? colors.accent : colors.mutedInk}
+            style={{ marginRight: 8, marginTop: 1 }}
           />
-          <Text style={{ fontSize: 13, color: '#334155', flex: 1, lineHeight: 19 }}>
+          <BodyText style={{ fontSize: 13, color: colors.ink, flex: 1, lineHeight: 18 }}>
             I agree to the campaign guidelines, fees, and advertising policies. I understand that actual reach depends on market inventory and delivery performance.
-          </Text>
+          </BodyText>
         </TouchableOpacity>
       </Card>
 

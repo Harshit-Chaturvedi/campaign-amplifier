@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
+import { View, ScrollView, StatusBar, Dimensions, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCampaignStore } from '../../store/useCampaignStore';
@@ -8,6 +8,16 @@ import { Card } from '../../components/ui/Card';
 import { CampaignCard } from '../../components/campaign/CampaignCard';
 import { formatCurrency, formatNumber } from '../../utils/formatting';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
+import { colors, fonts, tokens } from '../../theme/tokens';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  StatHero,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 import Svg, { Line, Circle } from 'react-native-svg';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -33,75 +43,137 @@ export function CreatorAnalyticsScreen({ navigation }: any) {
   const hasData = contributions.length > 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
-      <StatusBar barStyle="light-content" />
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
+      <StatusBar barStyle="dark-content" />
 
       {/* Header */}
-      <View style={{ backgroundColor: '#4f46e5', paddingTop: 52, paddingBottom: 24, paddingHorizontal: 20, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 }}>
+      <View
+        style={{
+          backgroundColor: colors.surface,
+          paddingTop: 52,
+          paddingBottom: 16,
+          paddingHorizontal: tokens.spacing.lg,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.hairline,
+        }}
+      >
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View>
-            <Text style={{ fontSize: 24, fontWeight: '800', color: '#fff' }}>Analytics & Impact</Text>
-            <Text style={{ fontSize: 13, color: '#c7d2fe', marginTop: 4 }}>Distribution reach & performance</Text>
+            <Headline style={{ fontSize: 24, color: colors.ink }}>
+              Analytics & Impact
+            </Headline>
+            <MetaLabel style={{ marginTop: 2 }}>
+              Distribution reach & performance (Estimate)
+            </MetaLabel>
           </View>
           <DemoDataBadge size="sm" />
         </View>
 
-        {/* Main Stats */}
-        <View style={{ flexDirection: 'row', marginTop: 20 }}>
-          {[
-            { label: 'Est. Reach', value: formatNumber(impact.peopleReached), icon: 'radio-outline' },
-            { label: 'Campaigns Backed', value: impact.campaignsBacked.toString(), icon: 'megaphone-outline' },
-            { label: 'Total Pooled', value: formatCurrency(impact.totalContributedDollars), icon: 'cash-outline' },
-          ].map((stat) => (
-            <View key={stat.label} style={{ flex: 1, alignItems: 'center' }}>
-              <Ionicons name={stat.icon as any} size={20} color="#c7d2fe" />
-              <Text style={{ fontSize: 20, fontWeight: '800', color: '#fff', marginTop: 4 }}>{stat.value}</Text>
-              <Text style={{ fontSize: 11, color: '#a5b4fc', marginTop: 2 }}>{stat.label}</Text>
-            </View>
-          ))}
+        {/* Newspaper Hero Numbers Block */}
+        <View
+          style={{
+            flexDirection: 'row',
+            marginTop: 16,
+            backgroundColor: colors.paperSecondary,
+            borderRadius: tokens.radius.sm,
+            paddingVertical: 12,
+            paddingHorizontal: 8,
+            borderWidth: 1,
+            borderColor: colors.hairline,
+          }}
+        >
+          <View style={{ flex: 1, alignItems: 'center', borderRightWidth: 1, borderRightColor: colors.hairline }}>
+            <StatHero style={{ fontSize: 18, color: colors.accent }}>
+              {formatNumber(impact.peopleReached)}
+            </StatHero>
+            <SmallCapsLabel style={{ fontSize: 9, color: colors.mutedInk, marginTop: 2 }}>
+              EST. REACH
+            </SmallCapsLabel>
+          </View>
+
+          <View style={{ flex: 1, alignItems: 'center', borderRightWidth: 1, borderRightColor: colors.hairline }}>
+            <StatHero style={{ fontSize: 18, color: colors.ink }}>
+              {impact.campaignsBacked}
+            </StatHero>
+            <SmallCapsLabel style={{ fontSize: 9, color: colors.mutedInk, marginTop: 2 }}>
+              BACKED
+            </SmallCapsLabel>
+          </View>
+
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <StatHero style={{ fontSize: 18, color: colors.positive }}>
+              {formatCurrency(impact.totalContributedDollars)}
+            </StatHero>
+            <SmallCapsLabel style={{ fontSize: 9, color: colors.mutedInk, marginTop: 2 }}>
+              POOLED
+            </SmallCapsLabel>
+          </View>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-        {/* Total Contributed */}
-        <Card style={{ marginBottom: 16 }}>
+      <ScrollView contentContainerStyle={{ padding: tokens.spacing.lg, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+        {/* Total Contributed Card */}
+        <Card style={{ marginBottom: tokens.spacing.md }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View>
-              <Text style={{ fontSize: 13, color: '#64748b' }}>Total Amplification Budget</Text>
-              <Text style={{ fontSize: 28, fontWeight: '800', color: '#0f172a', marginTop: 2 }}>
+              <SmallCapsLabel style={{ color: colors.mutedInk }}>
+                TOTAL AMPLIFICATION BUDGET
+              </SmallCapsLabel>
+              <StatHero style={{ fontSize: 28, color: colors.ink, marginTop: 4 }}>
                 {formatCurrency(impact.totalContributedDollars)}
-              </Text>
+              </StatHero>
             </View>
-            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#eef2ff', alignItems: 'center', justifyContent: 'center' }}>
-              <Ionicons name="trending-up" size={24} color="#4f46e5" />
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: tokens.radius.xs,
+                backgroundColor: colors.paperSecondary,
+                borderWidth: 1,
+                borderColor: colors.hairline,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Ionicons name="trending-up" size={20} color={colors.accent} />
             </View>
           </View>
         </Card>
 
         {/* Detailed Stats */}
-        <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-          <Card style={{ flex: 1, marginRight: 8 }}>
-            <Ionicons name="eye-outline" size={20} color="#3b82f6" />
-            <Text style={{ fontSize: 20, fontWeight: '700', color: '#0f172a', marginTop: 4 }}>{formatNumber(impact.totalViews)}</Text>
-            <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Ad Impressions</Text>
+        <View style={{ flexDirection: 'row', gap: 10, marginBottom: tokens.spacing.md }}>
+          <Card style={{ flex: 1 }}>
+            <Ionicons name="eye-outline" size={18} color={colors.accent} />
+            <StatHero style={{ fontSize: 20, color: colors.ink, marginTop: 6 }}>
+              {formatNumber(impact.totalViews)}
+            </StatHero>
+            <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>
+              EST. IMPRESSIONS
+            </SmallCapsLabel>
           </Card>
-          <Card style={{ flex: 1, marginLeft: 8 }}>
-            <Ionicons name="hand-left-outline" size={20} color="#22c55e" />
-            <Text style={{ fontSize: 20, fontWeight: '700', color: '#0f172a', marginTop: 4 }}>{formatNumber(impact.totalActions)}</Text>
-            <Text style={{ fontSize: 12, color: '#64748b' }}>Est. Clicks & Actions</Text>
+          <Card style={{ flex: 1 }}>
+            <Ionicons name="hand-left-outline" size={18} color={colors.positive} />
+            <StatHero style={{ fontSize: 20, color: colors.ink, marginTop: 6 }}>
+              {formatNumber(impact.totalActions)}
+            </StatHero>
+            <SmallCapsLabel style={{ fontSize: 10, marginTop: 2 }}>
+              EST. ACTIONS
+            </SmallCapsLabel>
           </Card>
         </View>
 
         {/* Reach Over Time Chart */}
         {impact.timeSeries.length > 1 && (
-          <Card style={{ marginBottom: 16 }}>
+          <Card style={{ marginBottom: tokens.spacing.md }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <Text style={{ fontSize: 15, fontWeight: '700', color: '#0f172a' }}>Estimated Reach Over Time</Text>
+              <SmallCapsLabel style={{ fontSize: 11, color: colors.ink }}>
+                ESTIMATED REACH OVER TIME (ESTIMATE)
+              </SmallCapsLabel>
               <DemoDataBadge size="sm" />
             </View>
             <Svg width={SCREEN_W - 80} height={120}>
               {impact.timeSeries.map((point, i) => {
-                const maxReach = Math.max(...impact.timeSeries.map(p => p.reach)) || 1;
+                const maxReach = Math.max(...impact.timeSeries.map((p) => p.reach)) || 1;
                 const x = (i / (impact.timeSeries.length - 1)) * (SCREEN_W - 100);
                 const y = 110 - (point.reach / maxReach) * 100;
                 return (
@@ -110,11 +182,13 @@ export function CreatorAnalyticsScreen({ navigation }: any) {
                       <Line
                         x1={((i - 1) / (impact.timeSeries.length - 1)) * (SCREEN_W - 100)}
                         y1={110 - (impact.timeSeries[i - 1].reach / maxReach) * 100}
-                        x2={x} y2={y}
-                        stroke="#4f46e5" strokeWidth={2}
+                        x2={x}
+                        y2={y}
+                        stroke={colors.accent}
+                        strokeWidth={1.5}
                       />
                     )}
-                    <Circle cx={x} cy={y} r={3} fill="#4f46e5" />
+                    <Circle cx={x} cy={y} r={3} fill={colors.accent} />
                   </React.Fragment>
                 );
               })}
@@ -125,7 +199,9 @@ export function CreatorAnalyticsScreen({ navigation }: any) {
         {/* Campaign Breakdown */}
         {impact.campaignSummaries.length > 0 && (
           <View>
-            <Text style={{ fontSize: 18, fontWeight: '700', color: '#0f172a', marginBottom: 12 }}>Supported Campaigns</Text>
+            <Headline style={{ fontSize: 18, color: colors.ink, marginBottom: 12 }}>
+              Supported Campaigns
+            </Headline>
             {impact.campaignSummaries.map((cs) => {
               const c = campaigns.find((x) => x.id === cs.id || x.slug === cs.id);
               if (!c) return null;
@@ -143,11 +219,13 @@ export function CreatorAnalyticsScreen({ navigation }: any) {
 
         {!hasData && (
           <View style={{ alignItems: 'center', paddingTop: 40 }}>
-            <Ionicons name="bar-chart-outline" size={48} color="#94a3b8" />
-            <Text style={{ fontSize: 16, fontWeight: '600', color: '#64748b', marginTop: 12 }}>No performance data yet</Text>
-            <Text style={{ fontSize: 13, color: '#94a3b8', marginTop: 4, textAlign: 'center' }}>
-              Back a campaign or launch one to inspect distribution analytics here.
+            <Ionicons name="bar-chart-outline" size={40} color={colors.secondaryCaption} />
+            <Text style={{ fontSize: 15, fontFamily: fonts.sansSemiBold, color: colors.mutedInk, marginTop: 12 }}>
+              No performance data yet
             </Text>
+            <MetaLabel style={{ textAlign: 'center', marginTop: 4, maxWidth: 280 }}>
+              Back a campaign or launch one to inspect distribution analytics here.
+            </MetaLabel>
           </View>
         )}
       </ScrollView>

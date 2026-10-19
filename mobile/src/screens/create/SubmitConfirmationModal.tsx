@@ -1,13 +1,21 @@
 import React from 'react';
 import {
   View,
-  Text,
   Modal,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Button } from '../../components/ui/Button';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface SubmitConfirmationModalProps {
   visible: boolean;
@@ -24,21 +32,21 @@ const TIMELINE_STEPS = [
     title: 'Submitted',
     status: 'completed',
     description: 'Your campaign draft has been received and entered into the moderation queue.',
-    icon: 'checkmark-circle',
+    icon: 'checkmark-circle-outline',
   },
   {
     key: 'review',
     title: 'In Review',
     status: 'current',
     description: 'Our team reviews all claims against cited sources, ad copy, visuals, and targeting.',
-    icon: 'time',
+    icon: 'time-outline',
   },
   {
     key: 'decision',
     title: 'Changes Requested or Approved',
     status: 'upcoming',
     description: 'If approved, your campaign goes live. If revisions are required, you will receive editorial feedback.',
-    icon: 'swap-horizontal',
+    icon: 'swap-horizontal-outline',
   },
   {
     key: 'funding',
@@ -67,7 +75,7 @@ export function SubmitConfirmationModal({
       <View
         style={{
           flex: 1,
-          backgroundColor: 'rgba(15, 23, 42, 0.75)',
+          backgroundColor: 'rgba(22, 19, 15, 0.6)',
           justifyContent: 'center',
           alignItems: 'center',
           padding: 20,
@@ -75,85 +83,79 @@ export function SubmitConfirmationModal({
       >
         <View
           style={{
-            backgroundColor: '#ffffff',
-            borderRadius: 24,
+            backgroundColor: colors.surface,
+            borderRadius: tokens.radius.md,
             width: '100%',
             maxWidth: 440,
             maxHeight: '90%',
             overflow: 'hidden',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.25,
-            shadowRadius: 20,
-            elevation: 10,
+            borderWidth: 1,
+            borderColor: colors.hairline,
           }}
         >
           {/* Header Banner */}
           <View
             style={{
-              backgroundColor: '#eef2ff',
-              paddingVertical: 24,
-              paddingHorizontal: 20,
+              backgroundColor: colors.paperSecondary,
+              paddingVertical: 20,
+              paddingHorizontal: tokens.spacing.lg,
               alignItems: 'center',
               borderBottomWidth: 1,
-              borderBottomColor: '#e0e7ff',
+              borderBottomColor: colors.hairline,
             }}
           >
             <View
               style={{
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                backgroundColor: '#22c55e',
+                width: 50,
+                height: 50,
+                borderRadius: 25,
+                backgroundColor: colors.positive,
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: 12,
+                marginBottom: 10,
               }}
             >
-              <Ionicons name="checkmark" size={36} color="#ffffff" />
+              <Ionicons name="checkmark" size={28} color={colors.surface} />
             </View>
-            <Text
+            <Headline
               style={{
                 fontSize: 20,
-                fontWeight: '800',
-                color: '#0f172a',
+                color: colors.ink,
                 textAlign: 'center',
               }}
             >
               Submitted for Review
-            </Text>
-            <Text
+            </Headline>
+            <MetaLabel
               style={{
-                fontSize: 13,
-                color: '#475569',
                 textAlign: 'center',
                 marginTop: 4,
               }}
             >
               Content, sources, creative and targeting queued for review.
-            </Text>
+            </MetaLabel>
           </View>
 
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ padding: 20 }}
+            contentContainerStyle={{ padding: tokens.spacing.lg }}
           >
             {/* Campaign Summary Card */}
             <View
               style={{
-                backgroundColor: '#f8fafc',
-                borderRadius: 12,
-                padding: 14,
+                backgroundColor: colors.paperSecondary,
+                borderRadius: tokens.radius.sm,
+                padding: 12,
                 borderWidth: 1,
-                borderColor: '#e2e8f0',
-                marginBottom: 20,
+                borderColor: colors.hairline,
+                marginBottom: tokens.spacing.md,
               }}
             >
               <Text
                 style={{
                   fontSize: 15,
-                  fontWeight: '700',
-                  color: '#0f172a',
+                  fontFamily: fonts.sansSemiBold,
+                  color: colors.ink,
                 }}
                 numberOfLines={2}
               >
@@ -164,14 +166,14 @@ export function SubmitConfirmationModal({
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginTop: 8,
+                  marginTop: 6,
                 }}
               >
-                <Text style={{ fontSize: 12, color: '#64748b' }}>
+                <MetaLabel>
                   ID: {campaignId.slice(0, 14)}...
-                </Text>
+                </MetaLabel>
                 {fundingGoal > 0 && (
-                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#4f46e5' }}>
+                  <Text style={{ fontSize: 13, fontFamily: fonts.sansBold, color: colors.accent }}>
                     Goal: ${fundingGoal.toLocaleString()}
                   </Text>
                 )}
@@ -179,18 +181,14 @@ export function SubmitConfirmationModal({
             </View>
 
             {/* Status Timeline */}
-            <Text
+            <SmallCapsLabel
               style={{
-                fontSize: 13,
-                fontWeight: '800',
-                color: '#64748b',
-                textTransform: 'uppercase',
-                letterSpacing: 0.6,
-                marginBottom: 14,
+                color: colors.mutedInk,
+                marginBottom: 12,
               }}
             >
-              Status Timeline
-            </Text>
+              STATUS TIMELINE
+            </SmallCapsLabel>
 
             <View style={{ marginBottom: 12 }}>
               {TIMELINE_STEPS.map((step, idx) => {
@@ -205,11 +203,11 @@ export function SubmitConfirmationModal({
                       <View
                         style={{
                           position: 'absolute',
-                          top: 26,
-                          left: 14,
-                          width: 2,
+                          top: 24,
+                          left: 13,
+                          width: 1,
                           bottom: -4,
-                          backgroundColor: isCompleted ? '#22c55e' : '#e2e8f0',
+                          backgroundColor: isCompleted ? colors.positive : colors.hairline,
                           zIndex: 1,
                         }}
                       />
@@ -218,14 +216,20 @@ export function SubmitConfirmationModal({
                     {/* Step Icon Node */}
                     <View
                       style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 15,
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
                         backgroundColor: isCompleted
-                          ? '#22c55e'
+                          ? colors.positive
                           : isCurrent
-                          ? '#4f46e5'
-                          : '#f1f5f9',
+                          ? colors.accent
+                          : colors.paperSecondary,
+                        borderWidth: 1,
+                        borderColor: isCompleted
+                          ? colors.positive
+                          : isCurrent
+                          ? colors.accent
+                          : colors.hairline,
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginRight: 12,
@@ -234,23 +238,23 @@ export function SubmitConfirmationModal({
                     >
                       <Ionicons
                         name={step.icon as any}
-                        size={16}
-                        color={isCompleted || isCurrent ? '#ffffff' : '#94a3b8'}
+                        size={14}
+                        color={isCompleted || isCurrent ? colors.surface : colors.mutedInk}
                       />
                     </View>
 
                     {/* Step Text Info */}
-                    <View style={{ flex: 1, paddingBottom: isLast ? 8 : 18 }}>
+                    <View style={{ flex: 1, paddingBottom: isLast ? 8 : 16 }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                         <Text
                           style={{
                             fontSize: 14,
-                            fontWeight: isCurrent || isCompleted ? '700' : '600',
+                            fontFamily: isCurrent || isCompleted ? fonts.sansSemiBold : fonts.sansRegular,
                             color: isCurrent
-                              ? '#4f46e5'
+                              ? colors.accent
                               : isCompleted
-                              ? '#15803d'
-                              : '#64748b',
+                              ? colors.positive
+                              : colors.mutedInk,
                           }}
                         >
                           {step.title}
@@ -258,56 +262,46 @@ export function SubmitConfirmationModal({
                         {isCurrent && (
                           <View
                             style={{
-                              backgroundColor: '#eef2ff',
-                              paddingHorizontal: 6,
-                              paddingVertical: 2,
-                              borderRadius: 4,
+                              backgroundColor: colors.paperSecondary,
+                              borderWidth: 1,
+                              borderColor: colors.hairline,
+                              paddingHorizontal: 5,
+                              paddingVertical: 1,
+                              borderRadius: tokens.radius.xs,
                             }}
                           >
-                            <Text
-                              style={{
-                                fontSize: 10,
-                                fontWeight: '700',
-                                color: '#4f46e5',
-                                textTransform: 'uppercase',
-                              }}
-                            >
-                              In Progress
-                            </Text>
+                            <SmallCapsLabel style={{ fontSize: 9, color: colors.accent }}>
+                              IN PROGRESS
+                            </SmallCapsLabel>
                           </View>
                         )}
                         {isCompleted && (
                           <View
                             style={{
-                              backgroundColor: '#dcfce7',
-                              paddingHorizontal: 6,
-                              paddingVertical: 2,
-                              borderRadius: 4,
+                              backgroundColor: colors.paperSecondary,
+                              borderWidth: 1,
+                              borderColor: colors.hairline,
+                              paddingHorizontal: 5,
+                              paddingVertical: 1,
+                              borderRadius: tokens.radius.xs,
                             }}
                           >
-                            <Text
-                              style={{
-                                fontSize: 10,
-                                fontWeight: '700',
-                                color: '#16a34a',
-                                textTransform: 'uppercase',
-                              }}
-                            >
-                              Done
-                            </Text>
+                            <SmallCapsLabel style={{ fontSize: 9, color: colors.positive }}>
+                              DONE
+                            </SmallCapsLabel>
                           </View>
                         )}
                       </View>
-                      <Text
+                      <BodyText
                         style={{
                           fontSize: 12,
-                          color: '#64748b',
-                          marginTop: 3,
+                          color: colors.mutedInk,
+                          marginTop: 2,
                           lineHeight: 16,
                         }}
                       >
                         {step.description}
-                      </Text>
+                      </BodyText>
                     </View>
                   </View>
                 );
@@ -319,18 +313,18 @@ export function SubmitConfirmationModal({
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: '#f0fdf4',
+                backgroundColor: colors.paperSecondary,
                 padding: 12,
-                borderRadius: 10,
+                borderRadius: tokens.radius.xs,
                 borderWidth: 1,
-                borderColor: '#bbf7d0',
-                marginBottom: 20,
+                borderColor: colors.hairline,
+                marginBottom: tokens.spacing.lg,
               }}
             >
-              <Ionicons name="notifications-outline" size={18} color="#16a34a" style={{ marginRight: 8 }} />
-              <Text style={{ fontSize: 12, color: '#166534', flex: 1, lineHeight: 16 }}>
+              <Ionicons name="notifications-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
+              <BodyText style={{ fontSize: 12, color: colors.mutedInk, flex: 1, lineHeight: 16 }}>
                 You will receive an in-app notification when the review decision is published.
-              </Text>
+              </BodyText>
             </View>
 
             {/* Actions */}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 interface AmplificationNoticeProps {
   compact?: boolean;
@@ -10,35 +11,29 @@ export function AmplificationNotice({ compact = false }: AmplificationNoticeProp
   return (
     <View
       style={{
-        backgroundColor: '#eef2ff',
-        borderRadius: 14,
+        backgroundColor: colors.surfaceSecondary,
+        borderRadius: tokens.radii.md,
         padding: compact ? 12 : 14,
         borderWidth: 1,
-        borderColor: '#c7d2fe',
+        borderColor: colors.border,
         flexDirection: 'row',
         alignItems: 'flex-start',
       }}
     >
-      <View
-        style={{
-          width: 24,
-          height: 24,
-          borderRadius: 12,
-          backgroundColor: '#4f46e5',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginRight: 10,
-          marginTop: 1,
-        }}
-      >
-        <Ionicons name="megaphone" size={13} color="#ffffff" />
-      </View>
+      <Ionicons
+        name="information-circle-outline"
+        size={18}
+        color={colors.inkSecondary}
+        style={{ marginRight: 10, marginTop: 1 }}
+      />
       <View style={{ flex: 1 }}>
         <Text
           style={{
-            fontSize: compact ? 12 : 13,
-            fontWeight: '700',
-            color: '#312e81',
+            fontSize: compact ? 11 : 12,
+            fontFamily: fonts.sansSemiBold,
+            color: colors.ink,
+            letterSpacing: 0.5,
+            textTransform: 'uppercase',
             marginBottom: 2,
           }}
         >
@@ -47,7 +42,8 @@ export function AmplificationNotice({ compact = false }: AmplificationNoticeProp
         <Text
           style={{
             fontSize: compact ? 12 : 13,
-            color: '#3730a3',
+            fontFamily: fonts.sansRegular,
+            color: colors.inkSecondary,
             lineHeight: compact ? 17 : 19,
           }}
         >

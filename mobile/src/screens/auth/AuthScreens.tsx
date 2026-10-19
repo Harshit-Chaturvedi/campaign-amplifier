@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { View, Text, StatusBar, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StatusBar, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 import { apiClient } from '../../api/client';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 export function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
@@ -50,7 +58,7 @@ export function LoginScreen({ navigation }: any) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#f8fafc' }}
+      style={{ flex: 1, backgroundColor: colors.paper }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
@@ -68,38 +76,42 @@ export function LoginScreen({ navigation }: any) {
             top: 48,
             left: 24,
             zIndex: 10,
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#f1f5f9',
+            width: 38,
+            height: 38,
+            borderRadius: tokens.radius.sm,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             alignItems: 'center',
             justifyContent: 'center',
           }}
           accessibilityRole="button"
           accessibilityLabel="Close sign in"
         >
-          <Ionicons name="close" size={22} color="#0f172a" />
+          <Ionicons name="close" size={20} color={colors.ink} />
         </TouchableOpacity>
 
         {/* Logo */}
-        <View style={{ alignItems: 'center', marginBottom: 36, marginTop: 40 }}>
+        <View style={{ alignItems: 'center', marginBottom: 32, marginTop: 40 }}>
           <View
             style={{
-              width: 64,
-              height: 64,
-              borderRadius: 18,
-              backgroundColor: '#4f46e5',
+              width: 58,
+              height: 58,
+              borderRadius: tokens.radius.sm,
+              backgroundColor: colors.accent,
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 16,
+              marginBottom: 14,
             }}
           >
-            <Ionicons name="megaphone" size={32} color="#fff" />
+            <Ionicons name="megaphone-outline" size={28} color={colors.surface} />
           </View>
-          <Text style={{ fontSize: 26, fontWeight: '800', color: '#0f172a' }}>Campaign Amplifier</Text>
-          <Text style={{ fontSize: 14, color: '#64748b', marginTop: 4, textAlign: 'center' }}>
+          <Headline style={{ fontSize: 24, color: colors.ink, textAlign: 'center' }}>
+            Campaign Amplifier
+          </Headline>
+          <MetaLabel style={{ marginTop: 4, textAlign: 'center' }}>
             Civic message distribution infrastructure
-          </Text>
+          </MetaLabel>
         </View>
 
         <Input
@@ -130,7 +142,7 @@ export function LoginScreen({ navigation }: any) {
           />
         </View>
 
-        <View style={{ marginTop: 14 }}>
+        <View style={{ marginTop: 12 }}>
           <Button
             title="Continue as Demo User"
             onPress={handleDemo}
@@ -146,8 +158,8 @@ export function LoginScreen({ navigation }: any) {
           accessibilityRole="button"
           accessibilityLabel="Navigate to sign up"
         >
-          <Text style={{ fontSize: 14, color: '#64748b' }}>
-            Don't have an account? <Text style={{ color: '#4f46e5', fontWeight: '700' }}>Sign Up</Text>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.mutedInk }}>
+            Don't have an account? <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.accent }}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -172,7 +184,7 @@ export function RegisterScreen({ navigation }: any) {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#f8fafc' }}
+      style={{ flex: 1, backgroundColor: colors.paper }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
@@ -190,22 +202,28 @@ export function RegisterScreen({ navigation }: any) {
             top: 48,
             left: 24,
             zIndex: 10,
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#f1f5f9',
+            width: 38,
+            height: 38,
+            borderRadius: tokens.radius.sm,
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
             alignItems: 'center',
             justifyContent: 'center',
           }}
           accessibilityRole="button"
           accessibilityLabel="Go back"
         >
-          <Ionicons name="arrow-back" size={22} color="#0f172a" />
+          <Ionicons name="arrow-back" size={20} color={colors.ink} />
         </TouchableOpacity>
 
         <View style={{ marginTop: 40, marginBottom: 28 }}>
-          <Text style={{ fontSize: 26, fontWeight: '800', color: '#0f172a', marginBottom: 6 }}>Create Account</Text>
-          <Text style={{ fontSize: 14, color: '#64748b' }}>Join the community-funded amplification network</Text>
+          <Headline style={{ fontSize: 24, color: colors.ink, marginBottom: 4 }}>
+            Create Account
+          </Headline>
+          <MetaLabel>
+            Join the community-funded amplification network
+          </MetaLabel>
         </View>
 
         <Input
@@ -243,8 +261,8 @@ export function RegisterScreen({ navigation }: any) {
           accessibilityRole="button"
           accessibilityLabel="Navigate to sign in"
         >
-          <Text style={{ fontSize: 14, color: '#64748b' }}>
-            Already have an account? <Text style={{ color: '#4f46e5', fontWeight: '700' }}>Sign In</Text>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.mutedInk }}>
+            Already have an account? <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.accent }}>Sign In</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>

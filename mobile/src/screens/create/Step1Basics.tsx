@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TouchableOpacity,
   ScrollView,
   Image,
@@ -13,7 +12,16 @@ import * as ImagePicker from 'expo-image-picker';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
+import {
+  Headline,
+  Subheading,
+  BodyText,
+  SmallCapsLabel,
+  MetaLabel,
+  Text,
+} from '../../components/ui/Typography';
 import { apiClient } from '../../api/client';
+import { colors, fonts, tokens } from '../../theme/tokens';
 import type { CampaignCategory } from '../../types/campaign';
 
 interface Step1BasicsProps {
@@ -95,16 +103,16 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
   };
 
   return (
-    <View style={{ gap: 20 }}>
+    <View style={{ gap: tokens.spacing.lg }}>
       {/* Demo Sample Banner */}
       {(draft.isDemoSample || draft.demo_mode) && (
         <View
           style={{
-            backgroundColor: '#eff6ff',
-            borderColor: '#93c5fd',
+            backgroundColor: colors.paperSecondary,
+            borderColor: colors.hairline,
             borderWidth: 1,
-            borderRadius: 12,
-            padding: 12,
+            borderRadius: tokens.radius.sm,
+            padding: tokens.spacing.md,
             flexDirection: 'row',
             alignItems: 'center',
             gap: 10,
@@ -112,33 +120,33 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
         >
           <View
             style={{
-              backgroundColor: '#3b82f6',
+              backgroundColor: colors.accent,
               paddingHorizontal: 8,
               paddingVertical: 3,
-              borderRadius: 6,
+              borderRadius: tokens.radius.xs,
             }}
           >
-            <Text style={{ fontSize: 11, fontWeight: '800', color: '#ffffff', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+            <SmallCapsLabel style={{ fontSize: 10, color: colors.surface }}>
               Demo sample
-            </Text>
+            </SmallCapsLabel>
           </View>
-          <Text style={{ flex: 1, fontSize: 12, color: '#1e40af', lineHeight: 17 }}>
+          <BodyText style={{ flex: 1, fontSize: 12, color: colors.mutedInk, lineHeight: 17 }}>
             This draft was pre-filled with demo sample content. All fields are editable and deletable. Funding goal is never set by AI.
-          </Text>
+          </BodyText>
         </View>
       )}
 
       {/* 1. Title */}
       <View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a' }}>
-            Campaign Title <Text style={{ color: '#ef4444' }}>*</Text>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
+            Campaign Title <Text style={{ color: colors.danger }}>*</Text>
           </Text>
           <Text
             style={{
               fontSize: 12,
-              fontWeight: '600',
-              color: titleLength > 60 ? '#ef4444' : titleLength >= 50 ? '#f59e0b' : '#94a3b8',
+              fontFamily: fonts.sansMedium,
+              color: titleLength > 60 ? colors.danger : titleLength >= 50 ? colors.warning : colors.secondaryCaption,
             }}
           >
             {titleLength}/60
@@ -156,12 +164,12 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
 
       {/* 2. Category */}
       <View>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 8 }}>
-          Category <Text style={{ color: '#ef4444' }}>*</Text>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 4 }}>
+          Category <Text style={{ color: colors.danger }}>*</Text>
         </Text>
-        <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 10 }}>
+        <MetaLabel style={{ marginBottom: 10 }}>
           Select the topic that best matches your evidence and public policy focus.
-        </Text>
+        </MetaLabel>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {CATEGORIES.map((cat) => {
             const isSelected = (draft.category || 'environment') === cat.key;
@@ -175,24 +183,24 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingHorizontal: 12,
-                  paddingVertical: 9,
-                  borderRadius: 10,
-                  borderWidth: 1.5,
-                  borderColor: isSelected ? '#4f46e5' : '#e2e8f0',
-                  backgroundColor: isSelected ? '#eef2ff' : '#fff',
+                  paddingVertical: 8,
+                  borderRadius: tokens.radius.sm,
+                  borderWidth: 1,
+                  borderColor: isSelected ? colors.accent : colors.hairline,
+                  backgroundColor: isSelected ? colors.surface : colors.paperSecondary,
                 }}
               >
                 <Ionicons
                   name={cat.icon}
-                  size={15}
-                  color={isSelected ? '#4f46e5' : '#64748b'}
+                  size={14}
+                  color={isSelected ? colors.accent : colors.mutedInk}
                   style={{ marginRight: 6 }}
                 />
                 <Text
                   style={{
                     fontSize: 13,
-                    fontWeight: isSelected ? '700' : '500',
-                    color: isSelected ? '#3730a3' : '#334155',
+                    fontFamily: isSelected ? fonts.sansSemiBold : fonts.sansRegular,
+                    color: isSelected ? colors.accent : colors.ink,
                   }}
                 >
                   {cat.label}
@@ -205,8 +213,8 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
 
       {/* 3. Creator / Organisation Name */}
       <View>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
-          Creator or Organisation Name <Text style={{ color: '#ef4444' }}>*</Text>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 6 }}>
+          Creator or Organisation Name <Text style={{ color: colors.danger }}>*</Text>
         </Text>
         <Input
           accessibilityLabel="Creator or Organisation Name"
@@ -219,7 +227,7 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
 
       {/* 4. Short Summary */}
       <View>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 6 }}>
           Short Summary
         </Text>
         <Input
@@ -236,15 +244,15 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
 
       {/* 5. Cover Image */}
       <View>
-        <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 6 }}>
+        <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink, marginBottom: 4 }}>
           Cover Image (Optional)
         </Text>
-        <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 10 }}>
+        <MetaLabel style={{ marginBottom: 10 }}>
           Recommended: 16:9 ratio, JPEG or PNG, under 10MB.
-        </Text>
+        </MetaLabel>
 
         {draft.coverUrl ? (
-          <View style={{ borderRadius: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#e2e8f0' }}>
+          <View style={{ borderRadius: tokens.radius.md, overflow: 'hidden', borderWidth: 1, borderColor: colors.hairline }}>
             <Image
               source={{ uri: draft.coverUrl }}
               style={{ width: '100%', height: 180 }}
@@ -255,60 +263,62 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 padding: 10,
-                backgroundColor: '#fff',
+                backgroundColor: colors.surface,
                 borderTopWidth: 1,
-                borderTopColor: '#f1f5f9',
+                borderTopColor: colors.hairline,
               }}
             >
               <TouchableOpacity
                 onPress={handlePickCover}
                 style={{ flexDirection: 'row', alignItems: 'center' }}
               >
-                <Ionicons name="refresh-outline" size={16} color="#4f46e5" style={{ marginRight: 6 }} />
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#4f46e5' }}>Replace photo</Text>
+                <Ionicons name="refresh-outline" size={15} color={colors.accent} style={{ marginRight: 6 }} />
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.accent }}>Replace photo</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => onChange({ coverUrl: '' })}
                 style={{ flexDirection: 'row', alignItems: 'center' }}
               >
-                <Ionicons name="trash-outline" size={16} color="#ef4444" style={{ marginRight: 4 }} />
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#ef4444' }}>Remove</Text>
+                <Ionicons name="trash-outline" size={15} color={colors.danger} style={{ marginRight: 4 }} />
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.danger }}>Remove</Text>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Select Cover Image"
             onPress={handlePickCover}
             style={{
               height: 120,
-              borderRadius: 14,
-              borderWidth: 1.5,
+              borderRadius: tokens.radius.md,
+              borderWidth: 1,
               borderStyle: 'dashed',
-              borderColor: '#cbd5e1',
-              backgroundColor: '#f8fafc',
+              borderColor: colors.hairlineDark,
+              backgroundColor: colors.paperSecondary,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Ionicons name="cloud-upload-outline" size={30} color="#64748b" />
-            <Text style={{ fontSize: 13, fontWeight: '700', color: '#475569', marginTop: 6 }}>
+            <Ionicons name="cloud-upload-outline" size={26} color={colors.mutedInk} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink, marginTop: 6 }}>
               Select Cover Image
             </Text>
-            <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+            <MetaLabel style={{ marginTop: 2 }}>
               From Photo Library (Max 10MB)
-            </Text>
+            </MetaLabel>
           </TouchableOpacity>
         )}
       </View>
 
       {/* 6. Suggest with AI Card */}
-      <Card style={{ padding: 16, backgroundColor: '#fdf4ff', borderWidth: 1, borderColor: '#f0abfc' }}>
+      <Card style={{ padding: tokens.spacing.md, backgroundColor: colors.paperSecondary }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Ionicons name="sparkles" size={18} color="#c026d3" />
-            <Text style={{ fontSize: 14, fontWeight: '800', color: '#701a75' }}>
+            <Ionicons name="sparkles-outline" size={16} color={colors.accent} />
+            <SmallCapsLabel style={{ fontSize: 12, color: colors.ink }}>
               Suggest with AI
-            </Text>
+            </SmallCapsLabel>
           </View>
           <Button
             title={isSuggesting ? 'Drafting...' : 'Suggest Ideas'}
@@ -320,45 +330,45 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
           />
         </View>
 
-        <Text style={{ fontSize: 12, color: '#86198f', marginTop: 6, lineHeight: 17 }}>
+        <MetaLabel style={{ marginTop: 6, lineHeight: 17 }}>
           Calls our Gemini draft assistant to suggest titles, category, summary, and ad headlines. Suggestions are never auto-applied and never touch your funding goal.
-        </Text>
+        </MetaLabel>
 
         {aiSuggestions && (
-          <View style={{ marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#fae8ff', gap: 10 }}>
+          <View style={{ marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.hairline, gap: 10 }}>
             {/* Suggestion 1: Title */}
-            <View style={{ backgroundColor: '#fff', padding: 12, borderRadius: 10 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>
-                Suggested Title
-              </Text>
-              <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginVertical: 4 }}>
+            <View style={{ backgroundColor: colors.surface, padding: 12, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+              <SmallCapsLabel style={{ fontSize: 10, color: colors.mutedInk }}>
+                SUGGESTED TITLE
+              </SmallCapsLabel>
+              <Text style={{ fontSize: 14, fontFamily: fonts.serifBold, color: colors.ink, marginVertical: 4 }}>
                 {aiSuggestions.title}
               </Text>
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                 <TouchableOpacity
                   onPress={() => applySuggestion('title', aiSuggestions.title)}
-                  style={{ backgroundColor: '#fdf4ff', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 }}
+                  style={{ backgroundColor: colors.paperSecondary, paddingHorizontal: 10, paddingVertical: 5, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#c026d3' }}>Use Title</Text>
+                  <SmallCapsLabel style={{ color: colors.accent }}>USE TITLE</SmallCapsLabel>
                 </TouchableOpacity>
               </View>
             </View>
 
             {/* Suggestion 2: Category */}
             {aiSuggestions.category && (
-              <View style={{ backgroundColor: '#fff', padding: 12, borderRadius: 10 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>
-                  Suggested Category
-                </Text>
-                <Text style={{ fontSize: 13, fontWeight: '700', color: '#0f172a', marginVertical: 4 }}>
+              <View style={{ backgroundColor: colors.surface, padding: 12, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                <SmallCapsLabel style={{ fontSize: 10, color: colors.mutedInk }}>
+                  SUGGESTED CATEGORY
+                </SmallCapsLabel>
+                <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink, marginVertical: 4 }}>
                   {aiSuggestions.category.replace('_', ' ').toUpperCase()}
                 </Text>
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                   <TouchableOpacity
                     onPress={() => applySuggestion('category', aiSuggestions.category)}
-                    style={{ backgroundColor: '#fdf4ff', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 }}
+                    style={{ backgroundColor: colors.paperSecondary, paddingHorizontal: 10, paddingVertical: 5, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}
                   >
-                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#c026d3' }}>Apply Category</Text>
+                    <SmallCapsLabel style={{ color: colors.accent }}>APPLY CATEGORY</SmallCapsLabel>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -366,19 +376,19 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
 
             {/* Suggestion 3: Summary */}
             {aiSuggestions.summary && (
-              <View style={{ backgroundColor: '#fff', padding: 12, borderRadius: 10 }}>
-                <Text style={{ fontSize: 11, fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>
-                  Suggested Summary
-                </Text>
-                <Text style={{ fontSize: 13, color: '#334155', marginVertical: 4, lineHeight: 18 }}>
+              <View style={{ backgroundColor: colors.surface, padding: 12, borderRadius: tokens.radius.sm, borderWidth: 1, borderColor: colors.hairline }}>
+                <SmallCapsLabel style={{ fontSize: 10, color: colors.mutedInk }}>
+                  SUGGESTED SUMMARY
+                </SmallCapsLabel>
+                <BodyText style={{ fontSize: 13, color: colors.mutedInk, marginVertical: 4, lineHeight: 18 }}>
                   {aiSuggestions.summary}
-                </Text>
+                </BodyText>
                 <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
                   <TouchableOpacity
                     onPress={() => applySuggestion('summary', aiSuggestions.summary)}
-                    style={{ backgroundColor: '#fdf4ff', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 }}
+                    style={{ backgroundColor: colors.paperSecondary, paddingHorizontal: 10, paddingVertical: 5, borderRadius: tokens.radius.xs, borderWidth: 1, borderColor: colors.hairline }}
                   >
-                    <Text style={{ fontSize: 12, fontWeight: '700', color: '#c026d3' }}>Use Summary</Text>
+                    <SmallCapsLabel style={{ color: colors.accent }}>USE SUMMARY</SmallCapsLabel>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -388,7 +398,7 @@ export function Step1Basics({ draft, onChange }: Step1BasicsProps) {
               onPress={() => setAiSuggestions(null)}
               style={{ alignItems: 'center', paddingVertical: 4 }}
             >
-              <Text style={{ fontSize: 12, color: '#94a3b8' }}>Dismiss Suggestions</Text>
+              <MetaLabel>Dismiss Suggestions</MetaLabel>
             </TouchableOpacity>
           </View>
         )}

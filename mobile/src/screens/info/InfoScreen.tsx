@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { colors, fonts, tokens } from '../../theme/tokens';
 
 export interface InfoPageContent {
   slug: string;
@@ -304,7 +305,7 @@ export function InfoScreen({ route, navigation }: any) {
   const content = INFO_PAGES[slug] || INFO_PAGES.about;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8fafc' }}>
+    <View style={{ flex: 1, backgroundColor: colors.paper }}>
       <StatusBar barStyle="dark-content" />
 
       {/* Top Header */}
@@ -313,9 +314,9 @@ export function InfoScreen({ route, navigation }: any) {
           paddingTop: 52,
           paddingBottom: 14,
           paddingHorizontal: 16,
-          backgroundColor: '#fff',
+          backgroundColor: colors.surface,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: colors.border,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -326,37 +327,39 @@ export function InfoScreen({ route, navigation }: any) {
           accessibilityLabel="Go back"
           onPress={() => navigation.goBack()}
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: '#f1f5f9',
+            width: 36,
+            height: 36,
+            borderRadius: tokens.radii.xs,
+            backgroundColor: colors.surfaceSecondary,
+            borderWidth: 1,
+            borderColor: colors.border,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Ionicons name="arrow-back" size={20} color="#0f172a" />
+          <Ionicons name="arrow-back" size={18} color={colors.ink} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a' }} numberOfLines={1}>
+        <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink }} numberOfLines={1}>
           {content.title}
         </Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 36 }} />
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
         {/* Hero Meta Card */}
-        <Card style={{ marginBottom: 20 }}>
+        <Card style={{ marginBottom: 16 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-            <View style={{ backgroundColor: '#eef2ff', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-              <Text style={{ fontSize: 11, fontWeight: '700', color: '#4f46e5', textTransform: 'uppercase' }}>
+            <View style={{ backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 8, paddingVertical: 2, borderRadius: tokens.radii.xs }}>
+              <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.accent, textTransform: 'uppercase', letterSpacing: 0.9 }}>
                 {content.category}
               </Text>
             </View>
-            <Text style={{ fontSize: 11, color: '#94a3b8' }}>Updated: {content.lastUpdated}</Text>
+            <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>Updated: {content.lastUpdated}</Text>
           </View>
-          <Text style={{ fontSize: 22, fontWeight: '800', color: '#0f172a', marginBottom: 8 }}>
+          <Text style={{ fontSize: 22, fontFamily: fonts.serifBold, color: colors.ink, marginBottom: 8, lineHeight: 28 }}>
             {content.title}
           </Text>
-          <Text style={{ fontSize: 14, color: '#475569', lineHeight: 21 }}>
+          <Text style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 21 }}>
             {content.summary}
           </Text>
         </Card>
@@ -364,12 +367,12 @@ export function InfoScreen({ route, navigation }: any) {
         {/* Content Sections */}
         {content.sections.map((sec, idx) => (
           <Card key={idx} style={{ marginBottom: 16 }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: '#0f172a', marginBottom: 10 }}>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink, marginBottom: 8 }}>
               {sec.heading}
             </Text>
 
             {sec.paragraphs?.map((p, pIdx) => (
-              <Text key={pIdx} style={{ fontSize: 13, color: '#475569', lineHeight: 20, marginBottom: 8 }}>
+              <Text key={pIdx} style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 20, marginBottom: 8 }}>
                 {p}
               </Text>
             ))}
@@ -378,8 +381,8 @@ export function InfoScreen({ route, navigation }: any) {
               <View style={{ gap: 6, marginVertical: 6 }}>
                 {sec.bullets.map((b, bIdx) => (
                   <View key={bIdx} style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                    <Text style={{ color: '#4f46e5', fontWeight: '800', marginRight: 8, fontSize: 14 }}>•</Text>
-                    <Text style={{ fontSize: 13, color: '#334155', lineHeight: 19, flex: 1 }}>{b}</Text>
+                    <Text style={{ color: colors.accent, fontFamily: fonts.sansBold, marginRight: 8, fontSize: 14 }}>•</Text>
+                    <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 19, flex: 1 }}>{b}</Text>
                   </View>
                 ))}
               </View>
@@ -389,18 +392,18 @@ export function InfoScreen({ route, navigation }: any) {
               <View
                 style={{
                   marginTop: 10,
-                  backgroundColor: sec.callout.type === 'policy' ? '#f0fdf4' : '#eff6ff',
-                  borderColor: sec.callout.type === 'policy' ? '#bbf7d0' : '#bfdbfe',
+                  backgroundColor: colors.surfaceSecondary,
+                  borderColor: sec.callout.type === 'policy' ? colors.positive : colors.border,
                   borderWidth: 1,
-                  borderRadius: 10,
+                  borderRadius: tokens.radii.xs,
                   padding: 12,
                 }}
               >
                 <Text
                   style={{
                     fontSize: 12,
-                    fontWeight: '600',
-                    color: sec.callout.type === 'policy' ? '#166534' : '#1e40af',
+                    fontFamily: fonts.sansMedium,
+                    color: colors.ink,
                     lineHeight: 18,
                   }}
                 >
@@ -413,7 +416,7 @@ export function InfoScreen({ route, navigation }: any) {
 
         {/* Quick Links to other info pages */}
         <Card style={{ marginTop: 8 }}>
-          <Text style={{ fontSize: 14, fontWeight: '700', color: '#0f172a', marginBottom: 10 }}>
+          <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 }}>
             Related Information
           </Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -425,13 +428,15 @@ export function InfoScreen({ route, navigation }: any) {
                   key={k}
                   onPress={() => navigation.push('InfoPage', { slug: k })}
                   style={{
-                    backgroundColor: '#f1f5f9',
+                    backgroundColor: colors.surfaceSecondary,
+                    borderWidth: 1,
+                    borderColor: colors.border,
                     paddingHorizontal: 12,
                     paddingVertical: 7,
-                    borderRadius: 8,
+                    borderRadius: tokens.radii.xs,
                   }}
                 >
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: '#475569' }}>
+                  <Text style={{ fontSize: 12, fontFamily: fonts.sansMedium, color: colors.ink }}>
                     {INFO_PAGES[k].title}
                   </Text>
                 </TouchableOpacity>
