@@ -275,12 +275,17 @@ If time is short, **cut in this order:** comments → image generation → push 
     - Honest demo mode: canned text is only applied when the user explicitly chooses `"Use Demo Mode"`, clearly prefixing answers with `"[Demo sample]"`.
     - `getCompiledTranscript` strictly compiles non-empty answers without falling back to demo answers, requiring at least one non-empty answer before draft generation.
     - Added pytest suite for `/ai/transcribe` verifying 401 unauthenticated, 400 bad extension, 413 oversized, 503 missing API key, and 200 mocked transcript response.
+
+- **Gemini API Key Hygiene & Error Sanitization (Sun 19 Oct, 08:45 IST):**
+  - **Header-Based Authentication:** Removed `GEMINI_API_KEY` query parameters (`?key=...`) from every Gemini endpoint URL in `backend/app/services/ai.py` (`draft-from-text`, `voice-draft`, `transcribe`). Keys are sent strictly via standard `x-goog-api-key` request headers.
+  - **Exception & Log Sanitization:** Replaced raw exception string formatting and response body dumps with generic, user-safe error messages (`"Transcription service unavailable"` with HTTP 503). Server-side logging strictly records response status codes and exception types without logging URLs, query strings, or API key values.
+  - **Leak Prevention Pytests:** Added `test_gemini_key_hygiene_and_leak_prevention` asserting outgoing requests use plain URLs + `x-goog-api-key` header, and verifying forced upstream errors containing mock API key strings and URL query parameters never leak into client response bodies.
   - **Verifications:**
-    - `pytest -v backend/tests`: 19/19 tests passed.
+    - `pytest -v backend/tests`: 20/20 tests passed.
+    - `git grep -n "key=" backend/app`: verified 0 instances in any AI call, URL, or service.
     - `npx tsc --noEmit`: 0 TypeScript errors.
     - `npx expo-doctor`: 20/20 checks passed.
-    - `python backend/scripts/verify_sources.py`: All 30 seed source URLs verified HTTP 200: True.
-- **Status:** Hardening, security, payment immutability, seed sources, and honest voice transcription completed, verified, and delivered.
+- **Status:** All security hardening, API key hygiene, and honest transcription requirements verified and delivered.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

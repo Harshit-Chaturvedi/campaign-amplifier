@@ -117,7 +117,11 @@ Generate a JSON object matching this schema exactly:
 Return ONLY raw JSON. No markdown backticks.
 """
     model_name = settings.GEMINI_MODEL or "gemini-3.8-flash"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+    headers = {
+        "x-goog-api-key": settings.GEMINI_API_KEY,
+        "Content-Type": "application/json",
+    }
     for attempt in range(2):
         try:
             try:
@@ -125,7 +129,7 @@ Return ONLY raw JSON. No markdown backticks.
             except Exception:
                 transport = None
             async with httpx.AsyncClient(transport=transport, timeout=30.0) as client:
-                res = await client.post(url, json={"contents": [{"parts": [{"text": prompt}]}]})
+                res = await client.post(url, headers=headers, json={"contents": [{"parts": [{"text": prompt}]}]})
                 if res.status_code == 200:
                     data = res.json()
                     raw_text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
@@ -147,9 +151,9 @@ Return ONLY raw JSON. No markdown backticks.
                     logger.info("Successfully generated campaign draft using Gemini model: %s", model_name)
                     return AIDraftResponse(**parsed)
                 else:
-                    logger.warning("Gemini API returned status %s: %s", res.status_code, res.text)
+                    logger.warning("Gemini API call returned status %s", res.status_code)
         except Exception as err:
-            logger.warning("Gemini API attempt %d error: %s", attempt + 1, err)
+            logger.warning("Gemini API attempt %d failed: %s", attempt + 1, type(err).__name__)
             continue
 
     logger.info("Gemini generation failed or timed out. Falling back to demo-mode draft.")
@@ -159,12 +163,16 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
     if not settings.GEMINI_API_KEY:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Transcription service unavailable (GEMINI_API_KEY not configured)"
+            detail="Transcription service unavailable"
         )
 
     b64_data = base64.b64encode(audio_bytes).decode("utf-8")
     model_name = settings.GEMINI_MODEL or "gemini-3.8-flash"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+    headers = {
+        "x-goog-api-key": settings.GEMINI_API_KEY,
+        "Content-Type": "application/json",
+    }
 
     payload = {
         "contents": [
@@ -195,7 +203,7 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
             transport = None
 
         async with httpx.AsyncClient(transport=transport, timeout=45.0) as client:
-            res = await client.post(url, json=payload)
+            res = await client.post(url, headers=headers, json=payload)
             if res.status_code == 200:
                 data = res.json()
                 candidates = data.get("candidates", [])
@@ -207,17 +215,17 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
                 transcript = candidates[0]["content"]["parts"][0]["text"].strip()
                 return transcript
             else:
-                logger.error("Gemini transcribe error %d: %s", res.status_code, res.text)
+                logger.error("Gemini transcribe failed with status: %d", res.status_code)
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail=f"Gemini transcription service error (status {res.status_code})"
+                    detail="Transcription service unavailable"
                 )
     except HTTPException:
         raise
     except Exception as err:
-        logger.error("Gemini transcribe exception: %s", err)
+        logger.error("Gemini transcribe error: %s", type(err).__name__)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Gemini transcription request failed: {str(err)}"
+            detail="Transcription service unavailable"
         )
 

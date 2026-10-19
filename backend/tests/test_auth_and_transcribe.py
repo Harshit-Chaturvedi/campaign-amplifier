@@ -1,4 +1,5 @@
 import io
+import httpx
 from unittest.mock import patch, AsyncMock
 from app.config import settings
 
@@ -103,7 +104,7 @@ def test_ai_transcribe_endpoint(client, user_token, monkeypatch):
         files={"file": ("speech.m4a", io.BytesIO(fake_audio), "audio/mp4")}
     )
     assert res.status_code == 503, f"Expected 503 when GEMINI_API_KEY is unset, got {res.status_code}"
-    assert "GEMINI_API_KEY not configured" in res.json()["detail"]
+    assert "Transcription service unavailable" in res.json()["detail"]
 
     # 5. Mocked Gemini -> transcript returned (200 with {"transcript": "..."})
     monkeypatch.setattr(settings, "GEMINI_API_KEY", "dummy_test_gemini_key")
@@ -117,3 +118,58 @@ def test_ai_transcribe_endpoint(client, user_token, monkeypatch):
         assert res.status_code == 200, res.text
         assert res.json() == {"transcript": "Thirty schools still draw drinking water through lead pipes."}
         mock_transcribe.assert_called_once()
+
+
+def test_gemini_key_hygiene_and_leak_prevention(client, user_token, monkeypatch):
+    auth_headers = {"Authorization": f"Bearer {user_token}"}
+    fake_audio = b"\x00" * 1024
+    test_key = "KEY123"
+    monkeypatch.setattr(settings, "GEMINI_API_KEY", test_key)
+
+    captured_requests = []
+
+    # A) Test that actual outgoing request uses plain URL and x-goog-api-key header
+    async def mock_post_success(self, url, *args, **kwargs):
+        captured_requests.append({"url": str(url), "headers": kwargs.get("headers", {})})
+        mock_response = httpx.Response(
+            status_code=200,
+            json={"candidates": [{"content": {"parts": [{"text": "Hygiene verified"}]}}]},
+            request=httpx.Request("POST", url)
+        )
+        return mock_response
+
+    with patch.object(httpx.AsyncClient, "post", new=mock_post_success):
+        res = client.post(
+            "/api/v1/ai/transcribe",
+            headers=auth_headers,
+            files={"file": ("speech.m4a", io.BytesIO(fake_audio), "audio/mp4")}
+        )
+        assert res.status_code == 200, res.text
+        assert res.json() == {"transcript": "Hygiene verified"}
+        assert len(captured_requests) == 1
+        req_url = captured_requests[0]["url"]
+        req_headers = captured_requests[0]["headers"]
+        # Assert no key= in URL
+        assert "key=" not in req_url, f"API key should not be in URL: {req_url}"
+        assert test_key not in req_url, f"API key should not be in URL: {req_url}"
+        # Assert key is sent in x-goog-api-key header
+        assert req_headers.get("x-goog-api-key") == test_key
+
+    # B) Force an upstream failure whose exception message contains "KEY123" and a URL with "key="
+    async def mock_post_leak_failure(self, url, *args, **kwargs):
+        raise httpx.ConnectError(
+            f"Failed to connect to https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={test_key} with error code 500"
+        )
+
+    with patch.object(httpx.AsyncClient, "post", new=mock_post_leak_failure):
+        res = client.post(
+            "/api/v1/ai/transcribe",
+            headers=auth_headers,
+            files={"file": ("speech.m4a", io.BytesIO(fake_audio), "audio/mp4")}
+        )
+        assert res.status_code == 503
+        body_text = res.text
+        # CRITICAL ASSERTIONS:
+        assert test_key not in body_text, f"Response body leaked API key: {body_text}"
+        assert "key=" not in body_text, f"Response body leaked URL key param: {body_text}"
+        assert res.json()["detail"] == "Transcription service unavailable"
