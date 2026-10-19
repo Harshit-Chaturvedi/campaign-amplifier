@@ -75,7 +75,8 @@ def create_contribution(
 @router.post("/payments/simulate")
 def simulate_payment(
     req: PaymentSimulateRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     valid_outcomes = ["success", "pending", "failed", "cancelled", "rejected"]
     if req.outcome not in valid_outcomes:
@@ -91,6 +92,28 @@ def simulate_payment(
     campaign = db.query(Campaign).filter(Campaign.id == contrib.campaign_id).first()
     if not campaign:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Campaign not found")
+
+    # CRITICAL: Once a contribution has succeeded, ignore any status change.
+    # It cannot transition out of succeeded or alter campaign stats.
+    if contrib.status == "succeeded":
+        return {
+            "status": "ok",
+            "contribution_id": contrib.id,
+            "payment_status": "succeeded",
+            "receipt_no": contrib.receipt_no,
+            "amount": contrib.amount,
+            "campaign_amount_raised": campaign.amount_raised,
+            "campaign_status": campaign.status,
+            "ignored": True
+        }
+
+    # If the contribution is owned by a registered user, only that owner can simulate
+    if contrib.user_id:
+        if not current_user or current_user.id != contrib.user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not authorised to modify payment for this contribution"
+            )
 
     old_status = contrib.status
     new_status = "succeeded" if req.outcome == "success" else req.outcome

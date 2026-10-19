@@ -70,9 +70,23 @@ const GUIDED_QUESTIONS: GuidedQuestion[] = [
 ];
 
 export function VoiceDraftScreen({ navigation }: any) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
   const saveDraft = useDraftStore((s) => s.saveDraft);
   const setActiveDraft = useDraftStore((s) => s.setActiveDraft);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      Alert.alert(
+        'Sign in required',
+        'Creating a campaign requires signing in so your drafts and campaigns are linked to your account.',
+        [
+          { text: 'Cancel', onPress: () => navigation.goBack() },
+          { text: 'Sign In', onPress: () => navigation.navigate('Login') },
+        ]
+      );
+    }
+  }, [isAuthenticated]);
 
   // Guided questions state
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
@@ -86,6 +100,7 @@ export function VoiceDraftScreen({ navigation }: any) {
   // Permission & Recording State
   const [permissionStatus, setPermissionStatus] = useState<'undetermined' | 'granted' | 'denied'>('undetermined');
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
   const [recordingDurationSec, setRecordingDurationSec] = useState<number>(0);
   const [isReviewStage, setIsReviewStage] = useState<boolean>(false);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
@@ -195,28 +210,43 @@ export function VoiceDraftScreen({ navigation }: any) {
     }
   };
 
-  // Stop recording answer
+  // Stop recording answer and transcribe with backend AI
   const stopRecording = async () => {
+    let recordedUri = '';
     try {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       await recorder.stop();
+      recordedUri = recorder.uri || '';
     } catch {
       // Ignore stop errors if already stopped
     } finally {
       setIsRecording(false);
       pulseAnim.stopAnimation();
       pulseAnim.setValue(1);
+    }
 
-      // Transcribe response (populate response text for current question)
-      const currentQ = GUIDED_QUESTIONS[currentQuestionIndex];
-      const existing = answers[currentQ.id];
-      if (!existing || existing.trim().length === 0) {
-        // Populate with the captured demo answer
+    if (!recordedUri) {
+      return;
+    }
+
+    // Call real backend transcription endpoint POST /ai/transcribe
+    setIsTranscribing(true);
+    setErrorMessage(null);
+    try {
+      const res = await apiClient.transcribeAudio(recordedUri);
+      if (res && res.transcript && res.transcript.trim()) {
+        const currentQ = GUIDED_QUESTIONS[currentQuestionIndex];
         setAnswers((prev) => ({
           ...prev,
-          [currentQ.id]: currentQ.demoAnswer,
+          [currentQ.id]: res.transcript.trim(),
         }));
+      } else {
+        setErrorMessage('Could not transcribe, please type your answer.');
       }
+    } catch (err: any) {
+      setErrorMessage('Could not transcribe, please type your answer.');
+    } finally {
+      setIsTranscribing(false);
     }
   };
 
@@ -251,14 +281,22 @@ export function VoiceDraftScreen({ navigation }: any) {
     }
   };
 
-  // Compile full transcript from answers
+  // Compile full transcript from answers without demoAnswer fallbacks
   const getCompiledTranscript = () => {
-    return [
-      `What is this about: ${answers[1] || GUIDED_QUESTIONS[0].demoAnswer}`,
-      `Who should see it: ${answers[2] || GUIDED_QUESTIONS[1].demoAnswer}`,
-      `Why does it matter: ${answers[3] || GUIDED_QUESTIONS[2].demoAnswer}`,
-      `What evidence supports it: ${answers[4] || GUIDED_QUESTIONS[3].demoAnswer}`,
-    ].join('\n\n');
+    const parts: string[] = [];
+    if (answers[1] && answers[1].trim()) {
+      parts.push(`What is this about: ${answers[1].trim()}`);
+    }
+    if (answers[2] && answers[2].trim()) {
+      parts.push(`Who should see it: ${answers[2].trim()}`);
+    }
+    if (answers[3] && answers[3].trim()) {
+      parts.push(`Why does it matter: ${answers[3].trim()}`);
+    }
+    if (answers[4] && answers[4].trim()) {
+      parts.push(`What evidence supports it: ${answers[4].trim()}`);
+    }
+    return parts.join('\n\n');
   };
 
   // Build draft and ALWAYS land on Step 1 (funding goal is NEVER filled in by AI!)
@@ -385,32 +423,49 @@ export function VoiceDraftScreen({ navigation }: any) {
 
   // Handle AI draft generation
   const handleGenerateAIDraft = async () => {
-    setIsGenerating(true);
     const transcript = getCompiledTranscript();
+    if (!transcript.trim()) {
+      Alert.alert(
+        'Input required',
+        'Please record or type an answer to at least one question before generating an AI draft, or tap "Use demo mode".'
+      );
+      return;
+    }
+
+    setIsGenerating(true);
+    setErrorMessage(null);
 
     try {
       const aiResult = await apiClient.generateVoiceDraft(transcript);
       await populateAndLandOnStep1(aiResult);
     } catch (err: any) {
       setErrorMessage(
-        'AI drafting encountered a network error. You can use demo mode with canned sample data or create manually.'
+        'AI drafting encountered an error. You can use demo mode with canned sample data or create manually.'
       );
     } finally {
       setIsGenerating(false);
     }
   };
 
-  // Canned demo mode fallback
+  // Canned demo mode fallback - explicitly labelled Demo sample
   const handleUseDemoMode = async () => {
     setIsGenerating(true);
+    const cannedAnswers = {
+      1: '[Demo sample] Thirty public schools in this county still draw drinking water through lead service lines installed before 1970. Testing last spring found elevated lead in eleven of them.',
+      2: '[Demo sample] Parents, teachers, and school-board voters in the county, aged 28 to 55, plus municipal leaders.',
+      3: '[Demo sample] The replacement programme is already funded at the state level, but districts have to apply before the deadline, and most lack grant staff to do it.',
+      4: '[Demo sample] Documented in county water testing reports from last spring and the official state lead service line replacement fund records.',
+    };
+    setAnswers(cannedAnswers);
+
     const cannedResult = {
-      title: 'Clean Drinking Water for Every Public School',
+      title: '[Demo sample] Clean Drinking Water for Every Public School',
       category: 'health',
       summary:
-        'Elevated lead was documented across 11 county public schools. State replacement funds are active but require immediate district application.',
+        '[Demo sample] Elevated lead was documented across 11 county public schools. State replacement funds are active but require immediate district application.',
       tagline: 'Fixing school drinking water with existing state infrastructure grants.',
       target_audience: 'Parents, teachers, and municipal voters in the school district.',
-      ad_headline: 'Eleven schools. Elevated lead. One deadline.',
+      ad_headline: '[Demo sample] Eleven schools. Elevated lead. One deadline.',
       ad_description:
         'The state will pay to replace the pipes, but only if the district applies. See the water test results.',
       suggested_sources: [], // NEVER invent sources; empty list so creator adds sources manually in Step 2
@@ -702,6 +757,19 @@ export function VoiceDraftScreen({ navigation }: any) {
               )}
             </Card>
 
+            {/* Transcribing Indicator */}
+            {isTranscribing && (
+              <Card style={{ marginBottom: 16, padding: 16, alignItems: 'center', backgroundColor: '#eef2ff', borderColor: '#c7d2fe' }}>
+                <ActivityIndicator size="small" color="#4f46e5" style={{ marginBottom: 6 }} />
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#312e81' }}>
+                  Transcribing your audio with AI...
+                </Text>
+                <Text style={{ fontSize: 12, color: '#4338ca', marginTop: 2 }}>
+                  Your spoken words will appear in the editable box below.
+                </Text>
+              </Card>
+            )}
+
             {/* Answer Transcript & Manual Edit Box */}
             <Card style={{ marginBottom: 20, padding: 16 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -710,10 +778,15 @@ export function VoiceDraftScreen({ navigation }: any) {
                 </Text>
                 {!currentAnswer && (
                   <TouchableOpacity
-                    onPress={() => setAnswers((prev) => ({ ...prev, [currentQ.id]: currentQ.demoAnswer }))}
+                    onPress={() =>
+                      setAnswers((prev) => ({
+                        ...prev,
+                        [currentQ.id]: `[Demo sample] ${currentQ.demoAnswer}`,
+                      }))
+                    }
                     style={{ paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#f1f5f9', borderRadius: 6 }}
                   >
-                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#4f46e5' }}>Use Sample Answer</Text>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: '#4f46e5' }}>Use Demo Sample Answer</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -783,14 +856,14 @@ export function VoiceDraftScreen({ navigation }: any) {
 
             {/* Compiled Transcript Cards */}
             {GUIDED_QUESTIONS.map((q) => {
-              const ans = answers[q.id] || q.demoAnswer;
+              const ans = answers[q.id]?.trim();
               return (
                 <Card key={q.id} style={{ marginBottom: 12, padding: 14 }}>
                   <Text style={{ fontSize: 13, fontWeight: '800', color: '#4f46e5', marginBottom: 4 }}>
                     {q.id}. {q.question}
                   </Text>
-                  <Text style={{ fontSize: 13, color: '#334155', lineHeight: 19 }}>
-                    {ans}
+                  <Text style={{ fontSize: 13, color: ans ? '#334155' : '#94a3b8', fontStyle: ans ? 'normal' : 'italic', lineHeight: 19 }}>
+                    {ans || '(No answer provided)'}
                   </Text>
                 </Card>
               );

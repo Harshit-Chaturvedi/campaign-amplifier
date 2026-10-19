@@ -1,8 +1,10 @@
 import os
 import uuid
 import shutil
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends
 from app.config import settings
+from app.models import User
+from app.auth.dependencies import get_current_user
 
 router = APIRouter(tags=["uploads"])
 
@@ -10,7 +12,10 @@ ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp4", ".mov", 
 MAX_FILE_SIZE = 15 * 1024 * 1024  # 15MB
 
 @router.post("/uploads")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
     # Validate extension
     filename = file.filename or "upload"
     ext = os.path.splitext(filename)[1].lower()
@@ -32,7 +37,7 @@ async def upload_file(file: UploadFile = File(...)):
     file_bytes = await file.read()
     if len(file_bytes) > MAX_FILE_SIZE:
         raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
             detail=f"File exceeds maximum allowed size of {MAX_FILE_SIZE // (1024*1024)}MB"
         )
 

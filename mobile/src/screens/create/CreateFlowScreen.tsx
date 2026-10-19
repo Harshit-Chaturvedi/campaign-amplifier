@@ -12,6 +12,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useDraftStore, CampaignDraft } from '../../store/useDraftStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { apiClient } from '../../api/client';
 import { Step1Basics } from './Step1Basics';
 import { Step2Story } from './Step2Story';
@@ -31,6 +32,16 @@ const STEPS = [
 
 export function CreateFlowScreen({ route, navigation }: any) {
   const { draftId, step: initialStep = 1 } = route.params || {};
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      Alert.alert('Sign in required', 'Creating a campaign requires signing in.', [
+        { text: 'Cancel', onPress: () => navigation.goBack() },
+        { text: 'Sign In', onPress: () => navigation.navigate('Login') },
+      ]);
+    }
+  }, [isAuthenticated]);
 
   const getDraft = useDraftStore((s) => s.getDraft);
   const saveDraft = useDraftStore((s) => s.saveDraft);

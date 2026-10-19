@@ -1,7 +1,9 @@
 import re
 import json
+import base64
 import httpx
 from typing import Dict, Any, List
+from fastapi import HTTPException, status
 from app.config import settings
 from app.schemas import AIDraftResponse, AISuggestResponse
 
@@ -152,3 +154,70 @@ Return ONLY raw JSON. No markdown backticks.
 
     logger.info("Gemini generation failed or timed out. Falling back to demo-mode draft.")
     return fallback_draft(text)
+
+async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "audio/mp4") -> str:
+    if not settings.GEMINI_API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Transcription service unavailable (GEMINI_API_KEY not configured)"
+        )
+
+    b64_data = base64.b64encode(audio_bytes).decode("utf-8")
+    model_name = settings.GEMINI_MODEL or "gemini-3.8-flash"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.GEMINI_API_KEY}"
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "inline_data": {
+                            "mime_type": mime_type,
+                            "data": b64_data
+                        }
+                    },
+                    {
+                        "text": (
+                            "Accurately transcribe the spoken words in this audio recording. "
+                            "Output ONLY the plain text transcript of what was spoken. "
+                            "Do not include conversational filler, introductory remarks, markdown formatting, or timestamps."
+                        )
+                    }
+                ]
+            }
+        ]
+    }
+
+    try:
+        try:
+            transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
+        except Exception:
+            transport = None
+
+        async with httpx.AsyncClient(transport=transport, timeout=45.0) as client:
+            res = await client.post(url, json=payload)
+            if res.status_code == 200:
+                data = res.json()
+                candidates = data.get("candidates", [])
+                if not candidates or "content" not in candidates[0]:
+                    raise HTTPException(
+                        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                        detail="No speech could be recognized in the audio"
+                    )
+                transcript = candidates[0]["content"]["parts"][0]["text"].strip()
+                return transcript
+            else:
+                logger.error("Gemini transcribe error %d: %s", res.status_code, res.text)
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail=f"Gemini transcription service error (status {res.status_code})"
+                )
+    except HTTPException:
+        raise
+    except Exception as err:
+        logger.error("Gemini transcribe exception: %s", err)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Gemini transcription request failed: {str(err)}"
+        )
+

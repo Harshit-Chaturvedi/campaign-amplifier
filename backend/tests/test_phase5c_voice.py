@@ -1,8 +1,5 @@
-from fastapi.testclient import TestClient
-from app.main import app
-
-def test_phase5c_voice_draft_api_and_rules():
-    client = TestClient(app)
+def test_phase5c_voice_draft_api_and_rules(client, user_token):
+    auth_headers = {"Authorization": f"Bearer {user_token}"}
 
     # 1. Transcript without spoken URLs -> sources must be strictly empty (NEVER invent sources)
     transcript_no_urls = (
@@ -12,7 +9,11 @@ def test_phase5c_voice_draft_api_and_rules():
         "What evidence supports it: Documented in county water testing reports from last spring and the official state lead service line replacement fund records."
     )
 
-    res = client.post("/api/v1/ai/voice-draft", json={"transcript": transcript_no_urls})
+    res = client.post(
+        "/api/v1/ai/voice-draft",
+        headers=auth_headers,
+        json={"transcript": transcript_no_urls}
+    )
     assert res.status_code == 200, f"Voice draft endpoint failed: {res.text}"
     data = res.json()
 
@@ -46,9 +47,12 @@ def test_phase5c_voice_draft_api_and_rules():
         "What is this about: School lead testing.\n\n"
         "What evidence supports it: The report is published at https://data.county.gov/water-testing-2025 and nowhere else."
     )
-    res_url = client.post("/api/v1/ai/voice-draft", json={"transcript": transcript_with_url})
+    res_url = client.post(
+        "/api/v1/ai/voice-draft",
+        headers=auth_headers,
+        json={"transcript": transcript_with_url}
+    )
     assert res_url.status_code == 200
     data_url = res_url.json()
     assert "https://data.county.gov/water-testing-2025" in data_url["suggested_sources"]
     assert len(data_url["suggested_sources"]) == 1
-

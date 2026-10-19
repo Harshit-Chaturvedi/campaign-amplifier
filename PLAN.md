@@ -255,12 +255,32 @@ If time is short, **cut in this order:** comments → image generation → push 
   - **Haptic Feedback:** Installed SDK 58 compatible `expo-haptics`. Wired haptic notifications strictly to key actions: payment success (`Success`), payment decline (`Error`), campaign review submission (`Success`), and submission validation errors (`Error`).
   - **Security & Privacy Audit:** Audited all endpoints (`/campaigns`, `/campaigns/{id}`, `/campaigns/{id}/analytics`, `/contributions`, `/receipts/{id}`, `/admin/*`). Verified `guest_email` is never returned in public responses, backer names strictly default to `"Anonymous"`, all `/admin/*` routes require `require_admin`, and git contains zero hardcoded production secrets or API keys.
   - **Offline & Fallback Behavior:** Verified graceful offline operation where network disconnect activates bundled seed fallback, displays `"Offline demo"` banner, and local draft autosaves are safely persisted on device with `"Saved on this device"` status.
+
+- **Hardening, Payment Idempotency & Honest Voice Transcription (Sun 19 Oct, 08:30 IST):**
+  - **Authentication Enforcement on Uploads & AI:**
+    - Protected `POST /uploads`, `POST /ai/draft-from-text`, `POST /ai/voice-draft`, `POST /ai/suggest`, and `POST /ai/transcribe` with `get_current_user`.
+    - Added unit and integration tests asserting unauthenticated requests receive HTTP 401 Unauthorized, while valid bearer tokens succeed.
+    - Updated mobile client (`apiClient`) and screen guards (`CreateLandingScreen`, `CreateFlowScreen`, `VoiceDraftScreen`) to verify authentication before making network calls, preventing guests from hitting protected AI/upload endpoints.
+  - **Payment Simulation Idempotency & Immutability:**
+    - Updated `POST /payments/simulate`: once a contribution is in `"succeeded"` state, any further simulated outcome is strictly ignored (`"ignored": True`), preserving contribution status and preventing double-counting or mutations of campaign `amount_raised` and `backer_count`.
+    - Restricted simulation of owned contributions strictly to the contribution's owner (returning 403 Forbidden for unauthorized callers).
+    - Added pytest assertions covering 403 non-owner rejection and idempotent success immutability.
+  - **Real, Stable Public Sources in `seed.py`:**
+    - Replaced all legacy `example.org` placeholder URLs with real, authoritative `.gov` and official organizational public pages (`epa.gov`, `ncbi.nlm.nih.gov`, `medlineplus.gov`, `nps.gov`, `energy.gov`, `fhwa.dot.gov`, `plainlanguage.gov`, `archives.gov`).
+    - Verified all 30 source links return HTTP 200 via `backend/scripts/verify_sources.py` run manually without adding startup network calls.
+  - **Real & Honest Voice Transcription (`POST /ai/transcribe`):**
+    - Built authenticated multipart endpoint `POST /ai/transcribe` with audio MIME and extension verification (rejecting non-audio with 400), 10MB payload size limit (rejecting oversized files with 413), and direct Gemini multimodal audio transcription (returning 503 if API key missing or unrecognized).
+    - Updated mobile `VoiceDraftScreen.tsx`: after audio recording finishes, the recording file is uploaded to `POST /ai/transcribe` with an active `isTranscribing` visual indicator.
+    - Removed automatic `demoAnswer` prefilling. If transcription fails, the app displays `"Could not transcribe, please type your answer"` and leaves the editable input ready for user entry.
+    - Honest demo mode: canned text is only applied when the user explicitly chooses `"Use Demo Mode"`, clearly prefixing answers with `"[Demo sample]"`.
+    - `getCompiledTranscript` strictly compiles non-empty answers without falling back to demo answers, requiring at least one non-empty answer before draft generation.
+    - Added pytest suite for `/ai/transcribe` verifying 401 unauthenticated, 400 bad extension, 413 oversized, 503 missing API key, and 200 mocked transcript response.
   - **Verifications:**
-    - `npx tsc --noEmit` passed with 0 errors.
-    - `npx expo-doctor` passed with 20/20 checks clean.
-    - `pytest -v tests` passed with 17/17 tests green.
-    - Forbidden copy scanner verified 0 violations (`verify_password` in backend auth only).
-- **Status:** All Phases (1-8) and Phase 8 Cleanup completed, verified, and delivered.
+    - `pytest -v backend/tests`: 19/19 tests passed.
+    - `npx tsc --noEmit`: 0 TypeScript errors.
+    - `npx expo-doctor`: 20/20 checks passed.
+    - `python backend/scripts/verify_sources.py`: All 30 seed source URLs verified HTTP 200: True.
+- **Status:** Hardening, security, payment immutability, seed sources, and honest voice transcription completed, verified, and delivered.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)

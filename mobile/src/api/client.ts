@@ -178,10 +178,14 @@ async function fetchWithTimeout(
       const id = setTimeout(() => controller.abort(), timeoutMs);
 
       const token = useAuthStore.getState().token;
+      const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(options.headers as Record<string, string>),
       };
+      if (isFormData) {
+        delete headers['Content-Type'];
+      }
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
@@ -406,6 +410,10 @@ export const apiClient = {
     suggested_sources: string[];
     demo_mode: boolean;
   }> {
+    const token = useAuthStore.getState().token;
+    if (!token) {
+      throw new Error('Sign in required to request AI suggestions');
+    }
     try {
       const url = `${API_BASE_URL}/ai/draft-from-text`;
       const res = await fetchWithTimeout(url, {
@@ -444,6 +452,10 @@ export const apiClient = {
     suggested_channels: string[];
     demo_mode: boolean;
   }> {
+    const token = useAuthStore.getState().token;
+    if (!token) {
+      throw new Error('Sign in required to generate voice drafts');
+    }
     try {
       const url = `${API_BASE_URL}/ai/voice-draft`;
       const res = await fetchWithTimeout(url, {
@@ -469,6 +481,100 @@ export const apiClient = {
         demo_mode: true,
       };
     }
+  },
+
+  async transcribeAudio(audioUri: string): Promise<{ transcript: string }> {
+    const token = useAuthStore.getState().token;
+    if (!token) {
+      throw new Error('Sign in required to transcribe audio');
+    }
+
+    const formData = new FormData();
+    const fileExt = audioUri ? audioUri.split('.').pop()?.toLowerCase() || 'm4a' : 'm4a';
+    const mimeType =
+      fileExt === 'wav'
+        ? 'audio/wav'
+        : fileExt === 'mp3'
+        ? 'audio/mpeg'
+        : fileExt === 'ogg'
+        ? 'audio/ogg'
+        : fileExt === 'webm'
+        ? 'audio/webm'
+        : 'audio/mp4';
+
+    if (Platform.OS === 'web' && audioUri.startsWith('blob:')) {
+      try {
+        const resp = await fetch(audioUri);
+        const blob = await resp.blob();
+        formData.append('file', blob, `recording.${fileExt}`);
+      } catch {
+        formData.append('file', {
+          uri: audioUri,
+          name: `recording.${fileExt}`,
+          type: mimeType,
+        } as any);
+      }
+    } else {
+      formData.append('file', {
+        uri: audioUri,
+        name: `recording.${fileExt}`,
+        type: mimeType,
+      } as any);
+    }
+
+    const url = `${API_BASE_URL}/ai/transcribe`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Transcription failed with status ${res.status}`);
+    }
+
+    return await res.json();
+  },
+
+  async uploadFile(fileUri: string, filename = 'upload.jpg', mimeType = 'image/jpeg'): Promise<{ url: string; filename: string }> {
+    const token = useAuthStore.getState().token;
+    if (!token) {
+      throw new Error('Sign in required to upload files');
+    }
+
+    const formData = new FormData();
+    if (Platform.OS === 'web' && fileUri.startsWith('blob:')) {
+      try {
+        const resp = await fetch(fileUri);
+        const blob = await resp.blob();
+        formData.append('file', blob, filename);
+      } catch {
+        formData.append('file', {
+          uri: fileUri,
+          name: filename,
+          type: mimeType,
+        } as any);
+      }
+    } else {
+      formData.append('file', {
+        uri: fileUri,
+        name: filename,
+        type: mimeType,
+      } as any);
+    }
+
+    const url = `${API_BASE_URL}/uploads`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Upload failed with status ${res.status}`);
+    }
+
+    return await res.json();
   },
 
   async submitDraft(id: string): Promise<{ success: boolean; isOffline: boolean; campaignStatus?: string }> {

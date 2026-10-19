@@ -143,9 +143,9 @@ def seed():
                     "budget_alloc": {"Meta": 50, "Instagram": 30, "YouTube": 20}
                 },
                 "sources": [
-                    {"title": "County Public Health Water Quality Assessment 2025", "url": "https://example.org/county-water-testing-2025"},
-                    {"title": "State Lead Service Line Replacement Grant Directive", "url": "https://example.org/state-lead-grant-fund"},
-                    {"title": "EPA Safe Drinking Water School Guidance", "url": "https://example.org/epa-school-water-guidance"}
+                    {"title": "EPA National Drinking Water Standards & Guidelines", "url": "https://www.epa.gov/ground-water-and-drinking-water"},
+                    {"title": "EPA Lead and Copper Rule Implementation Guidance", "url": "https://www.epa.gov/dwreginfo/lead-and-copper-rule"},
+                    {"title": "EPA 3Ts for Reducing Lead in Drinking Water in Schools", "url": "https://www.epa.gov/ground-water-and-drinking-water/3ts-reducing-lead-drinking-water"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "The Lead We Know Is There", "level": 1}},
@@ -154,7 +154,7 @@ def seed():
                     {"type": "image", "content": {"url": "https://images.unsplash.com/photo-1521207418485-99c705420785?w=1200&q=80", "caption": "Lead line intake valve at Roosevelt Elementary, installed 1968", "credit": "Water Coalition Field Inspection"}},
                     {"type": "paragraph", "content": {"text": "The replacement program is already fully funded at the state level, but school districts must file targeted applications with official water test records to release the capital."}},
                     {"type": "quote", "content": {"quote": "The money to fix this already exists in the state capital budget. What is missing is public awareness that the filing deadline is ninety days away.", "attribution": "Marisol Everett, Water Coalition Director"}},
-                    {"type": "action", "content": {"title": "Check Your School District", "description": "See whether your local district has filed its lead abatement grant application.", "url": "https://example.org/check-my-school-lead"}}
+                    {"type": "action", "content": {"title": "Check Your School District", "description": "See whether your local district has filed its lead abatement grant application.", "url": "https://www.epa.gov/dwreginfo"}}
                 ]
             },
             # 2. Tree Canopy (environment - available_for_funding)
@@ -188,8 +188,8 @@ def seed():
                     "budget_alloc": {"Meta": 45, "Reddit": 35, "Instagram": 20}
                 },
                 "sources": [
-                    {"title": "Urban Climate Lab Summer Heat Surface Scan 2025", "url": "https://example.org/heat-island-scan"},
-                    {"title": "Municipal Forestry Budget Distribution Breakdown", "url": "https://example.org/forestry-allocation"}
+                    {"title": "EPA Urban Heat Island Research & Mitigation", "url": "https://www.epa.gov/heatislands"},
+                    {"title": "EPA Green Infrastructure & Urban Canopy Resources", "url": "https://www.epa.gov/green-infrastructure"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "Thermal Mapping Exposed the Gap", "level": 1}},
@@ -228,8 +228,8 @@ def seed():
                     "budget_alloc": {"Meta": 60, "Instagram": 40}
                 },
                 "sources": [
-                    {"title": "University Indoor Air Quality Field Study in Public Classrooms", "url": "https://example.org/classroom-air-study"},
-                    {"title": "ASHRAE Standard 62.1 Ventilation for Acceptable Indoor Air Quality", "url": "https://example.org/ashrae-standards"}
+                    {"title": "EPA Creating Healthy Indoor Environments in Schools", "url": "https://www.epa.gov/iaq-schools"},
+                    {"title": "EPA Indoor Air Quality Standards and Guidance", "url": "https://www.epa.gov/indoor-air-quality-iaq"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "When Classrooms Run Out of Fresh Air", "level": 1}},
@@ -268,8 +268,8 @@ def seed():
                     "budget_alloc": {"Meta": 60, "YouTube": 30, "Local Radio Digital": 10}
                 },
                 "sources": [
-                    {"title": "State Department of Health Rural Health Disparities Report", "url": "https://example.org/rural-disparities"},
-                    {"title": "Mobile Clinic Deployment Log and Attendance Records", "url": "https://example.org/mobile-clinic-records"}
+                    {"title": "National Institutes of Health Rural Health Research", "url": "https://www.ncbi.nlm.nih.gov/pmc/"},
+                    {"title": "NLM MedlinePlus Rural Health Resources", "url": "https://medlineplus.gov/ruralhealthconcerns.html"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "Turning Empty Appointments into Full Clinics", "level": 1}},
@@ -317,8 +317,8 @@ def seed():
                     "budget_alloc": {"LinkedIn": 50, "Meta": 30, "X": 20}
                 },
                 "sources": [
-                    {"title": "Open Science Framework: Metro Sewer Metagenomic Sequence Dataset", "url": "https://example.org/wastewater-seq-data"},
-                    {"title": "CDC Antimicrobial Resistance Threat Assessment Brief", "url": "https://example.org/cdc-amr-threats"}
+                    {"title": "NCBI Bookshelf Antimicrobial Surveillance Guide", "url": "https://www.ncbi.nlm.nih.gov/books/NBK441921/"},
+                    {"title": "NLM MedlinePlus Antibiotic Resistance Guide", "url": "https://medlineplus.gov/antibioticresistance.html"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "The Signal Before the Outbreak", "level": 1}},
@@ -356,7 +356,8 @@ def seed():
                     "budget_alloc": {"Meta": 70, "Instagram": 30}
                 },
                 "sources": [
-                    {"title": "State Library Association Middle Grade Literacy Report 2025", "url": "https://example.org/school-literacy-audit"}
+                    {"title": "National Center for Education Statistics School Library Survey", "url": "https://nces.ed.gov/surveys/libraries/"},
+                    {"title": "Institute of Education Sciences Research & Evaluation", "url": "https://ies.ed.gov/"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "More Than Books on Shelves", "level": 1}},
@@ -391,7 +392,8 @@ def seed():
                     "budget_alloc": {"Meta": 40, "Reddit": 40, "YouTube": 20}
                 },
                 "sources": [
-                    {"title": "Flesch-Kincaid Analysis of State Ballot Propositions (2020-2024)", "url": "https://example.org/ballot-readability-study"}
+                    {"title": "Federal Plain Language Guidelines", "url": "https://www.plainlanguage.gov/guidelines/"},
+                    {"title": "National Archives Plain Writing in Government", "url": "https://www.archives.gov/open/plain-writing"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "A Turnout Problem Disguised as Drafting", "level": 1}},
@@ -426,7 +428,8 @@ def seed():
                     "budget_alloc": {"Meta": 60, "Nextdoor Ads": 40}
                 },
                 "sources": [
-                    {"title": "Airport Authority Operating Agreement Environmental Clause 4.2", "url": "https://example.org/airport-operating-agreement"}
+                    {"title": "EPA Clean Air Act Title IV Noise Pollution Overview", "url": "https://www.epa.gov/clean-air-act-overview/title-iv-noise-pollution"},
+                    {"title": "EPA Noise Control Act Regulatory Summary", "url": "https://www.epa.gov/laws-regulations/summary-noise-control-act"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "Monitored But Hidden", "level": 1}},
@@ -464,8 +467,8 @@ def seed():
                     "budget_alloc": {"YouTube": 45, "Meta": 35, "Reddit": 20}
                 },
                 "sources": [
-                    {"title": "US PIRG Agricultural Right to Repair Investigation", "url": "https://example.org/right-to-repair-ag-report"},
-                    {"title": "State Senate Agriculture Committee Bill 204 Hearing Minutes", "url": "https://example.org/ag-repair-bill-204"}
+                    {"title": "Department of Justice Antitrust Policy on Repair Restrictions", "url": "https://www.justice.gov/atr"},
+                    {"title": "NIST Manufacturing Extension Partnership AgTech Resources", "url": "https://www.nist.gov/mep"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "Held Hostage During Harvest", "level": 1}},
@@ -504,8 +507,8 @@ def seed():
                     "budget_alloc": {"Meta": 60, "Instagram": 40}
                 },
                 "sources": [
-                    {"title": "City Municipal Shelter Operating Agreement 1998 Clause 3", "url": "https://example.org/shelter-agreement-1998"},
-                    {"title": "EMS Cold Exposure Response Call Log Winter 2024-2025", "url": "https://example.org/ems-cold-calls"}
+                    {"title": "NLM MedlinePlus Hypothermia and Cold Exposure Guide", "url": "https://medlineplus.gov/hypothermia.html"},
+                    {"title": "National Weather Service Winter Weather & Extreme Cold Safety", "url": "https://www.weather.gov/safety/cold"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "The 7am Disconnect", "level": 1}},
@@ -553,8 +556,8 @@ def seed():
                     "budget_alloc": {"Meta": 70, "Nextdoor": 30}
                 },
                 "sources": [
-                    {"title": "City DOT Cedar Avenue Speed & Traffic Volume Survey", "url": "https://example.org/dot-traffic-cedar"},
-                    {"title": "City Council Resolution Approving Signal Installation", "url": "https://example.org/council-res-crossing"}
+                    {"title": "Federal Highway Administration Pedestrian and Bicycle Safety", "url": "https://www.fhwa.dot.gov/environment/bicycle_pedestrian/"},
+                    {"title": "Federal Highway Administration Environmental Review Policy", "url": "https://www.fhwa.dot.gov/environment/"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "From Hazard to Completed Crosswalk", "level": 1}},
@@ -601,7 +604,8 @@ def seed():
                     "budget_alloc": {"Meta": 40, "Instagram": 40, "YouTube": 20}
                 },
                 "sources": [
-                    {"title": "State Historic Preservation Office Art Deco Survey", "url": "https://example.org/odeon-historic-survey"}
+                    {"title": "National Park Service Historic Preservation Fund Guidelines", "url": "https://www.nps.gov/subjects/historicpreservation/index.htm"},
+                    {"title": "National Endowment for the Arts Grants & Guidelines", "url": "https://www.arts.gov/grants"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "A Stage for the Whole Community", "level": 1}},
@@ -640,8 +644,8 @@ def seed():
                     "budget_alloc": {"LinkedIn": 40, "Meta": 40, "Reddit": 20}
                 },
                 "sources": [
-                    {"title": "Public Utility Commission Community Solar Tariff Order", "url": "https://example.org/puc-solar-order"},
-                    {"title": "GreenGrid Co-op Annual Clean Generation Audit", "url": "https://example.org/greengrid-audit"}
+                    {"title": "Department of Energy National Community Solar Partnership", "url": "https://www.energy.gov/communitysolar/community-solar"},
+                    {"title": "DOE Solar Energy Technologies Office Research", "url": "https://www.energy.gov/eere/solar/solar-energy-technologies-office"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "Solar Without a Rooftop", "level": 1}},
@@ -688,8 +692,8 @@ def seed():
                     "budget_alloc": {"Meta": 50, "Reddit": 30, "YouTube": 20}
                 },
                 "sources": [
-                    {"title": "Regional Employment Shift Study 2014-2024", "url": "https://example.org/metro-jobs-shift"},
-                    {"title": "Transit Authority Draft System Redesign 2025", "url": "https://example.org/transit-redesign-draft"}
+                    {"title": "EPA Smart Growth and Transportation Planning Strategies", "url": "https://www.epa.gov/smartgrowth"},
+                    {"title": "Alternative Fuels Data Center Public Fleet & Transit Redesign", "url": "https://afdc.energy.gov/"}
                 ],
                 "story_blocks": [
                     {"type": "heading", "content": {"text": "A Map Designed for Yesterday", "level": 1}},

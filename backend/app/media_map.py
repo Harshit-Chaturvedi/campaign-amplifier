@@ -1,5 +1,5 @@
 """
-Static mapping of verified campaign media assets to campaign IDs and topics.
+Static mapping of validated campaign media assets to campaign IDs and topics.
 Pure data module with no side effects or network calls.
 """
 

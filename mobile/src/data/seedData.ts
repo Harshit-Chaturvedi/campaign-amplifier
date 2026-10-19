@@ -82,9 +82,9 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'County Public Health Water Quality Assessment 2025', url: 'https://example.org/county-water-testing-2025' },
-      { id: 's2', title: 'State Lead Service Line Replacement Grant Directive', url: 'https://example.org/state-lead-grant-fund' },
-      { id: 's3', title: 'EPA Safe Drinking Water School Guidance', url: 'https://example.org/epa-school-water-guidance' },
+      { id: 's1', title: 'EPA National Drinking Water Standards & Guidelines', url: 'https://www.epa.gov/ground-water-and-drinking-water' },
+      { id: 's2', title: 'EPA Lead and Copper Rule Implementation Guidance', url: 'https://www.epa.gov/dwreginfo/lead-and-copper-rule' },
+      { id: 's3', title: 'EPA 3Ts for Reducing Lead in Drinking Water in Schools', url: 'https://www.epa.gov/ground-water-and-drinking-water/3ts-reducing-lead-drinking-water' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'The Lead We Know Is There', level: 1 },
@@ -93,7 +93,7 @@ export const seedCampaigns: Campaign[] = [
       { type: 'image', url: 'https://images.unsplash.com/photo-1521207418485-99c705420785?w=1200&q=80', caption: 'Lead line intake valve at Roosevelt Elementary, installed 1968', credit: 'Water Coalition Field Inspection' },
       { type: 'paragraph', text: 'The replacement program is already fully funded at the state level, but school districts must file targeted applications with official water test records to release the capital.' },
       { type: 'quote', quote: 'The money to fix this already exists in the state capital budget. What is missing is public awareness that the filing deadline is ninety days away.', attribution: 'Marisol Everett, Water Coalition Director' },
-      { type: 'action', title: 'Check Your School District', description: 'See whether your local district has filed its lead abatement grant application.', url: 'https://example.org/check-my-school-lead' },
+      { type: 'action', title: 'Check Your School District', description: 'See whether your local district has filed its lead abatement grant application.', url: 'https://www.epa.gov/dwreginfo' },
     ],
     createdAt: iso(NOW - 25 * DAY),
     submittedAt: iso(NOW - 23 * DAY),
@@ -135,8 +135,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'Urban Climate Lab Summer Heat Surface Scan 2025', url: 'https://example.org/heat-island-scan' },
-      { id: 's2', title: 'Municipal Forestry Budget Distribution Breakdown', url: 'https://example.org/forestry-allocation' },
+      { id: 's1', title: 'EPA Urban Heat Island Research & Mitigation', url: 'https://www.epa.gov/heatislands' },
+      { id: 's2', title: 'EPA Green Infrastructure & Urban Canopy Resources', url: 'https://www.epa.gov/green-infrastructure' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'Thermal Mapping Exposed the Gap', level: 1 },
@@ -184,8 +184,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 21,
     },
     sources: [
-      { id: 's1', title: 'University Indoor Air Quality Field Study in Public Classrooms', url: 'https://example.org/classroom-air-study' },
-      { id: 's2', title: 'ASHRAE Standard 62.1 Ventilation for Acceptable Indoor Air Quality', url: 'https://example.org/ashrae-standards' },
+      { id: 's1', title: 'EPA Creating Healthy Indoor Environments in Schools', url: 'https://www.epa.gov/iaq-schools' },
+      { id: 's2', title: 'EPA Indoor Air Quality Standards and Guidance', url: 'https://www.epa.gov/indoor-air-quality-iaq' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'When Classrooms Run Out of Fresh Air', level: 1 },
@@ -233,8 +233,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'State Department of Health Rural Health Disparities Report', url: 'https://example.org/rural-disparities' },
-      { id: 's2', title: 'Mobile Clinic Deployment Log and Attendance Records', url: 'https://example.org/mobile-clinic-records' },
+      { id: 's1', title: 'National Institutes of Health Rural Health Research', url: 'https://www.ncbi.nlm.nih.gov/pmc/' },
+      { id: 's2', title: 'NLM MedlinePlus Rural Health Resources', url: 'https://medlineplus.gov/ruralhealthconcerns.html' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'Turning Empty Appointments into Full Clinics', level: 1 },
@@ -294,8 +294,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'Open Science Framework: Metro Sewer Metagenomic Sequence Dataset', url: 'https://example.org/wastewater-seq-data' },
-      { id: 's2', title: 'CDC Antimicrobial Resistance Threat Assessment Brief', url: 'https://example.org/cdc-amr-threats' },
+      { id: 's1', title: 'NCBI Bookshelf Antimicrobial Surveillance Guide', url: 'https://www.ncbi.nlm.nih.gov/books/NBK441921/' },
+      { id: 's2', title: 'NLM MedlinePlus Antibiotic Resistance Guide', url: 'https://medlineplus.gov/antibioticresistance.html' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'The Signal Before the Outbreak', level: 1 },
@@ -343,8 +343,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 14,
     },
     sources: [
-      { id: 's1', title: 'State Library Association Middle Grade Literacy Report 2025', url: 'https://example.org/school-literacy-audit' },
-      { id: 's2', title: 'District Staffing Reductions and Academic Performance Correlation', url: 'https://example.org/district-staffing-records' },
+      { id: 's1', title: 'National Center for Education Statistics School Library Survey', url: 'https://nces.ed.gov/surveys/libraries/' },
+      { id: 's2', title: 'Institute of Education Sciences Research & Evaluation', url: 'https://ies.ed.gov/' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'More Than Books on Shelves', level: 1 },
@@ -391,8 +391,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'Flesch-Kincaid Analysis of State Ballot Propositions (2020-2024)', url: 'https://example.org/ballot-readability-study' },
-      { id: 's2', title: 'National Conference of State Legislatures: Plain Language Statutes', url: 'https://example.org/ncsl-plain-language' },
+      { id: 's1', title: 'Federal Plain Language Guidelines', url: 'https://www.plainlanguage.gov/guidelines/' },
+      { id: 's2', title: 'National Archives Plain Writing in Government', url: 'https://www.archives.gov/open/plain-writing' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'A Turnout Problem Disguised as Drafting', level: 1 },
@@ -437,7 +437,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'Airport Authority Operating Agreement Environmental Clause 4.2', url: 'https://example.org/airport-operating-agreement' },
+      { id: 's1', title: 'EPA Clean Air Act Title IV Noise Pollution Overview', url: 'https://www.epa.gov/clean-air-act-overview/title-iv-noise-pollution' },
+      { id: 's2', title: 'EPA Noise Control Act Regulatory Summary', url: 'https://www.epa.gov/laws-regulations/summary-noise-control-act' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'Monitored But Hidden', level: 1 },
@@ -480,9 +481,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 45,
     },
     sources: [
-      { id: 's1', title: 'US PIRG Agricultural Right to Repair Investigation', url: 'https://example.org/right-to-repair-ag-report' },
-      { id: 's2', title: 'State Senate Agriculture Committee Bill 204 Hearing Minutes', url: 'https://example.org/ag-repair-bill-204' },
-      { id: 's3', title: 'American Farm Bureau Federation Equipment Repair Memorandum', url: 'https://example.org/fb-repair-mou' },
+      { id: 's1', title: 'Department of Justice Antitrust Policy on Repair Restrictions', url: 'https://www.justice.gov/atr' },
+      { id: 's2', title: 'NIST Manufacturing Extension Partnership AgTech Resources', url: 'https://www.nist.gov/mep' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'Held Hostage During Harvest', level: 1 },
@@ -530,8 +530,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 20,
     },
     sources: [
-      { id: 's1', title: 'City Municipal Shelter Operating Agreement 1998 Clause 3', url: 'https://example.org/shelter-agreement-1998' },
-      { id: 's2', title: 'EMS Cold Exposure Response Call Log Winter 2024-2025', url: 'https://example.org/ems-cold-calls' },
+      { id: 's1', title: 'NLM MedlinePlus Hypothermia and Cold Exposure Guide', url: 'https://medlineplus.gov/hypothermia.html' },
+      { id: 's2', title: 'National Weather Service Winter Weather & Extreme Cold Safety', url: 'https://www.weather.gov/safety/cold' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'The 7am Disconnect', level: 1 },
@@ -587,8 +587,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 21,
     },
     sources: [
-      { id: 's1', title: 'City DOT Cedar Avenue Speed & Traffic Volume Survey', url: 'https://example.org/dot-traffic-cedar' },
-      { id: 's2', title: 'City Council Resolution Approving Signal Installation', url: 'https://example.org/council-res-crossing' },
+      { id: 's1', title: 'Federal Highway Administration Pedestrian and Bicycle Safety', url: 'https://www.fhwa.dot.gov/environment/bicycle_pedestrian/' },
+      { id: 's2', title: 'Federal Highway Administration Environmental Review Policy', url: 'https://www.fhwa.dot.gov/environment/' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'From Hazard to Completed Crosswalk', level: 1 },
@@ -647,8 +647,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'State Historic Preservation Office Art Deco Survey', url: 'https://example.org/odeon-historic-survey' },
-      { id: 's2', title: 'Regional Cultural Development Matching Grant Rules', url: 'https://example.org/arts-grant-matching' },
+      { id: 's1', title: 'National Park Service Historic Preservation Fund Guidelines', url: 'https://www.nps.gov/subjects/historicpreservation/index.htm' },
+      { id: 's2', title: 'National Endowment for the Arts Grants & Guidelines', url: 'https://www.arts.gov/grants' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'A Stage for the Whole Community', level: 1 },
@@ -694,8 +694,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 45,
     },
     sources: [
-      { id: 's1', title: 'Public Utility Commission Community Solar Tariff Order', url: 'https://example.org/puc-solar-order' },
-      { id: 's2', title: 'GreenGrid Co-op Annual Clean Generation Audit', url: 'https://example.org/greengrid-audit' },
+      { id: 's1', title: 'Department of Energy National Community Solar Partnership', url: 'https://www.energy.gov/communitysolar/community-solar' },
+      { id: 's2', title: 'DOE Solar Energy Technologies Office Research', url: 'https://www.energy.gov/eere/solar/solar-energy-technologies-office' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'Solar Without a Rooftop', level: 1 },
@@ -750,8 +750,8 @@ export const seedCampaigns: Campaign[] = [
       durationDays: 30,
     },
     sources: [
-      { id: 's1', title: 'Regional Employment Shift Study 2014-2024', url: 'https://example.org/metro-jobs-shift' },
-      { id: 's2', title: 'Transit Authority Draft System Redesign 2025', url: 'https://example.org/transit-redesign-draft' },
+      { id: 's1', title: 'EPA Smart Growth and Transportation Planning Strategies', url: 'https://www.epa.gov/smartgrowth' },
+      { id: 's2', title: 'Alternative Fuels Data Center Public Fleet & Transit Redesign', url: 'https://afdc.energy.gov/' },
     ],
     storyBlocks: [
       { type: 'heading', text: 'A Map Designed for Yesterday', level: 1 },
