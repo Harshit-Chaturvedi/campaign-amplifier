@@ -254,6 +254,8 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
             return (
               <TouchableOpacity
                 key={t.key}
+                accessibilityRole="tab"
+                accessibilityLabel={`${t.label} tab`}
                 onPress={() => setActiveTab(t.key)}
                 style={{
                   paddingHorizontal: 12,

@@ -400,6 +400,38 @@ If time is short, **cut in this order:** comments → image generation → push 
   - `pytest -v backend/tests`: 21/21 passed.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
+### Phase 8.5 — Automated Browser End-to-End QA (Playwright)
+- **Local Test Isolation & Setup:**
+  - Local SQLite backend (`DATABASE_URL=sqlite:///./e2e.db`, `JWT_SECRET=localtest`, `CORS_ORIGINS=*`) running on port 8000.
+  - Mobile web export build (`EXPO_PUBLIC_API_URL=http://127.0.0.1:8000/api/v1`) served via single-page server on port 8081.
+  - Dev-only Playwright test suite in `e2e/` configured for Chromium across `412x915` (Pixel 7) and `360x740` (Compact Android) viewports.
+- **Automated Test Suites Executed (18/18 Passing):**
+  - **Smoke Test (`smoke.spec.ts`):** Verified home screen render, masthead typography, and seed campaign list across viewports.
+  - **Scenario A: Guest Flow (`guest_flow.spec.ts`):** Search, sort, filter, campaign inspection, preset & custom backing, platform fee review (2.9% + $0.30 gateway fee), checkout state simulation (Pending, Failed, Cancelled, Succeeded), and digital receipt with private backer identity.
+  - **Scenario B: Creator Flow (`creator_flow.spec.ts`):** Creator login, manual draft creation via `POST /drafts`, step-by-step drafting (Steps 1–5), live reach calculation, debounced autosave (`PATCH /drafts/:id`), status indicator, mid-flow reload resume, and submission for moderation.
+  - **Scenario C: Admin Lifecycle (`admin_lifecycle.spec.ts`):** Admin review queue login, editorial inspection and approval, creator Activity notification verification, full goal completion, ad distribution launch, and delivery report accounting (`MEASURED (DEMO DATA)` vs `ESTIMATE`).
+  - **Scenarios D & E: Creator Dashboard & Guest Profile (`dashboard_profile.spec.ts`):** Creator dashboard showing strictly user-owned campaigns across tabs (Funding, Review, Promoting, Completed, Action Needed, Drafts) with valid cover images, and Guest profile verifying sign-in prompt, zero fake seed contributions for new guests, and non-dead navigation across all 9 Info policy pages.
+  - **Scenarios F, G, H: Offline Resilience, Layout & Console Cleanliness (`offline_and_responsive.spec.ts`):** Browser offline mode handling (non-intrusive banner, cached campaign browsing, clean offline submit rejection), responsive layout verification (no horizontal scroll, min 44px touch targets, visible tab bar labels), and zero console errors/React key warnings.
+- **Captured Artifacts & Screenshots (`docs/qa/`):**
+  - `A_guest_checkout.png` (73.5 KB): Step 2 fee review with payment processing breakdown ($25 + $1.03 fee).
+  - `A_guest_receipt.png` (68.7 KB): Succeeded receipt modal with private backer badge and receipt reference.
+  - `B_creator_step5.png` (62.6 KB): Funding goal input ($5,000) with live reach calculation and policy confirmation checkboxes.
+  - `B_creator_submitted.png` (74.2 KB): Submission confirmation with audit status.
+  - `C_admin_approved.png` (50.6 KB): Admin moderation console approval of submitted campaign.
+  - `C_delivered_report.png` (88.4 KB): Transparent distribution report displaying `MEASURED (DEMO DATA)` vs `ESTIMATE`.
+  - `D_creator_dashboard.png` (101.3 KB): Creator dashboard showing user-owned campaigns and status tab options.
+  - `E_guest_profile.png` (63.6 KB): Clean guest profile with sign-in callout and empty backer history.
+  - `G_pixel_home.png` (59.9 KB): Home screen rendered at 412×915 viewport.
+  - `G_small_home.png` (59.9 KB): Home screen rendered at 360×740 compact viewport.
+- **Documentation:**
+  - `e2e/README.md` with complete local replication commands.
+- **Full QA Verification Status:**
+  - `npx playwright test`: 18/18 passed (2.8m).
+  - `pytest -v backend/tests`: 21/21 passed.
+  - `npx tsc --noEmit`: 0 errors.
+  - `npx expo-doctor`: 20/20 passed.
+  - `npm test` (mobile): 12/12 passed.
+
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)
 
 The repo was built from the website concept, **before** the brief, so several parts contradict graded requirements. Fix these first.

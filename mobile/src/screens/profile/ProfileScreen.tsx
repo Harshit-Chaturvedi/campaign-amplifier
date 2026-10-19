@@ -42,9 +42,16 @@ export function ProfileScreen({ navigation }: any) {
 
   // Contributions for this user/device
   const myContributions = useMemo(() => {
-    return user
-      ? contributions.filter((c) => c.userId === user.uid || c.userId === 'demo-user')
-      : contributions.slice(0, 3); // Show local prototype contributions for guest
+    if (user) {
+      return contributions.filter((c) => c.userId === user.uid || (user.email && c.guestEmail === user.email));
+    }
+    // Guest: only show contributions made by guest on this device/session (exclude seed demo data)
+    return contributions.filter(
+      (c) =>
+        !c.userId &&
+        Boolean(c.guestEmail) &&
+        !['con-1', 'con-2', 'con-3', 'con-4', 'con-5'].includes(c.id)
+    );
   }, [contributions, user]);
 
   // Saved campaigns from preferences store
@@ -189,40 +196,46 @@ export function ProfileScreen({ navigation }: any) {
           </Card>
         )}
 
-        {/* 2. Created Campaigns & Creator Dashboard Shortcut */}
-        <Card style={{ marginBottom: 16 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-            <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
-              Created Campaigns & Drafts
+        {/* 2. Created Campaigns & Creator Dashboard Shortcut - Authenticated Only */}
+        {user ? (
+          <Card style={{ marginBottom: 16 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+                Created Campaigns & Drafts
+              </Text>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Open creator dashboard"
+                onPress={() => navigation.navigate('CreatorDashboard')}
+              >
+                <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.accent }}>Dashboard →</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 12 }}>
+              Manage in-progress drafts, monitor moderation review feedback, and view delivery reports.
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('CreatorDashboard')}>
-              <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.accent }}>Dashboard →</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginBottom: 12 }}>
-            Manage in-progress drafts, monitor moderation review feedback, and view delivery reports.
-          </Text>
 
-          {/* Newspaper Stat Heroes */}
-          <View style={{ flexDirection: 'row', gap: 10 }}>
-            <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
-              <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.ink }}>{drafts.length}</Text>
-              <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Local Drafts</Text>
+            {/* Newspaper Stat Heroes */}
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+                <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.ink }}>{drafts.length}</Text>
+                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Local Drafts</Text>
+              </View>
+              <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+                <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.accent }}>
+                  {storeCampaigns.filter((c) => (c.creatorId === user.uid || (c as any).created_by === user.uid) && c.status === 'submitted').length}
+                </Text>
+                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>In Review</Text>
+              </View>
+              <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+                <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.positive }}>
+                  {storeCampaigns.filter((c) => (c.creatorId === user.uid || (c as any).created_by === user.uid) && ['available_for_funding', 'goal_reached'].includes(c.status)).length}
+                </Text>
+                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Published</Text>
+              </View>
             </View>
-            <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
-              <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.accent }}>
-                {storeCampaigns.filter((c) => c.status === 'submitted').length}
-              </Text>
-              <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>In Review</Text>
-            </View>
-            <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
-              <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.positive }}>
-                {storeCampaigns.filter((c) => ['available_for_funding', 'goal_reached'].includes(c.status)).length}
-              </Text>
-              <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Published</Text>
-            </View>
-          </View>
-        </Card>
+          </Card>
+        ) : null}
 
         {/* 3. Backed Campaigns */}
         <Card style={{ marginBottom: 16 }}>
@@ -230,7 +243,7 @@ export function ProfileScreen({ navigation }: any) {
             <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
               Backed Campaigns
             </Text>
-            <DemoDataBadge size="sm" />
+            {user ? <DemoDataBadge size="sm" /> : null}
           </View>
 
           {myContributions.length > 0 ? (
@@ -326,36 +339,44 @@ export function ProfileScreen({ navigation }: any) {
             Receipts for payments originating from this account or session.
           </Text>
 
-          {myContributions.map((c, i) => (
-            <TouchableOpacity
-              key={c.id || i}
-              onPress={() => setActiveReceipt(c)}
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingVertical: 10,
-                borderBottomWidth: i < myContributions.length - 1 ? 1 : 0,
-                borderBottomColor: colors.border,
-              }}
-            >
-              <View>
-                <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
-                  {formatCurrency(c.total || c.amount + 1.75)}
-                </Text>
-                <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 1 }}>
-                  {c.receiptNo || `REC-2026-${1000 + i}`} • {formatDate(c.createdAt)}
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <View style={{ backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 6, paddingVertical: 2, borderRadius: tokens.radii.xs }}>
-                  <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.positive }}>Succeeded</Text>
+          {myContributions.length > 0 ? (
+            myContributions.map((c, i) => (
+              <TouchableOpacity
+                key={c.id || i}
+                onPress={() => setActiveReceipt(c)}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  paddingVertical: 10,
+                  borderBottomWidth: i < myContributions.length - 1 ? 1 : 0,
+                  borderBottomColor: colors.border,
+                }}
+              >
+                <View>
+                  <Text style={{ fontSize: 14, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+                    {formatCurrency(c.total || c.amount + 1.75)}
+                  </Text>
+                  <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 1 }}>
+                    {c.receiptNo || `REC-2026-${1000 + i}`} • {formatDate(c.createdAt)}
+                  </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={14} color={colors.inkMuted} />
-              </View>
-            </TouchableOpacity>
-          ))}
+
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <View style={{ backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 6, paddingVertical: 2, borderRadius: tokens.radii.xs }}>
+                    <Text style={{ fontSize: 10, fontFamily: fonts.sansBold, color: colors.positive }}>Succeeded</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={14} color={colors.inkMuted} />
+                </View>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <View style={{ paddingVertical: 12, alignItems: 'center' }}>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkMuted }}>
+                No transaction receipts for this device yet.
+              </Text>
+            </View>
+          )}
         </Card>
 
         {/* 6. Help & About Directory (Info Pages) */}

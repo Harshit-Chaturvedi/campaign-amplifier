@@ -37,7 +37,7 @@ export const INFO_PAGES: Record<string, InfoPageContent> = {
     category: 'Platform Purpose',
     lastUpdated: 'October 2026',
     summary:
-      'Campaign Amplifier is a civic message distribution platform. We pool micro-contributions from community members to run targeted digital ads that bring checkable messages in front of decision makers and affected residents.',
+      'Campaign Amplifier is a civic message distribution platform. We pool micro-contributions from community members to run targeted digital ads that bring documented messages in front of decision makers and affected residents.',
     sections: [
       {
         heading: 'What We Do',
@@ -53,7 +53,7 @@ export const INFO_PAGES: Record<string, InfoPageContent> = {
       {
         heading: 'Core Principles',
         bullets: [
-          'Traceable Evidence: Every campaign must cite documented public records or checkable data sources.',
+          'Traceable Evidence: Every campaign must cite documented public records or primary data sources.',
           'Transparent Economics: Backers see exactly how contributions are split between ad spend (95%) and platform operations (5%).',
           'Privacy by Default: Backer identities and guest emails are kept private by default.',
           'Review Before Delivery: Reaching the funding goal does NOT start ads automatically; editorial and compliance review takes place before live distribution.',
@@ -200,7 +200,7 @@ export const INFO_PAGES: Record<string, InfoPageContent> = {
       {
         heading: '1. Platform Purpose & Scope',
         paragraphs: [
-          'Campaign Amplifier facilitates the pooling of funds for digital advertising distribution. Users agree that all campaigns must present checkable claims supported by cited sources.',
+          'Campaign Amplifier facilitates the pooling of funds for digital advertising distribution. Users agree that all campaigns must present documented claims supported by cited sources.',
         ],
       },
       {

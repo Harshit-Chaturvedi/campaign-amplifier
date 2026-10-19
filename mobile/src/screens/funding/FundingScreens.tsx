@@ -305,7 +305,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 Campaign Distribution Specs:
               </Text>
               <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 18 }}>
-                • Visible Sources: {campaign.sources?.length || 2} citations checkable by backers.
+                • Visible Sources: {campaign.sources?.length || 2} citations listed by the creator.
               </Text>
               <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 18 }}>
                 • Distribution split: 95% goes directly to targeted ad platforms (Meta, Instagram, Reddit).
@@ -603,7 +603,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 Unspent Funds & Allocation Policy:
               </Text>
               <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkSecondary, lineHeight: 16 }}>
-                Contributions purchase advertising distribution to spread checkable civic information. If a campaign is cancelled or fails to launch, all unspent funds are refunded. Reaching 100% of the funding goal does NOT start ads immediately; platform review finalizes targeting and creative setup first.
+                Contributions purchase advertising distribution to spread documented civic information. If a campaign is cancelled or fails to launch, all unspent funds are refunded. Reaching 100% of the funding goal does NOT start ads immediately; platform review finalizes targeting and creative setup first.
               </Text>
             </Card>
           </View>
@@ -1128,7 +1128,7 @@ export function ThankYouScreen({ route, navigation }: any) {
           </Text>
 
           <Text style={{ fontSize: 14, fontFamily: fonts.sansRegular, color: colors.inkSecondary, textAlign: 'center', marginTop: 8, lineHeight: 21, paddingHorizontal: 10 }}>
-            Your contribution of <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>{formatCurrency(amount)}</Text> pools to fund targeted digital advertising for this checkable message.
+            Your contribution of <Text style={{ fontFamily: fonts.sansSemiBold, color: colors.ink }}>{formatCurrency(amount)}</Text> pools to fund targeted digital advertising for this campaign message.
           </Text>
 
           {/* Animated Hero Numbers - Newspaper Graphic (Requirement 6) */}

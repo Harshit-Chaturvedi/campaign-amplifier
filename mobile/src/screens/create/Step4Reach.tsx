@@ -714,7 +714,7 @@ export function Step4Reach({ draft, onChange }: Step4ReachProps) {
                 {draft.headline || draft.title || 'Campaign Title'}
               </Text>
               <BodyText style={{ fontSize: 12, color: colors.mutedInk, marginTop: 4 }} numberOfLines={2}>
-                {draft.adDescription || draft.summary || 'Summary and checkable facts for the public.'}
+                {draft.adDescription || draft.summary || 'Summary and documented facts for the public.'}
               </BodyText>
             </View>
 

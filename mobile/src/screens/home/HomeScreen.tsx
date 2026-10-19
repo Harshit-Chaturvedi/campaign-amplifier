@@ -211,7 +211,7 @@ export function HomeScreen({ navigation }: any) {
               lineHeight: 21,
             }}
           >
-            Contributions pool to pay for digital advertising that spreads checkable messages to audiences and decision-makers.
+            Contributions pool to pay for digital advertising that spreads documented messages to audiences and decision-makers.
           </Text>
 
           {/* Newspaper Graphic Hero Numbers Box */}
@@ -330,17 +330,17 @@ export function HomeScreen({ navigation }: any) {
               {
                 num: '01',
                 title: 'Draft',
-                desc: 'Write the message, link checkable sources, and set an audience.',
+                desc: 'Write the message, link public sources, and set an audience.',
               },
               {
                 num: '02',
                 title: 'Review',
-                desc: 'Claims and creative are checked before funding opens.',
+                desc: 'Claims and sources undergo editorial review before funding.',
               },
               {
                 num: '03',
                 title: 'Amplify',
-                desc: 'Backers pool funds to pay for verified digital ads.',
+                desc: 'Backers pool funds to pay for targeted digital ads.',
               },
             ].map((card) => (
               <View
@@ -466,7 +466,7 @@ export function HomeScreen({ navigation }: any) {
                 paddingHorizontal: 20,
               }}
             >
-              Civic message distribution infrastructure. Micro-contributions pool to fund digital ads for checkable messages.
+              Civic message distribution infrastructure. Micro-contributions pool to fund digital ads for community-backed messages.
             </Text>
 
             <View

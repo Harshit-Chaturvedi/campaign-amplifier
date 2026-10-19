@@ -381,7 +381,7 @@ export function VoiceDraftScreen({ navigation }: any) {
         {
           id: `blk-${generateId()}`,
           type: 'paragraph',
-          text: answers[3] || 'Every resident deserves checkable facts. Targeted digital reach ensures this message reaches decision makers and affected families.',
+          text: answers[3] || 'Every resident deserves access to documented facts. Targeted digital reach ensures this message reaches decision makers and affected families.',
         },
         {
           id: `blk-${generateId()}`,

@@ -3,6 +3,10 @@ node_modules/
 .expo/
 dist/
 web-build/
+e2e-dist/
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/
 
 # Python
 __pycache__/

@@ -95,7 +95,7 @@ async def generate_draft_with_gemini(text: str) -> AIDraftResponse:
 
     prompt = f"""
 You are an expert campaign messaging strategist for an advertising amplification platform.
-The user wants to run a digital advertising campaign to spread a checkable message.
+The user wants to run a digital advertising campaign to spread a documented message.
 Note: DO NOT generate a funding goal under any circumstances.
 CRITICAL SOURCES RULE: Never invent or hallucinate sources or URLs. "suggested_sources" may contain ONLY valid URLs that the user explicitly typed or spoke in the text below. If no URLs were given by the user, return an empty array [] for "suggested_sources".
 
