@@ -68,8 +68,8 @@ export function CreateLandingScreen({ navigation }: any) {
         creator_name: user?.name || 'Campaign Organizer',
       });
 
-      if (!res.draft || !res.draft.id || res.isOffline) {
-        Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+      if (!res.draft || !res.draft.id) {
+        Alert.alert('Server Error', 'Failed to create campaign draft. Please try again.');
         return;
       }
 
@@ -83,8 +83,29 @@ export function CreateLandingScreen({ navigation }: any) {
       });
       setActiveDraft(newId);
       navigation.navigate('CreateFlow', { draftId: newId, step: 1 });
-    } catch {
-      Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+    } catch (err: any) {
+      if (err.status === 401 || err.isAuthError) {
+        Alert.alert(
+          'Sign in required',
+          'Please sign in again to create a draft.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Sign In', onPress: () => navigation.navigate('Login', { message: 'Please sign in again' }) },
+          ]
+        );
+      } else if (
+        err.isTimeout ||
+        err.isNetworkError ||
+        err.name === 'AbortError' ||
+        err.message?.includes('fetch') ||
+        err.message?.includes('Network') ||
+        err.message?.includes('timed out') ||
+        err.message?.includes('reach')
+      ) {
+        Alert.alert('Connection Error', "Can't reach the server. Retry.");
+      } else {
+        Alert.alert('Creation Error', err.detail || err.message || 'Server error occurred. Please try again.');
+      }
     } finally {
       setIsStartingManual(false);
     }
@@ -199,9 +220,29 @@ export function CreateLandingScreen({ navigation }: any) {
         )}
 
         {/* Section: Start New Campaign */}
-        <SmallCapsLabel style={{ fontSize: 12, color: colors.ink, marginBottom: 10 }}>
+        <SmallCapsLabel style={{ fontSize: 12, color: colors.ink, marginBottom: 8 }}>
           START A NEW CAMPAIGN
         </SmallCapsLabel>
+
+        {/* Reassuring banner */}
+        <View
+          style={{
+            backgroundColor: colors.paperSecondary,
+            borderWidth: 1,
+            borderColor: colors.hairline,
+            borderRadius: tokens.radius.sm,
+            paddingVertical: 10,
+            paddingHorizontal: 12,
+            marginBottom: 12,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <Ionicons name="cloud-done-outline" size={16} color={colors.accent} style={{ marginRight: 8 }} />
+          <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.mutedInk, flex: 1, lineHeight: 18 }}>
+            Your draft is saved to your account as you go, so you can leave and come back.
+          </Text>
+        </View>
 
         <View style={{ flexDirection: 'column', gap: 10, marginBottom: tokens.spacing.xl }}>
           {/* Card 1: Create Manually */}

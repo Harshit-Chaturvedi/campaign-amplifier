@@ -329,15 +329,35 @@ export function VoiceDraftScreen({ navigation }: any) {
         creator_name: user?.name || 'Campaign Organizer',
         summary: aiResult.summary,
       });
-      if (createRes.draft && createRes.draft.id && !createRes.isOffline) {
+      if (createRes.draft && createRes.draft.id) {
         serverId = createRes.draft.id;
       }
-    } catch {
-      // Handled below
+    } catch (err: any) {
+      if (err.status === 401 || err.isAuthError) {
+        Alert.alert('Sign in required', 'Please sign in again to create a draft.', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => navigation.navigate('Login', { message: 'Please sign in again' }) },
+        ]);
+        return;
+      } else if (
+        err.isTimeout ||
+        err.isNetworkError ||
+        err.name === 'AbortError' ||
+        err.message?.includes('fetch') ||
+        err.message?.includes('Network') ||
+        err.message?.includes('timed out') ||
+        err.message?.includes('reach')
+      ) {
+        Alert.alert('Connection Error', "Can't reach the server. Retry.");
+        return;
+      } else {
+        Alert.alert('Creation Error', err.detail || err.message || 'Server error occurred. Please try again.');
+        return;
+      }
     }
 
     if (!serverId) {
-      Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+      Alert.alert('Creation Error', 'Could not create campaign draft on the server. Please try again.');
       return;
     }
 
@@ -508,8 +528,8 @@ export function VoiceDraftScreen({ navigation }: any) {
         category: 'community',
         creator_name: user?.name || 'Campaign Organizer',
       });
-      if (!res.draft || !res.draft.id || res.isOffline) {
-        Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+      if (!res.draft || !res.draft.id) {
+        Alert.alert('Server Error', 'Failed to initialize draft. Please try again.');
         return;
       }
       const draftId = res.draft.id;
@@ -535,8 +555,25 @@ export function VoiceDraftScreen({ navigation }: any) {
       });
       setActiveDraft(draftId);
       navigation.replace('CreateFlow', { draftId, step: 1 });
-    } catch {
-      Alert.alert('Connection Error', 'Could not reach the server. Check your connection and try again.');
+    } catch (err: any) {
+      if (err.status === 401 || err.isAuthError) {
+        Alert.alert('Sign in required', 'Please sign in again to create a draft.', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Sign In', onPress: () => navigation.navigate('Login', { message: 'Please sign in again' }) },
+        ]);
+      } else if (
+        err.isTimeout ||
+        err.isNetworkError ||
+        err.name === 'AbortError' ||
+        err.message?.includes('fetch') ||
+        err.message?.includes('Network') ||
+        err.message?.includes('timed out') ||
+        err.message?.includes('reach')
+      ) {
+        Alert.alert('Connection Error', "Can't reach the server. Retry.");
+      } else {
+        Alert.alert('Creation Error', err.detail || err.message || 'Server error occurred. Please try again.');
+      }
     }
   };
 

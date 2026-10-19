@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StatusBar, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StatusBar, KeyboardAvoidingView, Platform, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Button } from '../../components/ui/Button';
@@ -15,44 +15,70 @@ import {
 import { apiClient } from '../../api/client';
 import { colors, fonts, tokens } from '../../theme/tokens';
 
-export function LoginScreen({ navigation }: any) {
+export function LoginScreen({ navigation, route }: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [wakingServer, setWakingServer] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const bannerMessage = route?.params?.message || null;
   const login = useAuthStore((s) => s.login);
-  const loginAsDemo = useAuthStore((s) => s.loginAsDemo);
 
   const handleLogin = async (userEmail: string, pass: string) => {
     setLoading(true);
+    setErrorMessage(null);
     try {
       const res = await apiClient.login(userEmail, pass || 'demo123');
-      login(userEmail, pass, res.token);
-    } catch {
-      login(userEmail, pass);
-    } finally {
-      setLoading(false);
+      login(res.user, res.token);
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
         navigation.navigate('Main');
       }
+    } catch (err: any) {
+      setErrorMessage(err.detail || err.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDemo = async () => {
     setLoading(true);
+    setWakingServer(true);
+    setErrorMessage(null);
+
+    let succeeded = false;
+
+    // Attempt 1
     try {
       const res = await apiClient.login('creator@demo.org', 'demo123');
-      login('creator@demo.org', 'demo123', res.token);
+      login(res.user, res.token);
+      succeeded = true;
     } catch {
-      loginAsDemo();
-    } finally {
-      setLoading(false);
+      // Attempt 2 (one retry with brief backoff for cold starts)
+      try {
+        await new Promise((r) => setTimeout(r, 1500));
+        const res = await apiClient.login('creator@demo.org', 'demo123');
+        login(res.user, res.token);
+        succeeded = true;
+      } catch {
+        succeeded = false;
+      }
+    }
+
+    setLoading(false);
+    setWakingServer(false);
+
+    if (succeeded) {
       if (navigation.canGoBack()) {
         navigation.goBack();
       } else {
         navigation.navigate('Main');
       }
+    } else {
+      setErrorMessage("Couldn't sign in, try again");
+      Alert.alert("Sign In Failed", "Couldn't sign in, try again");
     }
   };
 
@@ -114,6 +140,66 @@ export function LoginScreen({ navigation }: any) {
           </MetaLabel>
         </View>
 
+        {/* 401 Session Expired or Redirect Banner */}
+        {bannerMessage && (
+          <View
+            style={{
+              backgroundColor: colors.warningFaint || '#FFFBEB',
+              borderWidth: 1,
+              borderColor: colors.warning,
+              borderRadius: tokens.radius.sm,
+              padding: 12,
+              marginBottom: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
+            <Ionicons name="alert-circle-outline" size={18} color={colors.warning} style={{ marginRight: 8 }} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.warning, flex: 1 }}>
+              {bannerMessage}
+            </Text>
+          </View>
+        )}
+
+        {/* Server waking up indicator */}
+        {wakingServer && (
+          <View
+            style={{
+              backgroundColor: colors.paperSecondary,
+              borderWidth: 1,
+              borderColor: colors.accent,
+              borderRadius: tokens.radius.sm,
+              padding: 12,
+              marginBottom: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
+            <ActivityIndicator size="small" color={colors.accent} style={{ marginRight: 10 }} />
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.accent }}>
+              Waking the server…
+            </Text>
+          </View>
+        )}
+
+        {/* Error message */}
+        {errorMessage && !wakingServer && (
+          <View
+            style={{
+              backgroundColor: colors.dangerFaint,
+              borderWidth: 1,
+              borderColor: colors.danger,
+              borderRadius: tokens.radius.sm,
+              padding: 12,
+              marginBottom: 16,
+            }}
+          >
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.danger }}>
+              {errorMessage}
+            </Text>
+          </View>
+        )}
+
         <Input
           label="Email"
           value={email}
@@ -138,16 +224,17 @@ export function LoginScreen({ navigation }: any) {
             onPress={() => handleLogin(email || 'demo@example.com', password)}
             fullWidth
             size="lg"
-            loading={loading}
+            loading={loading && !wakingServer}
           />
         </View>
 
         <View style={{ marginTop: 12 }}>
           <Button
-            title="Continue as Demo User"
+            title={wakingServer ? 'Waking the server…' : 'Continue as Demo User'}
             onPress={handleDemo}
             variant="secondary"
-            icon="flash-outline"
+            icon={wakingServer ? undefined : 'flash-outline'}
+            loading={wakingServer}
             fullWidth
           />
         </View>
@@ -171,14 +258,34 @@ export function RegisterScreen({ navigation }: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const register = useAuthStore((s) => s.register);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleRegister = () => {
-    register(name || 'Demo User', email || 'demo@example.com', password);
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('Main');
+  const login = useAuthStore((s) => s.login);
+
+  const handleRegister = async () => {
+    if (!email.trim() || !password.trim()) {
+      setErrorMessage('Please provide both an email and password.');
+      return;
+    }
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await apiClient.register(
+        name.trim() || 'Demo User',
+        email.trim(),
+        password
+      );
+      login(res.user, res.token);
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate('Main');
+      }
+    } catch (err: any) {
+      setErrorMessage(err.detail || err.message || 'Registration failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -226,6 +333,23 @@ export function RegisterScreen({ navigation }: any) {
           </MetaLabel>
         </View>
 
+        {errorMessage && (
+          <View
+            style={{
+              backgroundColor: colors.dangerFaint,
+              borderWidth: 1,
+              borderColor: colors.danger,
+              borderRadius: tokens.radius.sm,
+              padding: 12,
+              marginBottom: 16,
+            }}
+          >
+            <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.danger }}>
+              {errorMessage}
+            </Text>
+          </View>
+        )}
+
         <Input
           label="Full Name"
           value={name}
@@ -252,7 +376,13 @@ export function RegisterScreen({ navigation }: any) {
         />
 
         <View style={{ marginTop: 8 }}>
-          <Button title="Create Account" onPress={handleRegister} fullWidth size="lg" />
+          <Button
+            title="Create Account"
+            onPress={handleRegister}
+            fullWidth
+            size="lg"
+            loading={loading}
+          />
         </View>
 
         <TouchableOpacity

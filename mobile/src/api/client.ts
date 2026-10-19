@@ -15,6 +15,7 @@ import { seedCampaigns } from '../data/seedData';
 import { useAuthStore } from '../store/useAuthStore';
 import { useDraftStore } from '../store/useDraftStore';
 import { calculateBackerFee } from '../services/reach';
+import { navigateToLogin } from '../navigation/navigationRef';
 
 interface ServerStatusState {
   isWakingUp: boolean;
@@ -197,6 +198,10 @@ async function fetchWithTimeout(
           signal: controller.signal,
         });
         clearTimeout(id);
+        if (response.status === 401) {
+          useAuthStore.getState().logout();
+          navigateToLogin('Please sign in again');
+        }
         return response;
       } catch (err: any) {
         clearTimeout(id);
@@ -372,10 +377,15 @@ export const apiClient = {
   }): Promise<{ draft: any; isOffline: boolean }> {
     try {
       const url = `${API_BASE_URL}/drafts`;
-      const res = await fetchWithTimeout(url, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
+      const res = await fetchWithTimeout(
+        url,
+        {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        },
+        20000, // 20s first request timeout
+        0
+      );
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
         const detail = errJson.detail || `Server returned ${res.status}`;
@@ -383,15 +393,24 @@ export const apiClient = {
         err.status = res.status;
         err.detail = detail;
         err.isHttpError = true;
+        if (res.status === 401) {
+          err.isAuthError = true;
+        }
         throw err;
       }
       const data = await res.json();
       return { draft: data, isOffline: false };
     } catch (err: any) {
-      if (err.isHttpError || err.status || (err.message && !err.message.includes('fetch') && !err.message.includes('Network') && !err.message.includes('Failed to fetch') && !err.message.includes('timed out') && !err.message.includes('abort'))) {
+      if (err.isAuthError || err.status === 401) {
         throw err;
       }
-      return { draft: null, isOffline: true };
+      if (err.isHttpError || err.status) {
+        throw err;
+      }
+      const netErr: any = new Error("Can't reach the server. Retry.");
+      netErr.isTimeout = true;
+      netErr.isNetworkError = true;
+      throw netErr;
     }
   },
 
@@ -670,35 +689,41 @@ export const apiClient = {
     }
   },
 
-  async login(email: string, password = 'demo123'): Promise<{ token: string; user: any; isOffline: boolean }> {
-    try {
-      const url = `${API_BASE_URL}/auth/login`;
-      const res = await fetchWithTimeout(url, {
-        method: 'POST',
-        body: JSON.stringify({ email: email.toLowerCase(), password }),
-      });
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson.detail || 'Login failed');
-      }
-      const data = await res.json();
-      return { token: data.access_token, user: data.user, isOffline: false };
-    } catch (err: any) {
-      if (err.message && !err.message.includes('fetch') && !err.message.includes('Network')) {
-        throw err;
-      }
-      return {
-        token: `demo-token-${email.split('@')[0]}`,
-        user: {
-          id: `user-${email.split('@')[0]}`,
-          email,
-          name: email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
-          username: email.split('@')[0].toLowerCase(),
-          role: 'user',
-        },
-        isOffline: true,
-      };
+  async register(name: string, email: string, password = 'demo123'): Promise<{ token: string; user: any; isOffline: boolean }> {
+    const url = `${API_BASE_URL}/auth/register`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      body: JSON.stringify({ name, email: email.toLowerCase(), password, role: 'user' }),
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      const detail = errJson.detail || `Registration failed (${res.status})`;
+      const err: any = new Error(detail);
+      err.status = res.status;
+      err.detail = detail;
+      throw err;
     }
+    const data = await res.json();
+    return { token: data.access_token, user: data.user, isOffline: false };
+  },
+
+  async login(email: string, password = 'demo123'): Promise<{ token: string; user: any; isOffline: boolean }> {
+    const url = `${API_BASE_URL}/auth/login`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      body: JSON.stringify({ email: email.toLowerCase(), password }),
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      const detail = errJson.detail || 'Invalid email or password';
+      const err: any = new Error(detail);
+      err.status = res.status;
+      err.detail = detail;
+      if (res.status === 401) err.isAuthError = true;
+      throw err;
+    }
+    const data = await res.json();
+    return { token: data.access_token, user: data.user, isOffline: false };
   },
 
   async createContribution(params: {

@@ -173,9 +173,11 @@ function MainTabs() {
   );
 }
 
+import { navigationRef } from './navigationRef';
+
 export function RootNavigator() {
   return (
-    <NavigationContainer theme={EditorialTheme}>
+    <NavigationContainer ref={navigationRef} theme={EditorialTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         <RootStack.Screen name="Main" component={MainTabs} />
         <RootStack.Group screenOptions={{ presentation: 'modal' }}>

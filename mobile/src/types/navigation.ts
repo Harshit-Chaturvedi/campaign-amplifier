@@ -1,11 +1,11 @@
 export type RootStackParamList = {
   Main: undefined;
-  Login: undefined;
+  Login: { message?: string } | undefined;
   Register: undefined;
 };
 
 export type AuthStackParamList = {
-  Login: undefined;
+  Login: { message?: string } | undefined;
   Register: undefined;
 };
 

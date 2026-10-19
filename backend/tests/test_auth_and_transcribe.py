@@ -173,3 +173,43 @@ def test_gemini_key_hygiene_and_leak_prevention(client, user_token, monkeypatch)
         assert test_key not in body_text, f"Response body leaked API key: {body_text}"
         assert "key=" not in body_text, f"Response body leaked URL key param: {body_text}"
         assert res.json()["detail"] == "Transcription service unavailable"
+
+
+def test_register_and_login(client):
+    # 1. Register a new user
+    reg_payload = {
+        "email": "newuser@example.com",
+        "name": "New User",
+        "password": "Password123!",
+        "role": "user"
+    }
+    res = client.post("/api/v1/auth/register", json=reg_payload)
+    assert res.status_code == 200, res.text
+    data = res.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+    assert data["user"]["email"] == "newuser@example.com"
+    assert data["user"]["name"] == "New User"
+    new_token = data["access_token"]
+
+    # 2. Duplicate registration should return 400
+    res_dup = client.post("/api/v1/auth/register", json=reg_payload)
+    assert res_dup.status_code == 400
+    assert "already exists" in res_dup.json()["detail"]
+
+    # 3. Login with the new user credentials
+    login_payload = {
+        "email": "newuser@example.com",
+        "password": "Password123!"
+    }
+    res_login = client.post("/api/v1/auth/login", json=login_payload)
+    assert res_login.status_code == 200, res_login.text
+    login_data = res_login.json()
+    assert "access_token" in login_data
+    assert login_data["user"]["email"] == "newuser@example.com"
+
+    # 4. Access protected endpoint /auth/me with new token
+    res_me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {login_data['access_token']}"})
+    assert res_me.status_code == 200
+    assert res_me.json()["email"] == "newuser@example.com"
+
