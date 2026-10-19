@@ -18,8 +18,10 @@ jest.mock('@expo/vector-icons', () => {
 import { CreateLandingScreen } from '../src/screens/create/CreateLandingScreen';
 import { ProfileScreen } from '../src/screens/profile/ProfileScreen';
 import { CreatorDashboardScreen } from '../src/screens/profile/CreatorDashboardScreen';
+import { ReportScreen } from '../src/screens/report/ReportScreen';
 import { useDraftStore, CampaignDraft } from '../src/store/useDraftStore';
 import { useAuthStore } from '../src/store/useAuthStore';
+import { useCampaignStore } from '../src/store/useCampaignStore';
 
 // Mock navigation
 const mockNavigation = {
@@ -198,6 +200,79 @@ describe('Render Stability and Selector Regression Suite', () => {
           tree = renderer.create(
             <CreatorDashboardScreen
               route={{ params: { initialTab: 'drafts' } }}
+              navigation={mockNavigation}
+            />
+          );
+        });
+      }).not.toThrow();
+
+      expect(tree).toBeDefined();
+      expect(tree!.toJSON()).toBeTruthy();
+    });
+  });
+
+  describe('ReportScreen', () => {
+    it('renders cleanly without infinite loops when contributions are empty', () => {
+      act(() => {
+        useCampaignStore.setState({ contributions: [] });
+      });
+
+      expect(() => {
+        act(() => {
+          tree = renderer.create(
+            <ReportScreen
+              route={{ params: { campaignId: 'cmp-clean-water' } }}
+              navigation={mockNavigation}
+            />
+          );
+        });
+      }).not.toThrow();
+
+      expect(tree).toBeDefined();
+      expect(tree!.toJSON()).toBeTruthy();
+    });
+
+    it('renders cleanly without infinite loops when campaign has multiple contributions', () => {
+      act(() => {
+        useCampaignStore.setState({
+          contributions: [
+            {
+              id: 'c-1',
+              campaignId: 'cmp-clean-water',
+              userId: 'u-1',
+              guestEmail: null,
+              amount: 50,
+              fee: 1.75,
+              total: 51.75,
+              status: 'succeeded',
+              backerName: 'Backer 1',
+              showName: true,
+              receiptNo: 'RCP-1',
+              createdAt: new Date().toISOString(),
+            },
+            {
+              id: 'c-2',
+              campaignId: 'cmp-clean-water',
+              userId: null,
+              guestEmail: 'g@example.com',
+              amount: 25,
+              fee: 1.03,
+              total: 26.03,
+              status: 'succeeded',
+              backerName: 'Anonymous',
+              showName: false,
+              receiptNo: 'RCP-2',
+              createdAt: new Date().toISOString(),
+            },
+          ],
+        });
+      });
+
+      expect(() => {
+        act(() => {
+          tree = renderer.create(
+            <ReportScreen
+              route={{ params: { campaignId: 'cmp-clean-water' } }}
               navigation={mockNavigation}
             />
           );
