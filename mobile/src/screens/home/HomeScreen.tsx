@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import { estimateReachPerDollar } from '../../services/reach';
 import { CampaignCardSkeleton } from '../../components/ui/Skeleton';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { Button } from '../../components/ui/Button';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { colors, fonts, tokens } from '../../theme/tokens';
 
 export function HomeScreen({ navigation }: any) {
@@ -34,6 +35,7 @@ export function HomeScreen({ navigation }: any) {
   const { data: featuredData } = useFeaturedCampaigns();
   const isServerWakingUp = useServerStatusStore((s) => s.isWakingUp);
   const [showNoticeModal, setShowNoticeModal] = useState(false);
+  const scrollViewRef = useRef<any>(null);
 
   const isOffline = Boolean(campaignsData?.isOffline);
   const campaigns = campaignsData?.items || [];
@@ -104,30 +106,11 @@ export function HomeScreen({ navigation }: any) {
         }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <View>
-            <Text
-              style={{
-                fontSize: 22,
-                fontFamily: fonts.sansBold,
-                color: colors.ink,
-                letterSpacing: -0.3,
-              }}
-            >
-              Campaign Amplifier
-            </Text>
-            <Text
-              style={{
-                fontSize: 10,
-                fontFamily: fonts.sansSemiBold,
-                color: colors.inkMuted,
-                letterSpacing: 0.8,
-                textTransform: 'uppercase',
-                marginTop: 2,
-              }}
-            >
-              Community-Funded Message Distribution
-            </Text>
-          </View>
+          <BrandLogo
+            size="md"
+            showWordmark={true}
+            onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}
+          />
           <TouchableOpacity
             onPress={() => navigation.navigate('ActivityTab')}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -194,6 +177,7 @@ export function HomeScreen({ navigation }: any) {
       </View>
 
       <ScrollView
+        ref={scrollViewRef}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={() => { refetch(); }} tintColor={colors.accent} />

@@ -17,6 +17,7 @@ import { CampaignCardSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { BottomSheet } from '../../components/ui/BottomSheet';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { colors, fonts, tokens } from '../../theme/tokens';
 import type { CampaignCategory } from '../../types/campaign';
 
@@ -133,9 +134,12 @@ export function ExploreScreen({ navigation }: any) {
         }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Text style={{ fontSize: 24, fontFamily: fonts.sansBold, color: colors.ink }}>
-            Explore
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <BrandLogo size="sm" showWordmark={false} />
+            <Text style={{ fontSize: 24, fontFamily: fonts.sansBold, color: colors.ink }}>
+              Explore
+            </Text>
+          </View>
           {isServerWakingUp ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceSecondary, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}>
               <ActivityIndicator size="small" color={colors.accent} style={{ marginRight: 6 }} />

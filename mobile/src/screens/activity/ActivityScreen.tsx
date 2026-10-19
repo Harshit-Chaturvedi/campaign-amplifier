@@ -16,6 +16,7 @@ import { Button } from '../../components/ui/Button';
 import { ActivitySkeleton } from '../../components/ui/Skeleton';
 import { timeAgo } from '../../utils/formatting';
 import { apiClient } from '../../api/client';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { colors, fonts, tokens } from '../../theme/tokens';
 
 type ActivityFilter = 'all' | 'funding' | 'updates' | 'following';
@@ -150,11 +151,14 @@ export function ActivityScreen({ navigation }: any) {
         }}
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <View>
-            <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink }}>Activity</Text>
-            <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
-              Campaign updates and distribution progress
-            </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <BrandLogo size="sm" showWordmark={false} />
+            <View>
+              <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink }}>Activity</Text>
+              <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}>
+                Campaign updates and distribution progress
+              </Text>
+            </View>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <DemoDataBadge size="sm" />

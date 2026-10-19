@@ -18,6 +18,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
+import { BrandLogo } from '../../components/ui/BrandLogo';
 import { colors, fonts, tokens } from '../../theme/tokens';
 
 export function ProfileScreen({ navigation }: any) {
@@ -77,9 +78,12 @@ export function ProfileScreen({ navigation }: any) {
           justifyContent: 'space-between',
         }}
       >
-        <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink }}>
-          Profile & Account
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <BrandLogo size="sm" showWordmark={false} />
+          <Text style={{ fontSize: 24, fontFamily: fonts.serifBold, color: colors.ink }}>
+            Profile & Account
+          </Text>
+        </View>
         <TouchableOpacity
           accessibilityRole="button"
           accessibilityLabel="Open settings modal"
