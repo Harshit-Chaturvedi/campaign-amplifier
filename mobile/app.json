@@ -9,7 +9,16 @@
     "plugins": [
       "expo-font",
       "expo-audio",
-      "expo-asset"
+      "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#EEF2FF",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain"
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
@@ -19,9 +28,9 @@
       "package": "com.campaigns.amplifier",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png",
-        "backgroundColor": "#4f46e5"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "monochromeImage": "./assets/adaptive-icon-monochrome.png",
+        "backgroundColor": "#EEF2FF"
       }
     },
     "web": {

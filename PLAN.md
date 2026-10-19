@@ -286,6 +286,28 @@ If time is short, **cut in this order:** comments → image generation → push 
     - `npx tsc --noEmit`: 0 TypeScript errors.
     - `npx expo-doctor`: 20/20 checks passed.
 - **Status:** All security hardening, API key hygiene, and honest transcription requirements verified and delivered.
+
+- **Brand Identity & Custom App Icon / Splash Screen (Sun 19 Oct, 09:15 IST):**
+  - **Original Brand Mark Design:** Designed an original brand mark in code representing message amplification (radiating sound waves / concentric amplification arcs emitting from a centered acoustic beacon) in the `#4F46E5` indigo brand family on an `#EEF2FF` soft canvas. Zero resemblance to donation jars, third-party logos, or commercial mascots.
+  - **Asset Generation Pipeline (`scripts/generate_brand_icons.py`):**
+    - High-precision vector SVG rendered via `resvg-py` and Pillow.
+    - `mobile/assets/icon.png`: 1024x1024, RGB (no alpha, square, no rounded corners) — 130,220 bytes.
+    - `mobile/assets/adaptive-icon.png`: 1024x1024, RGBA (transparent background, artwork strictly within the Android safe zone circle $r \le 338\text{px}$) — 42,902 bytes.
+    - `mobile/assets/adaptive-icon-monochrome.png`: 1024x1024, RGBA (flat monochrome silhouette for Android 13+ themed launchers) — 19,225 bytes.
+    - `mobile/assets/splash-icon.png`: 1024x1024, RGBA (clean centered brand mark) — 42,902 bytes.
+    - `mobile/assets/favicon.png`: 48x48, RGB — 2,193 bytes.
+    - `docs/icon-preview.png`: 1600x900, RGBA — 136,343 bytes (dual-theme presentation with circular and squircle adaptive launcher previews).
+  - **Expo SDK 58 Configuration in `mobile/app.json`:**
+    - App name set to `"Campaign Amplifier"`.
+    - Main icon set to `"./assets/icon.png"`.
+    - Android adaptive icon configured with `foregroundImage`, `monochromeImage`, and `backgroundColor: "#EEF2FF"`.
+    - Splash screen configured via the SDK 58 `expo-splash-screen` config plugin with `backgroundColor: "#EEF2FF"`, `image: "./assets/splash-icon.png"`, and `imageWidth: 200`.
+    - Web favicon set to `"./assets/favicon.png"`.
+  - **Verifications:**
+    - `npx tsc --noEmit`: 0 TypeScript errors.
+    - `npx expo-doctor`: 20/20 checks passed (clean config schema).
+    - `pytest -v backend/tests`: 20/20 tests passed.
+- **Status:** Brand identity, original icons, and splash assets fully delivered.
 Env: `DATABASE_URL`, `JWT_SECRET`, `GEMINI_API_KEY` (server only), `EXPO_PUBLIC_API_URL`.
 
 ## 13. Gap map: existing repo vs the brief (what to keep / change / build)
