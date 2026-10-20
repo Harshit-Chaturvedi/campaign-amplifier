@@ -11,6 +11,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCampaign, useSubmitFeedback } from '../../api/hooks';
 import { useServerStatusStore } from '../../api/client';
@@ -48,6 +49,7 @@ const catLabels: Record<string, string> = {
 
 export function CampaignDetailScreen({ route, navigation }: any) {
   const { campaignId } = route.params;
+  const insets = useSafeAreaInsets();
   const { data, isLoading, isError, refetch } = useCampaign(campaignId);
   const campaign = data?.campaign;
   const isOffline = Boolean(data?.isOffline);
@@ -702,30 +704,33 @@ export function CampaignDetailScreen({ route, navigation }: any) {
           backgroundColor: colors.surface,
           borderTopWidth: 1,
           borderTopColor: colors.border,
-          paddingHorizontal: 20,
-          paddingTop: 12,
-          paddingBottom: 28,
+          paddingHorizontal: 16,
+          paddingTop: 10,
+          paddingBottom: Math.max(insets?.bottom ?? 0, 14),
         }}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <View>
-            <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
+            <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.ink }} numberOfLines={1}>
               {formatCurrency(campaign.amountRaised)}{' '}
               <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>
                 of {formatCurrency(campaign.fundingGoal)}
               </Text>
             </Text>
-            <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkMuted, marginTop: 1 }}>
-              {pct}% funded • Est. reach at goal: ~{formatNumber(reachAtGoal)}
+            <Text style={{ fontSize: 11, fontFamily: fonts.sansRegular, color: colors.inkMuted, marginTop: 1 }} numberOfLines={1}>
+              {pct}% funded • Est. reach: ~{formatNumber(reachAtGoal)}
             </Text>
           </View>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <TouchableOpacity
               onPress={handleShare}
+              accessibilityRole="button"
+              accessibilityLabel="Share campaign"
               style={{
                 width: 40,
                 height: 40,
+                flexShrink: 0,
                 borderRadius: tokens.radii.xs,
                 backgroundColor: colors.surfaceSecondary,
                 borderWidth: 1,
@@ -739,9 +744,10 @@ export function CampaignDetailScreen({ route, navigation }: any) {
 
             {isBackable ? (
               <Button
-                title="Back This Campaign"
+                title="Back this campaign"
                 size="md"
                 onPress={() => navigation.navigate('FundCampaign', { campaignId: campaign.id })}
+                style={{ flexShrink: 0, paddingHorizontal: 16 }}
               />
             ) : (
               <Button
@@ -749,6 +755,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
                 size="md"
                 variant="outline"
                 onPress={() => navigation.navigate('Report', { campaignId: campaign.id })}
+                style={{ flexShrink: 0, paddingHorizontal: 16 }}
               />
             )}
           </View>

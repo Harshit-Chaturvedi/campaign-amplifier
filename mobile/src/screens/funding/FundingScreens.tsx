@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -29,13 +29,14 @@ import { usePreferencesStore } from '../../store/usePreferencesStore';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { ProgressBar } from '../../components/ui/ProgressBar';
-import { formatCurrency, formatNumber } from '../../utils/formatting';
+import { formatCurrency, formatMoney, formatNumber } from '../../utils/formatting';
 import { AmplificationNotice } from '../../components/campaign/AmplificationNotice';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { demoConfig } from '../../config/demoConfig';
 import { estimateReach, calculateBackerFee } from '../../services/reach';
 import { apiClient } from '../../api/client';
 import { colors, fonts, tokens } from '../../theme/tokens';
+import { navigateToHome } from '../../navigation/navigationRef';
 
 export function FundCampaignScreen({ route, navigation }: any) {
   const { campaignId, initialAmount } = route.params;
@@ -475,14 +476,14 @@ export function FundCampaignScreen({ route, navigation }: any) {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 }}>
                 <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Payment fee (2.9% + $0.30)</Text>
                 <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
-                  {formatCurrency(fee)}
+                  {formatMoney(fee)}
                 </Text>
               </View>
               <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 8 }} />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2 }}>
                 <Text style={{ fontSize: 14, fontFamily: fonts.serifBold, color: colors.ink }}>Total Payment</Text>
                 <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.accent }}>
-                  {formatCurrency(total)}
+                  {formatMoney(total)}
                 </Text>
               </View>
             </Card>
@@ -524,7 +525,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                   </Text>
                 </View>
                 <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
-                  +{formatCurrency(fee)}
+                  +{formatMoney(fee)}
                 </Text>
               </View>
 
@@ -535,7 +536,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                   Total Charged to Card
                 </Text>
                 <Text style={{ fontSize: 18, fontFamily: fonts.serifBold, color: colors.accent }}>
-                  {formatCurrency(total)}
+                  {formatMoney(total)}
                 </Text>
               </View>
 
@@ -556,13 +557,13 @@ export function FundCampaignScreen({ route, navigation }: any) {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                   <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>• Direct Ad Spend (95%)</Text>
                   <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.positive }}>
-                    {formatCurrency(netAdBudget)}
+                    {formatMoney(netAdBudget)}
                   </Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>• Platform Review & Ops (5%)</Text>
                   <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
-                    {formatCurrency(platformFee)}
+                    {formatMoney(platformFee)}
                   </Text>
                 </View>
               </View>
@@ -750,7 +751,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 }}>
                 <Text style={{ fontSize: 13, fontFamily: fonts.sansMedium, color: colors.inkSecondary }}>Amount to Authorize:</Text>
                 <Text style={{ fontSize: 18, fontFamily: fonts.serifBold, color: colors.accent }}>
-                  {formatCurrency(total)}
+                  {formatMoney(total)}
                 </Text>
               </View>
             </Card>
@@ -839,7 +840,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
               {/* 1. Simulate Success */}
               <TouchableOpacity
                 accessibilityRole="button"
-                accessibilityLabel={`Simulate successful payment of ${formatCurrency(total)}`}
+                accessibilityLabel={`Simulate successful payment of ${formatMoney(total)}`}
                 onPress={() => handleSimulatePayment('success')}
                 disabled={loading}
                 activeOpacity={0.8}
@@ -859,7 +860,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
                   <>
                     <Ionicons name="checkmark-circle" size={18} color={colors.surface} />
                     <Text style={{ fontSize: 14, fontFamily: fonts.sansBold, color: colors.surface }}>
-                      Simulate Success ({formatCurrency(total)})
+                      Simulate Success ({formatMoney(total)})
                     </Text>
                   </>
                 )}
@@ -976,7 +977,7 @@ export function FundCampaignScreen({ route, navigation }: any) {
               title={
                 step === 1
                   ? `Review ${formatCurrency(dollars)}`
-                  : `Proceed to Checkout (${formatCurrency(total)})`
+                  : `Proceed to Checkout (${formatMoney(total)})`
               }
               onPress={step === 1 ? handleProceedToReview : () => setStep(3)}
               size="lg"
@@ -998,6 +999,11 @@ export function ThankYouScreen({ route, navigation }: any) {
     () => campaigns.find((c) => c.id === campaignId || c.slug === campaignId),
     [campaigns, campaignId]
   );
+  const backerFee = useMemo(() => calculateBackerFee(amount), [amount]);
+  const activeFee = typeof fee === 'number' ? fee : backerFee.fee;
+  const activeTotal = typeof total === 'number' ? total : backerFee.total;
+  const targetReach = typeof estimatedReach === 'number' ? estimatedReach : estimateReach(amount).estimate;
+
   const followedCampaignIds = usePreferencesStore((s) => s.followedCampaignIds);
   const isFollowing = useMemo(
     () => followedCampaignIds.includes(campaignId),
@@ -1010,8 +1016,33 @@ export function ThankYouScreen({ route, navigation }: any) {
   const animatedProgress = useSharedValue(0);
   const checkScale = useSharedValue(0);
 
-  const targetReach = estimatedReach || 0;
   const targetPercent = campaign?.percentFunded ?? 100;
+
+  const handleReturnHome = useCallback(() => {
+    try {
+      if (typeof navigation.popToTop === 'function') {
+        navigation.popToTop();
+      }
+    } catch {}
+
+    const parent = navigation.getParent?.();
+    if (parent && typeof parent.navigate === 'function') {
+      try {
+        parent.navigate('HomeTab', { screen: 'Home' });
+        return;
+      } catch {}
+    }
+    navigateToHome();
+  }, [navigation]);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      handleReturnHome();
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [handleReturnHome]);
 
   useEffect(() => {
     checkScale.value = withTiming(1, {
@@ -1027,6 +1058,7 @@ export function ThankYouScreen({ route, navigation }: any) {
 
   useEffect(() => {
     let isMounted = true;
+    let animId: number;
     AccessibilityInfo.isReduceMotionEnabled().then((reducedMotion) => {
       if (!isMounted) return;
 
@@ -1046,22 +1078,22 @@ export function ThankYouScreen({ route, navigation }: any) {
       const startTime = Date.now();
       const duration = 1200;
       const step = () => {
+        if (!isMounted) return;
         const now = Date.now();
         const elapsed = now - startTime;
         const progress = Math.min(1, elapsed / duration);
         const eased = 1 - Math.pow(1 - progress, 3);
-        if (isMounted) {
-          setDisplayReach(Math.round(eased * targetReach));
-          if (progress < 1) {
-            requestAnimationFrame(step);
-          }
+        setDisplayReach(Math.round(eased * targetReach));
+        if (progress < 1) {
+          animId = requestAnimationFrame(step);
         }
       };
-      requestAnimationFrame(step);
+      animId = requestAnimationFrame(step);
     });
 
     return () => {
       isMounted = false;
+      if (animId) cancelAnimationFrame(animId);
     };
   }, [targetPercent, targetReach]);
 
@@ -1107,7 +1139,7 @@ export function ThankYouScreen({ route, navigation }: any) {
           Contribution Confirmed
         </Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Home')}
+          onPress={handleReturnHome}
           style={{
             width: 36,
             height: 36,
@@ -1281,14 +1313,14 @@ export function ThankYouScreen({ route, navigation }: any) {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ fontSize: 13, fontFamily: fonts.sansRegular, color: colors.inkSecondary }}>Payment fee (2.9% + $0.30)</Text>
               <Text style={{ fontSize: 13, fontFamily: fonts.sansSemiBold, color: colors.ink }}>
-                {fee ? formatCurrency(fee) : '$1.75'}
+                {formatMoney(activeFee)}
               </Text>
             </View>
             <View style={{ height: 1, backgroundColor: colors.border, marginVertical: 6 }} />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ fontSize: 14, fontFamily: fonts.serifBold, color: colors.ink }}>Total Paid</Text>
               <Text style={{ fontSize: 16, fontFamily: fonts.serifBold, color: colors.accent }}>
-                {total ? formatCurrency(total) : formatCurrency(amount + 1.75)}
+                {formatMoney(activeTotal)}
               </Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
@@ -1321,7 +1353,7 @@ export function ThankYouScreen({ route, navigation }: any) {
 
           <Button
             title="Return to Home Feed"
-            onPress={() => navigation.navigate('Home')}
+            onPress={handleReturnHome}
             variant="secondary"
             fullWidth
           />

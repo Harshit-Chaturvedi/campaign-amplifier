@@ -8,3 +8,12 @@ export function navigateToLogin(message = 'Please sign in again') {
     navigationRef.navigate('Login' as any, { message });
   }
 }
+
+export function navigateToHome() {
+  if (navigationRef.isReady()) {
+    navigationRef.navigate('Main' as any, {
+      screen: 'HomeTab',
+      params: { screen: 'Home' },
+    });
+  }
+}
