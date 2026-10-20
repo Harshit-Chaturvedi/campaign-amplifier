@@ -193,12 +193,15 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
         "Content-Type": "application/json",
     }
 
+    try:
+        transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
+    except Exception:
+        transport = None
+
     for attempt, model_name in enumerate(models_to_try):
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
         start_time = time.perf_counter()
 
-        # Minimal thinking configuration per Gemini API docs
-        thinking_config = {"thinkingLevel": "LOW"} if (attempt == 0 and "3.8" in model_name) else {"thinkingBudget": 0}
         payload = {
             "contents": [
                 {
@@ -216,7 +219,9 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
                 }
             ],
             "generationConfig": {
-                "thinkingConfig": thinking_config
+                "thinkingConfig": {
+                    "thinkingBudget": 0
+                }
             }
         }
 
