@@ -211,6 +211,7 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
         ],
         "generationConfig": {
             "thinkingConfig": {
+                "thinkingLevel": "low",
                 "thinkingBudget": 0
             }
         }
