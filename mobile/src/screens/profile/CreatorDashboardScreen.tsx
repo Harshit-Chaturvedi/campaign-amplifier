@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -27,6 +28,7 @@ import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting
 import { apiClient } from '../../api/client';
 import { getCoverUrl } from '../../utils/media';
 import { colors, fonts, tokens } from '../../theme/tokens';
+import { filterAndBucketCreatorCampaigns } from '../../hooks/useCreatorCampaigns';
 
 export type CreatorTab =
   | 'drafts'
@@ -39,6 +41,12 @@ export type CreatorTab =
 export function CreatorDashboardScreen({ route, navigation }: any) {
   const initialTab = (route?.params?.initialTab as CreatorTab) || 'published';
   const [activeTab, setActiveTab] = useState<CreatorTab>(initialTab);
+
+  useEffect(() => {
+    if (route?.params?.initialTab) {
+      setActiveTab(route.params.initialTab as CreatorTab);
+    }
+  }, [route?.params?.initialTab]);
 
   const user = useAuthStore((s) => s.user);
   const draftsMap = useDraftStore((s) => s.drafts);
@@ -63,68 +71,49 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
   // In-app editorial re-review notice modal state
   const [editNoticeCampaign, setEditNoticeCampaign] = useState<any | null>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    async function loadCampaigns() {
-      try {
-        setLoading(true);
-        const res = await apiClient.getMyCampaigns();
-        if (isMounted) {
-          setRemoteCampaigns(res.items || []);
-        }
-      } catch {
-        if (isMounted) {
-          // If offline or error, filter store campaigns to user-owned only
-          const userCampaigns = storeCampaigns.filter(
-            (c) => user?.uid && (c.creatorId === user.uid || (c as any).created_by === user.uid)
-          );
-          setRemoteCampaigns(userCampaigns);
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
+  const loadCampaigns = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await apiClient.getMyCampaigns();
+      setRemoteCampaigns(res.items || []);
+    } catch {
+      // Fallback
+    } finally {
+      setLoading(false);
     }
-    loadCampaigns();
-    return () => {
-      isMounted = false;
-    };
-  }, [user?.uid, storeCampaigns]);
+  }, []);
 
-  // Only user-owned campaigns! Never fall back to global seed campaigns
-  const allCampaigns = useMemo(() => {
-    if (remoteCampaigns !== null) return remoteCampaigns;
-    return storeCampaigns.filter(
-      (c) => user?.uid && (c.creatorId === user.uid || (c as any).created_by === user.uid)
-    );
-  }, [remoteCampaigns, storeCampaigns, user?.uid]);
+  useFocusEffect(
+    useCallback(() => {
+      loadCampaigns();
+    }, [loadCampaigns])
+  );
+
+  // Derived user-owned campaigns from shared selector
+  const buckets = useMemo(() => {
+    const rawList = remoteCampaigns !== null ? remoteCampaigns : storeCampaigns;
+    return filterAndBucketCreatorCampaigns(rawList, user?.uid, drafts);
+  }, [remoteCampaigns, storeCampaigns, user?.uid, drafts]);
 
   // Filter campaigns by active tab
   const campaignsInTab = useMemo(() => {
     switch (activeTab) {
       case 'drafts':
-        return []; // Rendered from drafts store below
+        return []; // Rendered from drafts store
       case 'under_review':
-        return allCampaigns.filter((c) =>
-          ['submitted', 'in_review', 'under_review'].includes(c.status)
-        );
+        return buckets.under_review;
       case 'published':
-        return allCampaigns.filter((c) =>
-          ['approved', 'available_for_funding', 'goal_reached'].includes(c.status)
-        );
+        return buckets.published;
       case 'promoting':
-        return allCampaigns.filter((c) =>
-          ['distribution_preparation', 'promoting'].includes(c.status)
-        );
+        return buckets.promoting;
       case 'completed':
-        return allCampaigns.filter((c) => c.status === 'completed');
+        return buckets.completed;
       case 'requires_action':
-        return allCampaigns.filter((c) =>
-          ['changes_requested', 'rejected', 'failed', 'cancelled'].includes(c.status)
-        );
+        return buckets.requires_action;
       default:
-        return allCampaigns;
+        return buckets.all;
     }
-  }, [activeTab, allCampaigns]);
+  }, [activeTab, buckets]);
 
   // Handle posting creator update
   const handlePostUpdate = async () => {
@@ -167,12 +156,12 @@ export function CreatorDashboardScreen({ route, navigation }: any) {
   };
 
   const tabOptions: { key: CreatorTab; label: string; count?: number }[] = [
-    { key: 'published', label: 'Funding', count: allCampaigns.filter((c) => ['approved', 'available_for_funding', 'goal_reached'].includes(c.status)).length },
-    { key: 'under_review', label: 'Review', count: allCampaigns.filter((c) => ['submitted', 'in_review'].includes(c.status)).length },
-    { key: 'promoting', label: 'Promoting', count: allCampaigns.filter((c) => ['distribution_preparation', 'promoting'].includes(c.status)).length },
-    { key: 'completed', label: 'Completed', count: allCampaigns.filter((c) => c.status === 'completed').length },
-    { key: 'requires_action', label: 'Action Needed', count: allCampaigns.filter((c) => ['changes_requested', 'rejected'].includes(c.status)).length },
-    { key: 'drafts', label: 'Drafts', count: drafts.length },
+    { key: 'published', label: 'Funding', count: buckets.counts.published },
+    { key: 'under_review', label: 'Review', count: buckets.counts.under_review },
+    { key: 'promoting', label: 'Promoting', count: buckets.counts.promoting },
+    { key: 'completed', label: 'Completed', count: buckets.counts.completed },
+    { key: 'requires_action', label: 'Action Needed', count: buckets.counts.requires_action },
+    { key: 'drafts', label: 'Drafts', count: buckets.counts.drafts },
   ];
 
   return (

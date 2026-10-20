@@ -53,48 +53,113 @@
     <div id="authStatus" style="font-size: 13px; font-weight: 600; color: var(--primary);"></div>
   </header>
 
-  <div class="auth-banner" id="authBanner">
-    <div>
-      <strong>Demo Admin Authentication</strong> &bull; Authenticated as <code>admin@demo.org</code>
+  <div id="loginSection" class="card" style="max-width: 440px; margin: 40px auto; padding: 28px;">
+    <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Admin Moderation Sign In</h2>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Platform moderator or administrator credentials required.</p>
+    <form id="adminLoginForm" onsubmit="handleLogin(event)">
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Email address</label>
+        <input type="email" id="loginEmail" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;" placeholder="name@example.org" />
+      </div>
+      <div style="margin-bottom: 18px;">
+        <label style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Password</label>
+        <input type="password" id="loginPassword" required style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;" placeholder="••••••••" />
+      </div>
+      <div id="loginError" style="display: none; color: var(--danger); font-size: 13px; margin-bottom: 14px; font-weight: 600;"></div>
+      <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width: 100%; padding: 10px;">Sign In</button>
+    </form>
+  </div>
+
+  <div id="adminAppSection" style="display: none;">
+    <div class="auth-banner" id="authBanner">
+      <div id="authBannerText">
+        <strong>Admin Authentication</strong> &bull; Authenticated
+      </div>
+      <button class="btn btn-outline" onclick="logoutAdmin()">Sign Out</button>
     </div>
-    <button class="btn btn-outline" onclick="relogin()">Switch / Re-login</button>
-  </div>
 
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h2 style="font-size: 18px; font-weight: 700;">Moderation & Distribution Queue</h2>
-    <button class="btn btn-primary" onclick="loadQueue()">Refresh Queue</button>
-  </div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 18px; font-weight: 700;">Moderation & Distribution Queue</h2>
+      <button class="btn btn-primary" onclick="loadQueue()">Refresh Queue</button>
+    </div>
 
-  <div class="queue-grid" id="queueContainer">
-    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">Loading moderation items...</div>
+    <div class="queue-grid" id="queueContainer">
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">Loading moderation items...</div>
+    </div>
   </div>
 
   <div id="toast" class="toast"></div>
 
   <script>
-    let token = localStorage.getItem('admin_token');
+    let token = null;
 
-    async function loginAsAdmin() {
+    function showLoginForm(errorMsg) {
+      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('adminAppSection').style.display = 'none';
+      document.getElementById('authStatus').innerText = '';
+      const errBox = document.getElementById('loginError');
+      if (errorMsg) {
+        errBox.innerText = errorMsg;
+        errBox.style.display = 'block';
+      } else {
+        errBox.style.display = 'none';
+      }
+    }
+
+    function showAppSection(userName, userEmail) {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('adminAppSection').style.display = 'block';
+      document.getElementById('authStatus').innerText = `Logged in: ${userName} (${userEmail})`;
+      document.getElementById('authBannerText').innerHTML = `<strong>Admin Authentication</strong> &bull; Authenticated as <code>${userEmail}</code>`;
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginSubmitBtn');
+      const errBox = document.getElementById('loginError');
+
+      errBox.style.display = 'none';
+      btn.disabled = true;
+      btn.innerText = 'Signing in...';
+
       try {
         const res = await fetch('/api/v1/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: 'admin@demo.org', password: 'demo123' })
+          body: JSON.stringify({ email, password })
         });
-        if (!res.ok) throw new Error('Failed to login demo admin');
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Invalid email or password');
+        }
+
         const data = await res.json();
+        if (data.user.role !== 'admin') {
+          token = null;
+          throw new Error('Admin access required');
+        }
+
         token = data.access_token;
-        localStorage.setItem('admin_token', token);
-        document.getElementById('authStatus').innerText = `Logged in: ${data.user.name} (${data.user.email})`;
+        document.getElementById('loginPassword').value = '';
+        showAppSection(data.user.name, data.user.email);
         loadQueue();
       } catch (err) {
-        showToast('Login error: ' + err.message);
+        errBox.innerText = err.message;
+        errBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Sign In';
       }
     }
 
-    function relogin() {
-      localStorage.removeItem('admin_token');
-      loginAsAdmin();
+    function logoutAdmin() {
+      token = null;
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
+      showLoginForm();
     }
 
     function showToast(msg) {
@@ -106,7 +171,7 @@
 
     async function loadQueue() {
       if (!token) {
-        await loginAsAdmin();
+        showLoginForm();
         return;
       }
       try {
@@ -114,7 +179,8 @@
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.status === 401 || res.status === 403) {
-          await loginAsAdmin();
+          token = null;
+          showLoginForm('Session expired or admin access required');
           return;
         }
         const items = await res.json();
@@ -246,8 +312,8 @@
       loadQueue();
     }
 
-    // Auto-run on start
-    loginAsAdmin();
+    // Start by displaying the login form
+    showLoginForm();
   </script>
 </body>
 </html>

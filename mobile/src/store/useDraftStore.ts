@@ -44,6 +44,7 @@ interface DraftState {
   setActiveDraft: (id: string | null) => void;
   remapDraftId: (oldId: string, newId: string) => void;
   getAllDrafts: () => CampaignDraft[];
+  clearAllDrafts: () => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -51,6 +52,10 @@ export const useDraftStore = create<DraftState>()(
     (set, get) => ({
       drafts: {},
       activeDraftId: null,
+
+      clearAllDrafts: () => {
+        set({ drafts: {}, activeDraftId: null });
+      },
 
       saveDraft: (draft) => {
         const existing = get().drafts[draft.id] || {

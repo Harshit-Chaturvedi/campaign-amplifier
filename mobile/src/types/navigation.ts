@@ -94,4 +94,6 @@ export type ProfileStackParamList = {
     paymentStatus?: string;
   };
   Settings: undefined;
+  AdminConsole: undefined;
+  AdminReviewDetail: { campaignId: string };
 };

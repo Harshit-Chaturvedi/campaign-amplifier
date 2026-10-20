@@ -16,6 +16,8 @@ import { VoiceDraftScreen } from '../screens/create/VoiceDraftScreen';
 import { ActivityScreen } from '../screens/activity/ActivityScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { CreatorDashboardScreen } from '../screens/profile/CreatorDashboardScreen';
+import { AdminConsoleScreen } from '../screens/admin/AdminConsoleScreen';
+import { AdminReviewDetailScreen } from '../screens/admin/AdminReviewDetailScreen';
 import { ReportScreen } from '../screens/report/ReportScreen';
 import { InfoScreen } from '../screens/info/InfoScreen';
 import { FundCampaignScreen, ThankYouScreen } from '../screens/funding/FundingScreens';
@@ -96,6 +98,8 @@ function ProfileNavigator() {
       <ProfileStack.Screen name="CampaignDetail" component={CampaignDetailScreen} />
       <ProfileStack.Screen name="FundCampaign" component={FundCampaignScreen} />
       <ProfileStack.Screen name="ThankYou" component={ThankYouScreen} />
+      <ProfileStack.Screen name="AdminConsole" component={AdminConsoleScreen} />
+      <ProfileStack.Screen name="AdminReviewDetail" component={AdminReviewDetailScreen} />
     </ProfileStack.Navigator>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Modal,
   Switch,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { useCampaignStore } from '../../store/useCampaignStore';
@@ -32,26 +33,25 @@ export function ActivityScreen({ navigation }: any) {
   const [loading, setLoading] = useState(false);
   const [showPrefsModal, setShowPrefsModal] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    async function loadNotifications() {
-      try {
-        setLoading(true);
-        const res = await apiClient.getNotifications(filter);
-        if (isMounted && res.items && res.items.length > 0) {
-          setRemoteNotifications(res.items);
-        }
-      } catch {
-        // Stored notifications fallback
-      } finally {
-        if (isMounted) setLoading(false);
+  const loadNotifications = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await apiClient.getNotifications(filter);
+      if (res.items && res.items.length > 0) {
+        setRemoteNotifications(res.items);
       }
+    } catch {
+      // Stored notifications fallback
+    } finally {
+      setLoading(false);
     }
-    loadNotifications();
-    return () => {
-      isMounted = false;
-    };
   }, [filter]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadNotifications();
+    }, [loadNotifications])
+  );
 
   // Merge store notifications and remote notifications with deduplication by id or title+timestamp
   const rawNotifications = remoteNotifications.length > 0 ? remoteNotifications : storeNotifications;

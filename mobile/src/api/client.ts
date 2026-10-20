@@ -1005,4 +1005,126 @@ export const apiClient = {
       return { success: true, status: 'submitted' };
     }
   },
+
+  async getAdminReviewQueue(): Promise<any[]> {
+    const token = useAuthStore.getState().token;
+    const url = `${API_BASE_URL}/admin/review-queue`;
+    const res = await fetchWithTimeout(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      const err: any = new Error(errJson.detail || 'Failed to fetch review queue');
+      err.status = res.status;
+      throw err;
+    }
+    return await res.json();
+  },
+
+  async adminApproveCampaign(id: string, note?: string): Promise<any> {
+    const token = useAuthStore.getState().token;
+    const url = `${API_BASE_URL}/admin/campaigns/${encodeURIComponent(id)}/approve`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ note: note || 'Content, sources, creative and targeting reviewed.' }),
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Failed to approve campaign');
+    }
+    return await res.json();
+  },
+
+  async adminRequestChanges(id: string, note: string): Promise<any> {
+    const token = useAuthStore.getState().token;
+    const url = `${API_BASE_URL}/admin/campaigns/${encodeURIComponent(id)}/request-changes`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ note }),
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Failed to request changes');
+    }
+    return await res.json();
+  },
+
+  async adminRejectCampaign(id: string, note: string): Promise<any> {
+    const token = useAuthStore.getState().token;
+    const url = `${API_BASE_URL}/admin/campaigns/${encodeURIComponent(id)}/reject`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ note }),
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Failed to reject campaign');
+    }
+    return await res.json();
+  },
+
+  async adminStartPromotion(id: string): Promise<any> {
+    const token = useAuthStore.getState().token;
+    const url = `${API_BASE_URL}/admin/campaigns/${encodeURIComponent(id)}/start-promotion`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Failed to start promotion');
+    }
+    return await res.json();
+  },
+
+  async adminSimulateDelivery(id: string, params: { impressions: number; measured_reach: number; clicks: number }): Promise<any> {
+    const token = useAuthStore.getState().token;
+    const url = `${API_BASE_URL}/admin/campaigns/${encodeURIComponent(id)}/simulate-delivery`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Failed to simulate delivery');
+    }
+    return await res.json();
+  },
+
+  async adminCompleteCampaign(id: string): Promise<any> {
+    const token = useAuthStore.getState().token;
+    const url = `${API_BASE_URL}/admin/campaigns/${encodeURIComponent(id)}/complete`;
+    const res = await fetchWithTimeout(url, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      throw new Error(errJson.detail || 'Failed to complete campaign');
+    }
+    return await res.json();
+  },
 };

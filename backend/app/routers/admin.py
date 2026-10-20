@@ -19,7 +19,7 @@ def get_review_queue(
     db: Session = Depends(get_db)
 ):
     campaigns = db.query(Campaign).filter(
-        Campaign.status.in_(["submitted", "changes_requested", "distribution_preparation", "promoting"])
+        Campaign.status.in_(["submitted", "changes_requested", "goal_reached", "distribution_preparation", "promoting"])
     ).order_by(Campaign.updated_at.desc()).all()
 
     results = []

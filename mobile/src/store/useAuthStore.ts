@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserProfile } from '../types/campaign';
+import { useDraftStore } from './useDraftStore';
 
 interface AuthState {
   user: UserProfile | null;
@@ -21,6 +22,29 @@ export function isFakeToken(token?: string | null): boolean {
   return token.startsWith('demo-jwt-token') || token.startsWith('demo-token');
 }
 
+export function normalizeUserProfile(raw: any): UserProfile {
+  if (!raw) {
+    return {
+      uid: 'user-anonymous',
+      email: '',
+      name: 'Anonymous',
+      username: 'anonymous',
+      role: 'user',
+      createdAt: new Date().toISOString(),
+    };
+  }
+  const uid = raw.uid || raw.id || (raw.email ? 'user-' + raw.email.split('@')[0].toLowerCase() : 'user-unknown');
+  return {
+    ...raw,
+    uid,
+    role: raw.role || 'user',
+    name: raw.name || raw.email?.split('@')[0] || 'User',
+    email: raw.email || '',
+    username: raw.username || raw.email?.split('@')[0] || 'user',
+    createdAt: raw.createdAt || raw.created_at || new Date().toISOString(),
+  };
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -29,11 +53,16 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
 
-      setAuth: (user: UserProfile, token: string) => {
+      setAuth: (rawUser: UserProfile, token: string) => {
         if (!token || isFakeToken(token)) {
           // Never store fake tokens
           set({ user: null, token: null, isAuthenticated: false });
           return;
+        }
+        const user = normalizeUserProfile(rawUser);
+        const currentUser = get().user;
+        if (!currentUser || currentUser.uid !== user.uid) {
+          useDraftStore.getState().clearAllDrafts();
         }
         set({
           user,
@@ -47,7 +76,7 @@ export const useAuthStore = create<AuthState>()(
         let token: string | undefined;
 
         if (typeof emailOrUser === 'object' && emailOrUser !== null) {
-          user = emailOrUser;
+          user = normalizeUserProfile(emailOrUser);
           token = passOrToken;
         } else {
           const email = emailOrUser;
@@ -69,6 +98,11 @@ export const useAuthStore = create<AuthState>()(
           return;
         }
 
+        const currentUser = get().user;
+        if (!currentUser || currentUser.uid !== user.uid) {
+          useDraftStore.getState().clearAllDrafts();
+        }
+
         set({
           user,
           token,
@@ -77,6 +111,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        useDraftStore.getState().clearAllDrafts();
         set({ user: null, token: null, isAuthenticated: false });
       },
 

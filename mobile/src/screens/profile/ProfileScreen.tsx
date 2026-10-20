@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Modal,
   Switch,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCampaignStore } from '../../store/useCampaignStore';
@@ -20,6 +21,8 @@ import { DemoDataBadge } from '../../components/ui/DemoDataBadge';
 import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting';
 import { BrandLogo } from '../../components/ui/BrandLogo';
 import { colors, fonts, tokens } from '../../theme/tokens';
+import { filterAndBucketCreatorCampaigns } from '../../hooks/useCreatorCampaigns';
+import { apiClient } from '../../api/client';
 
 export function ProfileScreen({ navigation }: any) {
   const user = useAuthStore((s) => s.user);
@@ -40,6 +43,35 @@ export function ProfileScreen({ navigation }: any) {
   const [activeReceipt, setActiveReceipt] = useState<any | null>(null);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [privacyDefaultOn, setPrivacyDefaultOn] = useState(true); // Default ON per platform policy
+  const [pendingAdminCount, setPendingAdminCount] = useState<number | null>(null);
+
+  // Admin review queue count fetch
+  useFocusEffect(
+    useCallback(() => {
+      let isMounted = true;
+      if (user?.role === 'admin') {
+        apiClient
+          .getAdminReviewQueue()
+          .then((items) => {
+            if (isMounted && Array.isArray(items)) {
+              const pending = items.filter((c) =>
+                ['submitted', 'in_review', 'under_review', 'changes_requested'].includes(c.status)
+              ).length;
+              setPendingAdminCount(pending);
+            }
+          })
+          .catch(() => {});
+      }
+      return () => {
+        isMounted = false;
+      };
+    }, [user?.role])
+  );
+
+  // Creator campaign metrics derived from single shared selector
+  const creatorBuckets = useMemo(() => {
+    return filterAndBucketCreatorCampaigns(storeCampaigns, user?.uid, drafts);
+  }, [storeCampaigns, user?.uid, drafts]);
 
   // Contributions for this user/device
   const myContributions = useMemo(() => {
@@ -141,15 +173,27 @@ export function ProfileScreen({ navigation }: any) {
             </View>
 
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border }}>
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Button
-                  title="Dashboard"
-                  onPress={() => navigation.navigate('CreatorDashboard')}
-                  size="sm"
-                  variant="primary"
-                  fullWidth
-                />
-              </View>
+              {user.role === 'admin' ? (
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Button
+                    title="Admin Console"
+                    onPress={() => navigation.navigate('AdminConsole')}
+                    size="sm"
+                    variant="primary"
+                    fullWidth
+                  />
+                </View>
+              ) : (
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Button
+                    title="Dashboard"
+                    onPress={() => navigation.navigate('CreatorDashboard')}
+                    size="sm"
+                    variant="primary"
+                    fullWidth
+                  />
+                </View>
+              )}
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Button
                   title="Sign Out"
@@ -200,8 +244,87 @@ export function ProfileScreen({ navigation }: any) {
           </Card>
         )}
 
-        {/* 2. Created Campaigns & Creator Dashboard Shortcut - Authenticated Only */}
-        {user ? (
+        {/* Admin Console Row - Admin Only */}
+        {user && user.role === 'admin' && (
+          <Card style={{ marginBottom: 16 }}>
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Open Admin moderation console"
+              onPress={() => navigation.navigate('AdminConsole')}
+              activeOpacity={0.7}
+              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+                <View
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: tokens.radii.xs,
+                    backgroundColor: colors.surfaceSecondary,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Ionicons name="shield-checkmark" size={22} color={colors.accent} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
+                      Admin Console
+                    </Text>
+                    <View
+                      style={{
+                        backgroundColor: colors.accent + '20',
+                        paddingHorizontal: 6,
+                        paddingVertical: 1,
+                        borderRadius: tokens.radii.xs,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 9,
+                          fontFamily: fonts.sansBold,
+                          color: colors.accent,
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        Staff
+                      </Text>
+                    </View>
+                  </View>
+                  <Text
+                    style={{ fontSize: 12, fontFamily: fonts.sansRegular, color: colors.inkSecondary, marginTop: 2 }}
+                  >
+                    Moderation queue & ad operations
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                {pendingAdminCount !== null && pendingAdminCount > 0 && (
+                  <View
+                    style={{
+                      backgroundColor: colors.accent,
+                      borderRadius: 999,
+                      paddingHorizontal: 8,
+                      paddingVertical: 2,
+                    }}
+                  >
+                    <Text style={{ fontSize: 11, fontFamily: fonts.sansBold, color: '#ffffff' }}>
+                      {`${pendingAdminCount} Pending`}
+                    </Text>
+                  </View>
+                )}
+                <Ionicons name="chevron-forward" size={18} color={colors.inkMuted} />
+              </View>
+            </TouchableOpacity>
+          </Card>
+        )}
+
+        {/* 2. Created Campaigns & Creator Dashboard Shortcut - Authenticated Non-Admins Only */}
+        {user && user.role !== 'admin' ? (
           <Card style={{ marginBottom: 16 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8 }}>
               <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink, flex: 1, minWidth: 0 }} numberOfLines={1}>
@@ -220,24 +343,52 @@ export function ProfileScreen({ navigation }: any) {
               Manage in-progress drafts, monitor moderation review feedback, and view delivery reports.
             </Text>
 
-            {/* Newspaper Stat Heroes */}
+            {/* Newspaper Stat Heroes - Tappable tiles */}
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
-                <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.ink }}>{drafts.length}</Text>
-                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Local Drafts</Text>
-              </View>
-              <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Open local drafts"
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('CreatorDashboard', { initialTab: 'drafts' })}
+                style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}
+              >
+                <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.ink }}>
+                  {creatorBuckets.counts.drafts}
+                </Text>
+                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>
+                  Local Drafts
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Open campaigns in review"
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('CreatorDashboard', { initialTab: 'under_review' })}
+                style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}
+              >
                 <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.accent }}>
-                  {storeCampaigns.filter((c) => (c.creatorId === user.uid || (c as any).created_by === user.uid) && c.status === 'submitted').length}
+                  {creatorBuckets.counts.under_review}
                 </Text>
-                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>In Review</Text>
-              </View>
-              <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}>
+                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>
+                  In Review
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Open published campaigns"
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('CreatorDashboard', { initialTab: 'published' })}
+                style={{ flex: 1, backgroundColor: colors.surfaceSecondary, borderWidth: 1, borderColor: colors.border, padding: 12, borderRadius: tokens.radii.xs }}
+              >
                 <Text style={{ fontSize: 20, fontFamily: fonts.serifBold, color: colors.positive }}>
-                  {storeCampaigns.filter((c) => (c.creatorId === user.uid || (c as any).created_by === user.uid) && ['available_for_funding', 'goal_reached'].includes(c.status)).length}
+                  {creatorBuckets.counts.published}
                 </Text>
-                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>Published</Text>
-              </View>
+                <Text style={{ fontSize: 9, fontFamily: fonts.sansBold, color: colors.inkMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 2 }}>
+                  Published
+                </Text>
+              </TouchableOpacity>
             </View>
           </Card>
         ) : null}

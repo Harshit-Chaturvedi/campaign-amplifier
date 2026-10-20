@@ -82,3 +82,37 @@ def test_delete_campaign_permissions(client, user_token, admin_token):
     assert admin_del_res.json()["status"] == "ok"
     assert admin_del_res.json()["deleted_id"] == test_id
 
+def test_admin_html_security():
+    import os
+    admin_html_path = os.path.join(os.path.dirname(__file__), "..", "app", "static", "admin.html")
+    with open(admin_html_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Must contain NO hardcoded passwords
+    assert "demo123" not in content
+    assert "password: 'demo" not in content
+    assert "password: \"" not in content
+    assert "loginAsAdmin" not in content
+    # Must contain login form and admin access check
+    assert "adminLoginForm" in content
+    assert "Admin access required" in content
+    assert "showLoginForm" in content
+
+def test_non_admin_forbidden_on_admin_endpoints(client, user_token):
+    headers = {"Authorization": f"Bearer {user_token}"}
+    endpoints = [
+        ("GET", "/api/v1/admin/review-queue", None),
+        ("POST", "/api/v1/admin/campaigns/cmp-clean-water/approve", {"note": "1234567890"}),
+        ("POST", "/api/v1/admin/campaigns/cmp-clean-water/request-changes", {"note": "1234567890"}),
+        ("POST", "/api/v1/admin/campaigns/cmp-clean-water/reject", {"note": "1234567890"}),
+        ("POST", "/api/v1/admin/campaigns/cmp-clean-water/start-promotion", None),
+        ("POST", "/api/v1/admin/campaigns/cmp-clean-water/complete", None),
+    ]
+    for method, path, json_body in endpoints:
+        if method == "GET":
+            res = client.get(path, headers=headers)
+        else:
+            res = client.post(path, headers=headers, json=json_body)
+        assert res.status_code == 403, f"{method} {path} returned {res.status_code}, expected 403"
+
+
