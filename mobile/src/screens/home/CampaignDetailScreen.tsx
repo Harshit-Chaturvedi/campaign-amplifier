@@ -30,7 +30,7 @@ import { formatCurrency, formatNumber, formatDate } from '../../utils/formatting
 import { estimateReach } from '../../services/reach';
 import { useAuthStore } from '../../store/useAuthStore';
 import { usePreferencesStore } from '../../store/usePreferencesStore';
-import { colors, fonts, tokens } from '../../theme/tokens';
+import { colors, fonts, tokens, getCategoryColor } from '../../theme/tokens';
 import type { StoryBlock } from '../../types/campaign';
 
 const catLabels: Record<string, string> = {
@@ -142,7 +142,7 @@ export function CampaignDetailScreen({ route, navigation }: any) {
     );
   }
 
-  const catColor = colors.category[campaign.category] || colors.accent;
+  const catColor = getCategoryColor(campaign.category);
   const pct = campaign.percentFunded ?? 0;
   const displayCategory = catLabels[campaign.category] || campaign.category;
   const coverUrl = getCoverUrl(campaign);

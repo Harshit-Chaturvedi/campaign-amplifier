@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { formatCurrency, formatNumber } from '../../utils/formatting';
-import { colors, fonts, tokens } from '../../theme/tokens';
+import { colors, fonts, tokens, getCategoryColor } from '../../theme/tokens';
 import { DemoDataBadge } from '../ui/DemoDataBadge';
 import { StatusBadge } from '../ui/StatusBadge';
 import { ProgressBar } from '../ui/ProgressBar';
@@ -40,7 +40,7 @@ export function CampaignCard({
   onBackPress,
   variant = 'default',
 }: CampaignCardProps) {
-  const catColor = colors.category[campaign.category] || colors.accent;
+  const catColor = getCategoryColor(campaign.category);
   const pct = campaign.percentFunded ?? 0;
   const displayCategory = catLabels[campaign.category] || campaign.category;
   const coverUrl = getCoverUrl(campaign);

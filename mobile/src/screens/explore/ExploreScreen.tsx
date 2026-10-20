@@ -18,7 +18,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { BottomSheet } from '../../components/ui/BottomSheet';
 import { BrandLogo } from '../../components/ui/BrandLogo';
-import { colors, fonts, tokens } from '../../theme/tokens';
+import { colors, fonts, tokens, getCategoryColor } from '../../theme/tokens';
 import type { CampaignCategory } from '../../types/campaign';
 
 const CATEGORIES: { key: CampaignCategory | 'all'; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
@@ -269,6 +269,7 @@ export function ExploreScreen({ navigation }: any) {
         >
           {CATEGORIES.map((cat) => {
             const selected = category === cat.key;
+            const catColor = cat.key === 'all' ? colors.accent : getCategoryColor(cat.key);
             return (
               <TouchableOpacity
                 key={cat.key}
@@ -281,22 +282,22 @@ export function ExploreScreen({ navigation }: any) {
                   paddingVertical: 6,
                   borderRadius: tokens.radii.xs,
                   marginRight: 8,
-                  backgroundColor: selected ? colors.accent : colors.surfaceSecondary,
+                  backgroundColor: selected ? catColor : colors.surfaceSecondary,
                   borderWidth: 1,
-                  borderColor: selected ? colors.accent : colors.border,
+                  borderColor: selected ? catColor : colors.border,
                 }}
               >
                 <Ionicons
                   name={cat.icon}
                   size={13}
-                  color={selected ? colors.inkInverse : colors.inkSecondary}
+                  color={selected ? colors.inkInverse : cat.key === 'all' ? colors.inkSecondary : catColor}
                   style={{ marginRight: 5 }}
                 />
                 <Text
                   style={{
                     fontSize: 11,
                     fontFamily: selected ? fonts.sansSemiBold : fonts.sansMedium,
-                    color: selected ? colors.inkInverse : colors.inkSecondary,
+                    color: selected ? colors.inkInverse : colors.ink,
                     letterSpacing: 0.3,
                   }}
                 >

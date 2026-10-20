@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getCategoryColor } from '../../theme/colors';
-import { colors, fonts, tokens } from '../../theme/tokens';
+import { colors, fonts, tokens, getCategoryColor } from '../../theme/tokens';
 
 interface GeneratedCoverProps {
   category: string;
@@ -58,7 +57,7 @@ export function GeneratedCover({
             marginBottom: 8,
           }}
         >
-          <Ionicons name={iconName} size={iconSize} color={colors.accent} />
+          <Ionicons name={iconName} size={iconSize} color={getCategoryColor(category)} />
         </View>
 
         {title ? (
@@ -71,7 +70,7 @@ export function GeneratedCover({
         ) : null}
 
         <View style={styles.categoryPill}>
-          <Text style={styles.categoryText}>
+          <Text style={[styles.categoryText, { color: getCategoryColor(category) }]}>
             {category.replace('_', ' ').toUpperCase()}
           </Text>
         </View>
