@@ -73,7 +73,7 @@ export const INFO_PAGES: Record<string, InfoPageContent> = {
       {
         heading: 'Step 1: Create & Source',
         paragraphs: [
-          'Creators draft their message manually or use our voice-guided workflow. All claims must be anchored by traceable sources.',
+          'Creators draft their message with structured steps. All claims must be anchored by traceable sources.',
           'Creators set their own funding goal based on the reach they need. The platform never sets a default goal.',
         ],
       },
