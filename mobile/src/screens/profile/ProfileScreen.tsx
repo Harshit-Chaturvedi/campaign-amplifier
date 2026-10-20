@@ -141,16 +141,16 @@ export function ProfileScreen({ navigation }: any) {
             </View>
 
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border }}>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Button
-                  title="Creator Dashboard"
+                  title="Dashboard"
                   onPress={() => navigation.navigate('CreatorDashboard')}
                   size="sm"
                   variant="primary"
                   fullWidth
                 />
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Button
                   title="Sign Out"
                   onPress={() => {
@@ -203,14 +203,15 @@ export function ProfileScreen({ navigation }: any) {
         {/* 2. Created Campaigns & Creator Dashboard Shortcut - Authenticated Only */}
         {user ? (
           <Card style={{ marginBottom: 16 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink }}>
-                Created Campaigns & Drafts
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8 }}>
+              <Text style={{ fontSize: 16, fontFamily: fonts.serifSemiBold, color: colors.ink, flex: 1, minWidth: 0 }} numberOfLines={1}>
+                Your Campaigns
               </Text>
               <TouchableOpacity
                 accessibilityRole="button"
                 accessibilityLabel="Open creator dashboard"
                 onPress={() => navigation.navigate('CreatorDashboard')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
                 <Text style={{ fontSize: 12, fontFamily: fonts.sansSemiBold, color: colors.accent }}>Dashboard →</Text>
               </TouchableOpacity>

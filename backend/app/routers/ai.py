@@ -65,11 +65,11 @@ async def transcribe(
 
     # Determine standard MIME type for Gemini
     mime_type = ctype if ctype.startswith("audio/") else "audio/mp4"
-    if ext == ".wav":
+    if ext == ".wav" or mime_type == "audio/x-wav":
         mime_type = "audio/wav"
-    elif ext == ".mp3":
+    elif ext == ".mp3" or mime_type == "audio/mpeg":
         mime_type = "audio/mp3"
-    elif ext in [".m4a", ".mp4", ".aac"]:
+    elif ext in [".m4a", ".mp4", ".aac"] or mime_type in ["audio/m4a", "audio/x-m4a", "video/mp4"]:
         mime_type = "audio/mp4"
     elif ext == ".ogg":
         mime_type = "audio/ogg"

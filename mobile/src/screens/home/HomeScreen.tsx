@@ -99,16 +99,18 @@ export function HomeScreen({ navigation }: any) {
         style={{
           paddingTop: 52,
           paddingBottom: 12,
-          paddingHorizontal: 20,
+          paddingLeft: 16,
+          paddingRight: 16,
           backgroundColor: colors.surface,
           borderBottomWidth: 1,
           borderBottomColor: colors.border,
         }}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
           <BrandLogo
             size="md"
             showWordmark={true}
+            style={{ flex: 1, minWidth: 0, marginRight: 8 }}
             onPress={() => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}
           />
           <TouchableOpacity
@@ -123,6 +125,7 @@ export function HomeScreen({ navigation }: any) {
               borderColor: colors.border,
               alignItems: 'center',
               justifyContent: 'center',
+              flexShrink: 0,
             }}
             accessibilityRole="button"
             accessibilityLabel="Notifications"

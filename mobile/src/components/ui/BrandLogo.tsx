@@ -112,6 +112,7 @@ export function BrandLogo({
         activeOpacity={0.7}
         accessibilityRole="button"
         accessibilityLabel="Campaign Amplifier, scroll to top"
+        style={style}
       >
         {content}
       </TouchableOpacity>
@@ -125,15 +126,19 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
   },
   iconWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
+    flexShrink: 0,
   },
   textWrapper: {
     marginLeft: 10,
     justifyContent: 'center',
+    flex: 1,
+    flexShrink: 1,
   },
   wordmark: {
     fontFamily: fonts.sansBold,

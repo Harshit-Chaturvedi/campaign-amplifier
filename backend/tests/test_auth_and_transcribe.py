@@ -158,7 +158,7 @@ def test_gemini_key_hygiene_and_leak_prevention(client, user_token, monkeypatch)
     # B) Force an upstream failure whose exception message contains "KEY123" and a URL with "key="
     async def mock_post_leak_failure(self, url, *args, **kwargs):
         raise httpx.ConnectError(
-            f"Failed to connect to https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={test_key} with error code 500"
+            f"Failed to connect to https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={test_key} with error code 500"
         )
 
     with patch.object(httpx.AsyncClient, "post", new=mock_post_leak_failure):

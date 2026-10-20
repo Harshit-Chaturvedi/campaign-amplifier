@@ -116,7 +116,7 @@ Generate a JSON object matching this schema exactly:
 }}
 Return ONLY raw JSON. No markdown backticks.
 """
-    model_name = settings.GEMINI_MODEL or "gemini-3.8-flash"
+    model_name = settings.GEMINI_MODEL or "gemini-1.5-flash"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
     headers = {
         "x-goog-api-key": settings.GEMINI_API_KEY,
@@ -166,8 +166,14 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
             detail="Transcription service unavailable"
         )
 
+    # Normalize to standard Gemini audio MIME types
+    if mime_type in ["audio/m4a", "audio/x-m4a", "video/mp4"]:
+        mime_type = "audio/mp4"
+    elif mime_type == "audio/x-wav":
+        mime_type = "audio/wav"
+
     b64_data = base64.b64encode(audio_bytes).decode("utf-8")
-    model_name = settings.GEMINI_MODEL or "gemini-3.8-flash"
+    model_name = settings.GEMINI_MODEL or "gemini-1.5-flash"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
     headers = {
         "x-goog-api-key": settings.GEMINI_API_KEY,

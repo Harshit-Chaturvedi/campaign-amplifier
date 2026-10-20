@@ -13,6 +13,7 @@ interface ButtonProps {
   loading?: boolean;
   disabled?: boolean;
   fullWidth?: boolean;
+  style?: any;
 }
 
 const variantBg: Record<string, string> = {
@@ -49,6 +50,7 @@ export function Button({
   loading = false,
   disabled = false,
   fullWidth = false,
+  style: customStyle,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const isPrimary = variant === 'primary' || size === 'lg';
@@ -66,20 +68,24 @@ export function Button({
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
-      style={({ pressed }) => ({
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: bg,
-        paddingHorizontal: size === 'sm' ? 14 : 20,
-        height: minHeight,
-        borderRadius,
-        opacity: isDisabled ? 0.5 : 1,
-        borderWidth: borderColor !== 'transparent' ? 1 : 0,
-        borderColor: borderColor,
-        width: fullWidth ? '100%' : undefined,
-        transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
-      })}
+      style={({ pressed }) => [
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: bg,
+          paddingHorizontal: size === 'sm' ? 12 : 18,
+          paddingVertical: size === 'sm' ? 8 : isPrimary ? 12 : 10,
+          minHeight,
+          borderRadius,
+          opacity: isDisabled ? 0.5 : 1,
+          borderWidth: borderColor !== 'transparent' ? 1 : 0,
+          borderColor: borderColor,
+          width: fullWidth ? '100%' : undefined,
+          transform: [{ scale: pressed && !isDisabled ? 0.98 : 1 }],
+        },
+        customStyle,
+      ]}
       accessibilityRole="button"
       accessibilityLabel={title}
     >
@@ -90,7 +96,17 @@ export function Button({
           {icon && iconPosition === 'left' && (
             <Ionicons name={icon} size={iconSize} color={textColor} style={{ marginRight: 8 }} />
           )}
-          <Text style={{ color: textColor, fontSize, fontFamily: fonts.sansSemiBold }}>
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={{
+              color: textColor,
+              fontSize,
+              fontFamily: fonts.sansSemiBold,
+              textAlign: 'center',
+              flexShrink: 1,
+            }}
+          >
             {title}
           </Text>
           {icon && iconPosition === 'right' && (

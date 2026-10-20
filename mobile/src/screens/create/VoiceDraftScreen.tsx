@@ -250,10 +250,10 @@ export function VoiceDraftScreen({ navigation }: any) {
           [currentQ.id]: res.transcript.trim(),
         }));
       } else {
-        setErrorMessage('Could not transcribe, please type your answer.');
+        setErrorMessage("Couldn't transcribe");
       }
     } catch (err: any) {
-      setErrorMessage('Could not transcribe, please type your answer.');
+      setErrorMessage("Couldn't transcribe");
     } finally {
       setIsTranscribing(false);
     }
@@ -687,17 +687,21 @@ export function VoiceDraftScreen({ navigation }: any) {
               <Ionicons name="alert-circle-outline" size={20} color={colors.danger} style={{ marginRight: 8, marginTop: 1 }} />
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 14, fontFamily: fonts.sansSemiBold, color: colors.danger }}>
-                  Microphone or Recording Unavailable
+                  {permissionStatus === 'denied'
+                    ? 'Microphone permission needed'
+                    : "Couldn't transcribe"}
                 </Text>
                 <BodyText style={{ fontSize: 13, color: colors.danger, marginTop: 4, lineHeight: 18 }}>
-                  {errorMessage || 'Microphone permission was denied. You can proceed with demo mode using a pre-recorded campaign sample or create manually.'}
+                  {permissionStatus === 'denied'
+                    ? 'Microphone permission was denied. You can proceed with demo mode using a pre-recorded campaign sample or create manually.'
+                    : 'You can type your answer below or use demo mode.'}
                 </BodyText>
               </View>
             </View>
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Button
-                  title="Use Demo Mode"
+                  title="Demo mode"
                   variant="primary"
                   size="sm"
                   icon="sparkles-outline"
@@ -705,9 +709,9 @@ export function VoiceDraftScreen({ navigation }: any) {
                   fullWidth
                 />
               </View>
-              <View style={{ flex: 1 }}>
+              <View style={{ flex: 1, minWidth: 0 }}>
                 <Button
-                  title="Create Manually"
+                  title="Create manually"
                   variant="secondary"
                   size="sm"
                   icon="create-outline"
