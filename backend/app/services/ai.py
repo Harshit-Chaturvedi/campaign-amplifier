@@ -1,6 +1,7 @@
 import re
 import json
 import base64
+import time
 import httpx
 from typing import Dict, Any, List
 from fastapi import HTTPException, status
@@ -166,15 +167,27 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
             detail="Transcription service unavailable"
         )
 
+    if len(audio_bytes) > 10 * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Audio file exceeds maximum allowed size of 10MB"
+        )
+
     # Normalize to standard Gemini audio MIME types
     if mime_type in ["audio/m4a", "audio/x-m4a", "video/mp4"]:
         mime_type = "audio/mp4"
-    elif mime_type == "audio/x-wav":
+    elif mime_type in ["audio/x-wav", "audio/wave"]:
         mime_type = "audio/wav"
 
     b64_data = base64.b64encode(audio_bytes).decode("utf-8")
-    model_name = settings.GEMINI_MODEL or "gemini-3.8-flash"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+    primary_model = settings.GEMINI_MODEL or "gemini-3.8-flash"
+    fallback_model = "gemini-3.6-flash"
+
+    # Try primary model, retry once with fallback model on timeout or 5xx
+    models_to_try = [primary_model]
+    if fallback_model != primary_model:
+        models_to_try.append(fallback_model)
+
     headers = {
         "x-goog-api-key": settings.GEMINI_API_KEY,
         "Content-Type": "application/json",
@@ -191,47 +204,61 @@ async def transcribe_audio_with_gemini(audio_bytes: bytes, mime_type: str = "aud
                         }
                     },
                     {
-                        "text": (
-                            "Accurately transcribe the spoken words in this audio recording. "
-                            "Output ONLY the plain text transcript of what was spoken. "
-                            "Do not include conversational filler, introductory remarks, markdown formatting, or timestamps."
-                        )
+                        "text": "Transcribe this audio verbatim. Return only the text."
                     }
                 ]
             }
-        ]
+        ],
+        "generationConfig": {
+            "thinkingConfig": {
+                "thinkingBudget": 0
+            }
+        }
     }
 
     try:
-        try:
-            transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
-        except Exception:
-            transport = None
+        transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
+    except Exception:
+        transport = None
 
-        async with httpx.AsyncClient(transport=transport, timeout=45.0) as client:
-            res = await client.post(url, headers=headers, json=payload)
-            if res.status_code == 200:
-                data = res.json()
-                candidates = data.get("candidates", [])
-                if not candidates or "content" not in candidates[0]:
-                    raise HTTPException(
-                        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                        detail="No speech could be recognized in the audio"
-                    )
-                transcript = candidates[0]["content"]["parts"][0]["text"].strip()
-                return transcript
-            else:
-                logger.error("Gemini transcribe failed with status: %d", res.status_code)
-                raise HTTPException(
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail="Transcription service unavailable"
-                )
-    except HTTPException:
-        raise
-    except Exception as err:
-        logger.error("Gemini transcribe error: %s", type(err).__name__)
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Transcription service unavailable"
-        )
+    for attempt, model_name in enumerate(models_to_try):
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+        start_time = time.perf_counter()
+        try:
+            async with httpx.AsyncClient(transport=transport, timeout=20.0) as client:
+                res = await client.post(url, headers=headers, json=payload)
+                elapsed = time.perf_counter() - start_time
+
+                if res.status_code == 200:
+                    logger.info("model=%s status=%s latency=%.2fs", model_name, res.status_code, elapsed)
+                    data = res.json()
+                    candidates = data.get("candidates", [])
+                    if not candidates or "content" not in candidates[0]:
+                        raise HTTPException(
+                            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail="No speech could be recognized in the audio"
+                        )
+                    transcript = candidates[0]["content"]["parts"][0]["text"].strip()
+                    return transcript
+                else:
+                    logger.warning("model=%s status=%s latency=%.2fs", model_name, res.status_code, elapsed)
+                    if attempt < len(models_to_try) - 1:
+                        continue
+        except HTTPException:
+            raise
+        except (httpx.TimeoutException, httpx.RequestError) as err:
+            elapsed = time.perf_counter() - start_time
+            logger.warning("model=%s status=timeout/network latency=%.2fs", model_name, elapsed)
+            if attempt < len(models_to_try) - 1:
+                continue
+        except Exception:
+            elapsed = time.perf_counter() - start_time
+            logger.warning("model=%s status=error latency=%.2fs", model_name, elapsed)
+            if attempt < len(models_to_try) - 1:
+                continue
+
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail="Transcription service unavailable"
+    )
 
